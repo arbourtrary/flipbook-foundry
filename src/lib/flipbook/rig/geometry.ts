@@ -328,7 +328,7 @@ function simplifyOpen(r: Ring, tol: number): Ring {
  */
 export function removeOverlaps(
 	cs: Contour[],
-	union: (...geoms: Ring[][][]) => Ring[][],
+	union: (...geoms: Ring[][]) => Ring[][],
 	tol = 0.8
 ): Contour[] {
 	if (cs.length === 0) return cs;

@@ -15,7 +15,9 @@ export default function Demo() {
 			<Stage style={{ height: 300, border: '1px solid' }} onUpdate={(_, s) => s.characters.forEach((c) => c.x > s.width + 50 && (c.x = -50))}>
 				<TextFlow text={'Pretext reflows this paragraph around every figure, every frame. '.repeat(8)} font="400 20px Georgia" x={16} y={16} width={700} lineHeight={28} />
 				{Array.from({ length: 8 }, (_, i) => (
-					<Figure key={i} ref={(c) => (crowd.current[i] = c)} animate={i % 2 ? 'run' : 'walk'} x={i * 90} y={120 + (i % 3) * 80} size={80} transition={{ phase: i / 8 }} />
+					<Figure key={i} ref={(c) => {
+						crowd.current[i] = c;
+					}} animate={i % 2 ? 'run' : 'walk'} x={i * 90} y={120 + (i % 3) * 80} size={80} transition={{ phase: i / 8 }} />
 				))}
 			</Stage>
 		</FlipbookConfig>

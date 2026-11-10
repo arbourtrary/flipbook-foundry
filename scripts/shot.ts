@@ -10,6 +10,7 @@ const browser = await chromium.launch({
 const page = await browser.newPage({ viewport: { width: +w, height: +h }, deviceScaleFactor: 1 });
 page.on('console', (m) => (m.type() === 'error' || m.type() === 'warning') && console.log(`[${m.type()}]`, m.text()));
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
+page.on('response', (r) => r.status() >= 400 && console.log('[http]', r.status(), r.url()));
 await page.goto(`http://localhost:${process.env.PORT ?? 5199}${path}`, { waitUntil: 'networkidle' });
 await page.waitForTimeout(+wait);
 await page.screenshot({ path: out, fullPage: process.env.FULL === '1' });

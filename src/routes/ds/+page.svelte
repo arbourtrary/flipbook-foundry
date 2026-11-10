@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { Text, Button, Link, Field, Stack, Row, Container, Rule } from '$lib/ds';
-	import { Flipbook, FlipbookField, listAnimations } from '$lib/flipbook';
+	import { Figure } from '$lib/flipbook/svelte';
 
 	let fieldValue = $state('');
 	let errorValue = $state('not-an-email');
-	const allAnimations = listAnimations();
 </script>
 
 <svelte:head>
@@ -68,7 +67,7 @@
 					<Button variant="primary" disabled>{#snippet children()}Disabled{/snippet}</Button>
 				</Row>
 				<Row gap="4" wrap>
-					<Button variant="primary" href="/usage">{#snippet children()}As link{/snippet}</Button>
+					<Button variant="primary" href="/docs">{#snippet children()}As link{/snippet}</Button>
 					<Button variant="secondary" href="/license">
 						{#snippet children()}Read license{/snippet}
 					</Button>
@@ -81,7 +80,7 @@
 				<Text variant="heading">Link</Text>
 				<Stack gap="3">
 					<Text variant="body">
-						An inline <Link href="/usage">internal link</Link> reads as part of the sentence,
+						An inline <Link href="/docs">internal link</Link> reads as part of the sentence,
 						not a button. An <Link href="https://github.com/chenglou/pretext" external>
 							external link
 						</Link> shows the marker.
@@ -144,76 +143,19 @@
 			<Rule />
 
 			<Stack gap="8">
-				<Text variant="heading">Flipbook primitive</Text>
+				<Text variant="heading">Figure</Text>
 				<Text variant="body" color="ink-2">
-					The animated font in isolation. Single glyph, cycling at the named animation's
-					framerate. Phase is randomized per instance unless you set it.
+					The motion primitive in isolation: one glyph, swapped for the next drawing at the action's
+					authored rate. Hover to cheer.
 				</Text>
-				<Row gap="8" align="center" wrap>
-					<Stack gap="2" align="center">
-						<Flipbook animation="walk" fps={14} size="120px" />
-						<Text variant="mono" color="ink-2">walk · 14 fps</Text>
-					</Stack>
-					<Stack gap="2" align="center">
-						<Flipbook animation="run" fps={20} size="120px" />
-						<Text variant="mono" color="ink-2">run · 20 fps</Text>
-					</Stack>
-					<Stack gap="2" align="center">
-						<Flipbook animation="jump" fps={12} size="120px" />
-						<Text variant="mono" color="ink-2">jump · 12 fps</Text>
-					</Stack>
-					<Stack gap="2" align="center">
-						<Flipbook animation="dance" fps={12} size="120px" />
-						<Text variant="mono" color="ink-2">dance · 12 fps</Text>
-					</Stack>
-				</Row>
-			</Stack>
-
-			<Rule />
-
-			<Stack gap="8">
-				<Text variant="heading">Every animation</Text>
-				<Text variant="body" color="ink-2">
-					{allAnimations.length} named animations shipped with the font. Each is just a
-					sequence of pose codepoints cycled at a framerate.
-				</Text>
-				<div class="anim-grid">
-					{#each allAnimations as anim}
+				<Row gap="8" align="end" wrap>
+					{#each ['walk', 'run', 'jump', 'dance'] as a}
 						<Stack gap="2" align="center">
-							<div class="anim-cell">
-								<Flipbook animation={anim} fps={6} size="80px" />
-							</div>
-							<Text variant="mono" color="ink-2">{anim}</Text>
+							<Figure animate={a} size={120} whileHover="cheer" transition={{ repeat: Infinity, repeatDelay: 0.5 }} />
+							<Text variant="mono" color="ink-2">{a}</Text>
 						</Stack>
 					{/each}
-				</div>
-			</Stack>
-
-			<Rule />
-
-			<Stack gap="8">
-				<Text variant="heading">FlipbookField</Text>
-				<Text variant="body" color="ink-2">
-					Pretext lays out the source text into lines. Each grapheme is replaced by an
-					absolutely-positioned Flipbook, with phase staggered by grapheme index. Resize the
-					window — the field reflows; the animation never stops.
-				</Text>
-				<Stack gap="6">
-					<FlipbookField
-						text="FLIPBOOK FOUNDRY"
-						animation="greet"
-						fps={6}
-						font='700 96px "Inter Tight"'
-						lineHeight={110}
-					/>
-					<FlipbookField
-						text="The quick brown fox jumps over a lazy dog"
-						animation="greet"
-						fps={5}
-						font='500 40px "Inter Tight"'
-						lineHeight={56}
-					/>
-				</Stack>
+				</Row>
 			</Stack>
 
 			<Rule />
@@ -261,19 +203,6 @@
 		background: var(--paper);
 	}
 
-	.anim-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-		gap: var(--space-6);
-	}
-	.anim-cell {
-		width: 100%;
-		height: 120px;
-		border: var(--hairline);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
 
 	.price {
 		color: var(--accent);

@@ -9,8 +9,9 @@
 				import('react'),
 				import('./Demo.tsx')
 			]);
-			root = createRoot(host);
-			root.render(createElement(Demo));
+			const r = createRoot(host);
+			r.render(createElement(Demo));
+			root = r;
 		})();
 		return () => root?.unmount();
 	});
