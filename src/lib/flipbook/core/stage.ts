@@ -22,6 +22,39 @@ export interface Prop {
 	data?: Record<string, unknown>;
 }
 
+/**
+ * A thing from the Flipbook Things font — a prop or a set piece. On the
+ * ground it stands at (x, y) like a figure; held, it rides a figure's hand
+ * (tools turn with the forearm, sacks hang). `frame` picks the drawing, so
+ * a sack can fill and a hole can deepen just by counting up.
+ */
+export interface Thing {
+	id: number;
+	name: string;
+	frame: number;
+	x: number;
+	y: number;
+	/** Font size in px. Defaults to the size figures are drawn at. */
+	size: number;
+	facing: 1 | -1;
+	/** On the ground: draw before ('back') or after ('front') the figures. A wall in front hides whoever is behind it. */
+	layer: 'back' | 'front';
+	held?: { by: Character; hand: 'L' | 'R'; behind?: boolean };
+	color?: string;
+	data?: Record<string, unknown>;
+}
+
+interface Flight {
+	item: { x: number; y: number; rotate?: number };
+	from: [number, number];
+	to: [number, number];
+	height: number;
+	t: number;
+	duration: number;
+	spin: number;
+	done: () => void;
+}
+
 export interface StageOptions {
 	library?: Library;
 	background?: string | null;
@@ -56,6 +89,8 @@ export class Stage {
 	readonly library: Library;
 	readonly characters: Character[] = [];
 	readonly props: Prop[] = [];
+	readonly things: Thing[] = [];
+	private flights: Flight[] = [];
 	options: Required<Omit<StageOptions, 'library'>>;
 	width = 0;
 	height = 0;
@@ -138,6 +173,54 @@ export class Stage {
 		return prop;
 	}
 
+	addThing(t: Partial<Thing> & { name: string }): Thing {
+		this.library.thing(t.name); // validate early
+		const thing: Thing = { id: propId++, frame: 0, x: 0, y: 0, size: 64, facing: 1, layer: 'back', ...t };
+		this.things.push(thing);
+		return thing;
+	}
+
+	removeThing(t: Thing) {
+		const i = this.things.indexOf(t);
+		if (i >= 0) this.things.splice(i, 1);
+	}
+
+	/** Put a thing in a figure's hand. `behind` draws it behind the figure. */
+	hold(t: Thing, by: Character, hand: 'L' | 'R' = 'R', behind = false) {
+		t.held = { by, hand, behind };
+	}
+
+	/** Let go: the thing lands on the ground under the hand that held it. */
+	drop(t: Thing) {
+		if (!t.held) return;
+		const { by, hand } = t.held;
+		t.x = by.anchor(hand === 'L' ? 'handL' : 'handR')[0];
+		t.y = by.y;
+		t.facing = by.facing;
+		t.held = undefined;
+	}
+
+	/**
+	 * Throw a prop or thing along an arc to `to` (stage px). `height` is how
+	 * far above the higher end the arc peaks; `spin` is turns per flight.
+	 */
+	fly(item: Prop | Thing, opts: { to: [number, number]; height?: number; duration?: number; spin?: number }): Promise<void> {
+		if ('held' in item && item.held) this.drop(item);
+		if ('attach' in item) item.attach = undefined;
+		return new Promise((done) =>
+			this.flights.push({
+				item: item as Flight['item'],
+				from: [item.x, item.y],
+				to: opts.to,
+				height: opts.height ?? 80,
+				t: 0,
+				duration: (opts.duration ?? 0.6) * 1000,
+				spin: opts.spin ?? 0,
+				done
+			})
+		);
+	}
+
 	removeProp(p: Prop) {
 		const i = this.props.indexOf(p);
 		if (i >= 0) this.props.splice(i, 1);
@@ -202,6 +285,22 @@ export class Stage {
 	private tick = (data: FrameData) => {
 		const t0 = performance.now();
 		for (const c of this.characters) c.update(data.delta);
+		for (let i = this.flights.length - 1; i >= 0; i--) {
+			const f = this.flights[i];
+			f.t += data.delta;
+			const u = Math.min(1, f.t / f.duration);
+			const top = Math.min(f.from[1], f.to[1]) - f.height;
+			// Quadratic Bézier through a control point that peaks at `top`.
+			const cx = (f.from[0] + f.to[0]) / 2;
+			const cy = 2 * top - (f.from[1] + f.to[1]) / 2;
+			f.item.x = (1 - u) * (1 - u) * f.from[0] + 2 * (1 - u) * u * cx + u * u * f.to[0];
+			f.item.y = (1 - u) * (1 - u) * f.from[1] + 2 * (1 - u) * u * cy + u * u * f.to[1];
+			if (f.spin) f.item.rotate = u * f.spin * Math.PI * 2;
+			if (u >= 1) {
+				this.flights.splice(i, 1);
+				f.done();
+			}
+		}
 		for (const c of this.characters) for (const b of c.behaviors) b(c, this, data.timestamp);
 		for (const h of this.hooks.update) h(data, this);
 		this.stats.updateMs = performance.now() - t0;
@@ -265,6 +364,11 @@ export class Stage {
 			}
 		}
 
+		// Who's holding what this frame.
+		const held = new Map<Character, Thing[]>();
+		for (const t of this.things) if (t.held) held.set(t.held.by, [...(held.get(t.held.by) ?? []), t]);
+		for (const t of this.things) if (!t.held && t.layer === 'back') this.drawThing(t, z);
+
 		const vx0 = camera.x - 200, vx1 = camera.x + this.width / camera.zoom + 200;
 		const vy0 = camera.y - 200, vy1 = camera.y + this.height / camera.zoom + 400;
 		ctx.textAlign = 'center';
@@ -282,6 +386,13 @@ export class Stage {
 			// A figure is a character: set the font, fillText the glyph.
 			// Mirroring is a flipped x axis around the figure's root.
 			ctx.setTransform(z * c.facing, 0, 0, z, X, Y);
+			const hands = held.get(c);
+			if (hands) {
+				for (const t of hands) if (t.held!.behind) this.drawHeld(t, c);
+				ctx.textAlign = 'center';
+				font = '';
+				fill = '';
+			}
 			if (col !== fill) ctx.fillStyle = fill = col;
 			const f = this.fontFor(c.layer, c.size);
 			if (f !== font) ctx.font = font = f;
@@ -296,10 +407,16 @@ export class Stage {
 				ctx.strokeText(c.glyph, 0, 0);
 			}
 			ctx.fillText(c.glyph, 0, 0);
+			if (hands) {
+				for (const t of hands) if (!t.held!.behind) this.drawHeld(t, c);
+				font = '';
+				fill = '';
+			}
 			c.dirty = false;
 			drawn++;
 		}
 		ctx.globalAlpha = 1;
+		for (const t of this.things) if (!t.held && t.layer === 'front') this.drawThing(t, z);
 		base();
 
 		for (const p of this.props) {
@@ -330,6 +447,36 @@ export class Stage {
 		this.stats.drawn = drawn;
 		this.stats.drawMs = performance.now() - t0;
 	};
+
+	private drawThing(t: Thing, z: number) {
+		const { ctx, camera } = this;
+		const info = this.library.thing(t.name);
+		ctx.setTransform(z * t.facing, 0, 0, z, (t.x - camera.x) * z, (t.y - camera.y) * z);
+		ctx.font = this.fontFor('things', t.size);
+		ctx.fillStyle = t.color ?? this.options.color;
+		ctx.textAlign = 'center';
+		ctx.fillText(this.library.thingGlyph(info, t.frame), 0, 0);
+	}
+
+	// Context is in the holder's (mirrored) space, origin at their root.
+	private drawHeld(t: Thing, c: Character) {
+		const { ctx } = this;
+		const lib = this.library;
+		const info = lib.thing(t.name);
+		const s = c.scale;
+		const ts = t.size / lib.unitsPerEm;
+		const [hx, hy] = lib.anchor(c.action, c.frame, t.held!.hand === 'L' ? 'handL' : 'handR');
+		const [gx, gy] = info.grip[Math.max(0, Math.min(info.frames - 1, Math.round(t.frame)))];
+		ctx.save();
+		ctx.translate(hx * s, -hy * s);
+		if (info.hold === 'forearm') ctx.rotate((-lib.forearm(c.action, c.frame, t.held!.hand) * Math.PI) / 180);
+		ctx.translate(-gx * ts, gy * ts);
+		ctx.font = this.fontFor('things', t.size);
+		ctx.fillStyle = t.color ?? this.options.color;
+		ctx.textAlign = 'center';
+		ctx.fillText(lib.thingGlyph(info, t.frame), 0, 0);
+		ctx.restore();
+	}
 
 	// Letter-as-body: the letter stands between pelvis and head-top, tilted
 	// with the spine. Context is already in the character's mirrored space.

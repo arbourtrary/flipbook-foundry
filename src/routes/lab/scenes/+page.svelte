@@ -8,6 +8,8 @@
 	import Bedtime from './Bedtime.svelte';
 	import ReadingRace from './ReadingRace.svelte';
 	import Queue from './Queue.svelte';
+	import LetterThief from './LetterThief.svelte';
+	import Dig from './Dig.svelte';
 
 	const lib = getLibrary();
 
@@ -114,6 +116,32 @@
 					</Text>
 				</Stack>
 			</header>
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">The Letter Thief</Text>
+					<Text variant="small" color="ink-2">
+						The sentence is real text. Each stolen letter is removed and pretext closes the gap, so the line slides toward the
+						thief. The wall and sack are glyphs from the Things font, and the sack grows a drawing per letter.
+					</Text>
+					<LetterThief />
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">Buried</Text>
+					<Text variant="small" color="ink-2">
+						The shovel is a glyph held in the hand and turned with the forearm. Every scoop draws the hole one frame deeper,
+						every toss the pile one frame taller.
+					</Text>
+					<Dig />
+				</Stack>
+			</section>
+
+			<Rule />
 
 			<section>
 				<Stack gap="4">

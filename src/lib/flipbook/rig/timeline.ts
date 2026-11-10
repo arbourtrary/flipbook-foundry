@@ -100,6 +100,10 @@ export interface Anchors {
 	spine: number;
 	headR: [number, number];
 	headRot: number;
+	// Forearm directions (deg, y-up, 0 = pointing +x): held props are drawn
+	// along these, so a shovel follows the hands through any action.
+	forearmL: number;
+	forearmR: number;
 }
 
 export interface BakedFrame {
@@ -490,9 +494,13 @@ function anchorsOf(j: Joints): Anchors {
 		shoulder: R(j.shoulder),
 		spine: Math.round((Math.atan2(j.shoulder[0] - j.pelvis[0], j.shoulder[1] - j.pelvis[1]) * 1800) / Math.PI) / 10,
 		headR: [Math.round(j.headRx), Math.round(j.headRy)],
-		headRot: Math.round((-j.headRot * 1800) / Math.PI) / 10
+		headRot: Math.round((-j.headRot * 1800) / Math.PI) / 10,
+		forearmL: deg(j.elbowL, j.handL),
+		forearmR: deg(j.elbowR, j.handR)
 	};
 }
+
+const deg = (a: Vec, b: Vec) => Math.round((Math.atan2(b[1] - a[1], b[0] - a[0]) * 1800) / Math.PI) / 10;
 
 // Smooth hand-off between two poses (used for generated in/out bridges).
 export function bridge(name: string, from: PoseInput, to: PoseInput, frames: number, ease: Ease = 'inOut'): ActionDef {

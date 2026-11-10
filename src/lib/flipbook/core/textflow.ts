@@ -43,7 +43,7 @@ export interface TextFlowOptions {
 	minGap?: number;
 	/** Space kept between text and obstacles. */
 	padding?: number;
-	align?: 'left' | 'center';
+	align?: 'left' | 'center' | 'right';
 }
 
 export interface TextFlow {
@@ -56,6 +56,12 @@ export interface TextFlow {
 	/** Ledges: the top edge of each word, for figures to stand on. */
 	ledges(): { x0: number; x1: number; y: number; text: string }[];
 	setText(text: string): void;
+	/**
+	 * Every visible letter with its index in the source text and where it
+	 * sits on screen — so a scene can pick a letter up, and remove it from
+	 * the text with setText() to let pretext close the gap.
+	 */
+	glyphs(): { index: number; char: string; x: number; y: number; width: number }[];
 	destroy(): void;
 }
 
@@ -80,6 +86,23 @@ export function createTextFlow(opts: TextFlowOptions): TextFlow {
 		},
 		destroy() {
 			if (typeof document !== 'undefined') document.fonts.removeEventListener('loadingdone', onFonts);
+		},
+		glyphs() {
+			const ctx = measureCtx(opts.font);
+			const out: { index: number; char: string; x: number; y: number; width: number }[] = [];
+			let ptr = 0;
+			for (const f of flow.fragments) {
+				const at = opts.text.indexOf(f.text, ptr);
+				if (at < 0) continue;
+				let prev = 0;
+				for (let k = 0; k < f.text.length; k++) {
+					const next = ctx ? ctx.measureText(f.text.slice(0, k + 1)).width : (k + 1) * 10;
+					if (f.text[k].trim()) out.push({ index: at + k, char: f.text[k], x: f.x + prev, y: f.y, width: next - prev });
+					prev = next;
+				}
+				ptr = at + f.text.length;
+			}
+			return out;
 		},
 		layout(obstacles = []) {
 			const { x, y, width, lineHeight } = opts;
@@ -117,7 +140,8 @@ export function createTextFlow(opts: TextFlowOptions): TextFlow {
 					}
 					const l = materializeLineRange(prepared, range);
 					const text = l.text.replace(/\s+$/, '');
-					const fx = opts.align === 'center' ? g0 + (g1 - g0 - l.width) / 2 : g0;
+					const free = g1 - g0 - l.width;
+					const fx = opts.align === 'center' ? g0 + free / 2 : opts.align === 'right' ? g0 + free : g0;
 					out.push({ text, x: fx, y: top + ascent + (lineHeight - ascent) * 0.35, width: l.width, line });
 					cursor = range.end;
 				}

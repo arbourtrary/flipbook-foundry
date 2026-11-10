@@ -14,6 +14,7 @@
 		['transition', 'Transition'],
 		['variants', 'Variants'],
 		['stage', 'Stage'],
+		['things', 'Things & props'],
 		['textflow', 'TextFlow'],
 		['animate', 'animate() & stagger()'],
 		['character', 'Character'],
@@ -104,6 +105,26 @@ stage.hitTest(x, y)                      // topmost Character or null
 stage.toStage(clientX, clientY)          // pointer → stage space
 stage.camera = { x, y, zoom }            // scroll and zoom big maps
 stage.stats                               // { fps, characters, drawn, updateMs, drawMs }`;
+
+	const thingsEx = `// Things are glyphs too: props and set pieces in the Flipbook Things font.
+// shovel · broom · sack (12 fullnesses) · hole (12 depths) · pile (12 sizes) · wall · clod
+await getLibrary().load(['regular', 'things']);
+
+const sack   = stage.addThing({ name: 'sack', x: 600, y: ground, size: 120 });
+const wall   = stage.addThing({ name: 'wall', x: 900, y: ground, layer: 'front' }); // hides who's behind
+const shovel = stage.addThing({ name: 'shovel', size: 120 });
+
+stage.hold(shovel, digger, 'R');      // tools turn with the forearm, every frame
+stage.hold(sack, thief, 'L', true);   // sacks hang; true draws it behind the figure
+stage.drop(sack);                     // lands under the hand
+sack.frame++;                         // a drawing fuller
+
+// Throw anything along an arc: a stolen letter, a clod of earth.
+const letter = stage.addProp({ text: 'A', font: '700 54px Georgia', x, y });
+await stage.fly(letter, { to: [sack.x, sack.y - 40], height: 90, spin: 1.5 });
+
+// Real letters as objects: where each one is, so you can take it.
+flow.glyphs();   // [{ index, char, x, y, width }, …]  then flow.setText(without it)`;
 
 	const flowEx = `<Stage style="height: 420px">
   <TextFlow
@@ -292,6 +313,19 @@ export const shrug: ActionDef = {
 								A canvas world. Each figure is one <code>fillText</code> of its current glyph, depth-sorted by its ground line and skipped when offscreen; a stage that's scrolled out of view stops painting. A thousand figures draw in a few milliseconds.
 							</Text>
 							<Code code={stageEx} />
+						</Stack>
+					</section>
+
+					<section id="things">
+						<Stack gap="4">
+							<Text variant="heading">Things & props</Text>
+							<Text variant="body">
+								Glyphs don't have to be people. The Things font holds props and set pieces, some with frames of their own,
+								so a sack can fill and a hole can deepen. A held tool is drawn at the figure's hand and turned by the
+								forearm angle baked into every frame, so one shovel works with every action. Events like <code>scoop</code>,
+								<code>toss</code>, <code>grab</code> and <code>release</code> are the beats you sync to.
+							</Text>
+							<Code code={thingsEx} />
 						</Stack>
 					</section>
 

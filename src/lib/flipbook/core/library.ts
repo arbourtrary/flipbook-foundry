@@ -3,7 +3,7 @@
 import defaultManifest from '../generated/manifest.json';
 
 export type Hub = 'stand' | 'crouch' | 'sit' | 'lie' | 'perch' | 'hang';
-export type Layer = 'regular' | 'bold' | 'limbs' | 'limbs-bold';
+export type Layer = 'regular' | 'bold' | 'limbs' | 'limbs-bold' | 'things';
 export type AnchorName = 'head' | 'top' | 'handL' | 'handR' | 'footL' | 'footR' | 'pelvis' | 'shoulder';
 
 export interface ActionInfo {
@@ -31,6 +31,17 @@ export interface ActionInfo {
 	anchors?: number[][];
 }
 
+export interface ThingInfo {
+	name: string;
+	start: number;
+	frames: number;
+	/** 'forearm' tools follow the forearm; 'hang' things hang from the hand; 'none' stand on the ground. */
+	hold: 'forearm' | 'hang' | 'none';
+	description: string;
+	/** Grip point per frame, font units from the thing's bottom-centre origin. */
+	grip: [number, number][];
+}
+
 interface Chunk {
 	file: string;
 	from: number;
@@ -47,6 +58,7 @@ export interface Manifest {
 	extents?: { left: number; right: number; top: number; bottom: number };
 	layers: Record<Layer, { family: string; style: string; weight: number; parts: string; file: string; chunks?: Chunk[] | null }>;
 	actions: Record<string, Omit<ActionInfo, 'name'>>;
+	things?: Record<string, Omit<ThingInfo, 'name'>>;
 }
 
 const ANCHOR_INDEX: Record<AnchorName, number> = {
@@ -78,6 +90,11 @@ export interface Library {
 	/** Furthest ink [behind, ahead] of the pelvis over all frames (font units). */
 	reach(action: ActionInfo): [number, number];
 	headRot(action: ActionInfo, frame: number): number;
+	/** Forearm direction in degrees (y-up, 0 = +x), for drawing held tools. 0 until anchors load. */
+	forearm(action: ActionInfo, frame: number, hand: 'L' | 'R'): number;
+	thing(name: string): ThingInfo;
+	thingNames(): string[];
+	thingGlyph(thing: ThingInfo, frame: number): string;
 	/** Transition actions that carry a figure from one hub to another. */
 	route(from: Hub, to: Hub): ActionInfo[];
 	/** CSS font-family + weight for a layer. */
@@ -151,6 +168,14 @@ export function createLibrary(manifest: Manifest = defaultManifest as unknown as
 		spine: (action, frame) => action.anchors?.[frame][16] ?? 0,
 		reach: (action) => action.reach,
 		headRot: (action, frame) => action.anchors?.[frame][17] ?? 0,
+		forearm: (action, frame, hand) => action.anchors?.[frame][hand === 'L' ? 20 : 21] ?? -90,
+		thing(name) {
+			const t = manifest.things?.[name];
+			if (!t) throw new Error(`[flipbook] Unknown thing "${name}". Try one of: ${Object.keys(manifest.things ?? {}).join(', ')}`);
+			return { name, ...t };
+		},
+		thingNames: () => Object.keys(manifest.things ?? {}),
+		thingGlyph: (t, frame) => String.fromCharCode(t.start + Math.max(0, Math.min(t.frames - 1, Math.round(frame)))),
 		route(from, to) {
 			if (from === to) return [];
 			const key = `${from}>${to}`;

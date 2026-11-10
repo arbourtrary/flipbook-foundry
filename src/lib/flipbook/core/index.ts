@@ -8,6 +8,7 @@ export {
 	type Hub,
 	type Layer,
 	type AnchorName,
+	type ThingInfo,
 	type Manifest
 } from './library';
 export {
@@ -20,7 +21,7 @@ export {
 	type Variants,
 	type PlaybackControls
 } from './character';
-export { Stage, createStage, type StageOptions, type Prop, type StageStats } from './stage';
+export { Stage, createStage, type StageOptions, type Prop, type Thing, type StageStats } from './stage';
 export { animate, stagger, type AnimateOptions, type SequenceStep } from './animate';
 export { InlineFigure, mountFigure, gestures, type InlineOptions } from './inline';
 export { Page, createPage, type PageOptions } from './page';

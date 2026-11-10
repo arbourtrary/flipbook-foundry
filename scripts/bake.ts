@@ -16,6 +16,7 @@ import { bake, type BakedAction } from '../src/lib/flipbook/rig/timeline.ts';
 import { emit, bounds, removeOverlaps } from '../src/lib/flipbook/rig/geometry.ts';
 import polygonClipping from 'polygon-clipping';
 import { BUILD, type Parts } from '../src/lib/flipbook/rig/skeleton.ts';
+import { THINGS } from '../src/lib/flipbook/rig/things.ts';
 import { exportWoff2 } from '../src/lib/font/exportWoff2.ts';
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -152,13 +153,14 @@ async function main() {
 					height: Math.ceil(Math.max(...baked.frames.map((f) => bounds(f.contours).y1)))
 				};
 				// Flattened per frame: head(x,y) top(x,y) handL handR footL footR
-				// pelvis shoulder → 16 ints, then spine°, headRot°, headRx, headRy.
+				// pelvis shoulder → 16 ints, then spine°, headRot°, headRx, headRy,
+				// forearmL°, forearmR°.
 				anchorsOut[def.name] = baked.frames.map((f) => {
 					const a = f.anchors;
 					return [
 						...a.head, ...a.top, ...a.handL, ...a.handR,
 						...a.footL, ...a.footR, ...a.pelvis, ...a.shoulder,
-						a.spine, a.headRot, a.headR[0], a.headR[1]
+						a.spine, a.headRot, a.headR[0], a.headR[1], a.forearmL, a.forearmR
 					];
 				});
 			}
@@ -197,6 +199,35 @@ async function main() {
 		console.log(`${layer.id}: ${glyphs.length} glyphs · ${(otf.byteLength / 1024).toFixed(0)}KB otf · ${(woff2.byteLength / 1024).toFixed(0)}KB woff2`);
 	}
 
+	// Things: props and set pieces in their own font, after the figures.
+	const thingsOut: Record<string, unknown> = {};
+	if (!variant) {
+		const glyphs = [notdef()];
+		let tcp = 0xf000;
+		for (const t of THINGS) {
+			thingsOut[t.name] = {
+				start: tcp,
+				frames: t.frames,
+				hold: t.hold,
+				description: t.description,
+				grip: Array.from({ length: t.frames }, (_, i) => t.grip(i).map(Math.round))
+			};
+			for (let i = 0; i < t.frames; i++) {
+				const path = new opentype.Path();
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				emit(removeOverlaps(t.draw(i), polygonClipping.union as any), path, ADVANCE / 2);
+				glyphs.push(new opentype.Glyph({ name: `${t.name}.${i}`, unicode: tcp++, advanceWidth: ADVANCE, path }));
+			}
+		}
+		const font = new opentype.Font({ familyName: 'Flipbook Things', styleName: 'Regular', unitsPerEm: UPM, ascender: ASCENDER, descender: DESCENDER, glyphs });
+		const otf = new Uint8Array(font.toArrayBuffer());
+		const woff2 = await exportWoff2(otf);
+		await writeFile(join(fontDir, 'flipbook-things.otf'), otf);
+		await writeFile(join(fontDir, 'flipbook-things.woff2'), woff2);
+		files.things = 'flipbook-things.woff2';
+		console.log(`things: ${glyphs.length} glyphs · ${(woff2.byteLength / 1024).toFixed(0)}KB woff2`);
+	}
+
 	const manifest = {
 		version: '',
 		unitsPerEm: UPM,
@@ -206,10 +237,14 @@ async function main() {
 		extents: { left: Math.floor(ext.left), right: Math.ceil(ext.right), top: Math.ceil(ext.top), bottom: Math.floor(ext.bottom) },
 		build,
 		label: variant ? VARIANTS[variant].label : 'Flipbook',
-		layers: Object.fromEntries(
-			LAYERS.map((l) => [l.id, { family: l.family, style: l.style, weight: l.weight, parts: l.parts, file: files[l.id], chunks: chunkFiles[l.id] ?? null }])
-		),
-		actions: manifestActions
+		layers: {
+			...Object.fromEntries(
+				LAYERS.map((l) => [l.id, { family: l.family, style: l.style, weight: l.weight, parts: l.parts, file: files[l.id], chunks: chunkFiles[l.id] ?? null }])
+			),
+			...(files.things ? { things: { family: 'Flipbook Things', style: 'Regular', weight: 22, parts: 'things', file: files.things, chunks: null } } : {})
+		},
+		actions: manifestActions,
+		things: thingsOut
 	};
 	const json = JSON.stringify(manifest);
 	manifest.version = createHash('sha256').update(json).digest('hex').slice(0, 10);

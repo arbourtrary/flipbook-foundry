@@ -13,6 +13,21 @@ import { ACTIONS } from '../src/lib/flipbook/rig/actions/index.ts';
 import { HUBS } from '../src/lib/flipbook/rig/actions/hubs.ts';
 import { bake } from '../src/lib/flipbook/rig/timeline.ts';
 import { toSvgD } from '../src/lib/flipbook/rig/geometry.ts';
+import { THINGS } from '../src/lib/flipbook/rig/things.ts';
+
+// PROP=shovel (or PROP=sack:L) draws a held thing at the figure's hand on
+// every frame, the same way the runtime will.
+const [propName, propHand = 'R'] = (process.env.PROP ?? '').split(':');
+const prop = THINGS.find((t) => t.name === propName);
+const PROP_FRAME = Number(process.env.PROP_FRAME ?? 0);
+function propSvg(a: { handL: number[]; handR: number[]; forearmL: number; forearmR: number }, dx: number) {
+	if (!prop) return '';
+	const hand = propHand === 'L' ? a.handL : a.handR;
+	const ang = prop.hold === 'forearm' ? (propHand === 'L' ? a.forearmL : a.forearmR) : 0;
+	const [gx, gy] = prop.grip(PROP_FRAME);
+	// SVG is y-down: rotate by −angle; draw the thing with its grip at the hand.
+	return `<g transform="translate(${hand[0] + dx} ${BASE - hand[1]}) rotate(${-ang})"><path d="${toSvgD(prop.draw(PROP_FRAME), 0, -gx).replace(/([ML]|C)/g, '$1')}" transform="translate(0 ${gy})" fill="#c30"/></g>`;
+}
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = process.env.SHEET_OUT ?? join(repo, '.sheets');
@@ -52,6 +67,7 @@ function sheet(def: (typeof ACTIONS)[number]) {
 			<rect width="${CELL}" height="${CELL}" fill="none" stroke="#ddd" stroke-width="4"/>
 			<line x1="0" x2="${CELL}" y1="${BASE}" y2="${BASE}" stroke="#bbb" stroke-width="4"/>
 			<path d="${toSvgD(f.contours, BASE, CELL / 2)}" fill="#111"/>
+			${propSvg(f.anchors as never, CELL / 2)}
 			<text x="20" y="70" font-size="60" fill="#999" font-family="monospace">${i}</text>
 		</g>`;
 	});
