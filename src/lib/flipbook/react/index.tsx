@@ -198,6 +198,8 @@ export interface FigureProps {
 	color?: string;
 	body?: { char: string; font: string; color?: string };
 	travel?: boolean;
+	/** Stage only: a thing from the Things font in this figure's hand. */
+	holding?: { thing: string; hand?: 'L' | 'R'; behind?: boolean; frame?: number; size?: number };
 	className?: string;
 	style?: CSSProperties;
 	ref?: Ref<Character | null>;
@@ -257,6 +259,14 @@ export function Figure(props: FigureProps) {
 			c.on('complete', (e) => latest.current.onAnimationComplete?.(e.action)),
 			c.on('frame', (e) => e.event && latest.current.onEvent?.(e.event, e.action))
 		];
+		const h = latest.current.holding;
+		if (handle && h) {
+			handle.whenReady((st) => {
+				const t = st.addThing({ name: h.thing, frame: h.frame ?? 0, size: h.size ?? c.size });
+				st.hold(t, c, h.hand ?? 'R', h.behind);
+				offs.push(() => st.removeThing(t));
+			});
+		}
 		if (inline && (props.whileHover || props.whileTap)) {
 			offs.push(gestures(span.current!, c, { whileHover: props.whileHover, whileTap: props.whileTap, rest: () => latest.current.animate }));
 		}
@@ -404,4 +414,39 @@ export function Page({ className, style, ...opts }: PageProps) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [key]);
 	return <canvas ref={canvas} className={className} style={{ display: 'block', width: '100%', ...style }} />;
+}
+
+// ----- things -----
+
+export interface ThingProps {
+	name: string;
+	frame?: number;
+	x?: number;
+	y?: number;
+	size?: number;
+	facing?: 1 | -1;
+	layer?: 'back' | 'front';
+}
+
+/** A prop or set piece from the Things font, standing on the enclosing Stage. */
+export function Thing(props: ThingProps) {
+	const handle = useContext(StageContext);
+	if (!handle) throw new Error('[flipbook] <Thing> must be inside a <Stage>');
+	const ref = useRef<import('../core').Thing | null>(null);
+	useEffect(() => {
+		let alive = true;
+		handle.whenReady((st) => {
+			if (!alive) return;
+			ref.current = st.addThing({ size: 64, ...props });
+		});
+		return () => {
+			alive = false;
+			if (ref.current) handle.stage?.removeThing(ref.current);
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [handle, props.name]);
+	useEffect(() => {
+		if (ref.current) Object.assign(ref.current, props);
+	});
+	return null;
 }

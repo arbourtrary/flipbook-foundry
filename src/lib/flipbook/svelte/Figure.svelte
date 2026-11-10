@@ -33,6 +33,8 @@
 		body?: { char: string; font: string; color?: string };
 		/** Inline only: let root motion move the element. */
 		travel?: boolean;
+		/** Stage only: a thing from the Things font in this figure's hand. */
+		holding?: { thing: string; hand?: 'L' | 'R'; behind?: boolean; frame?: number; size?: number };
 		character?: Character | null;
 		onAnimationStart?: (action: string) => void;
 		onAnimationComplete?: (action: string) => void;
@@ -56,6 +58,7 @@
 		color,
 		body,
 		travel = false,
+		holding,
 		character = $bindable(null),
 		onAnimationStart,
 		onAnimationComplete,
@@ -99,6 +102,16 @@
 		}
 		const c = character!;
 		const offs: (() => void)[] = [];
+		if (stage && holding) {
+			const h = holding;
+			const give = () => {
+				if (!stage.stage) return void requestAnimationFrame(give);
+				const t = stage.stage.addThing({ name: h.thing, frame: h.frame ?? 0, size: h.size ?? c.size });
+				stage.stage.hold(t, c, h.hand ?? 'R', h.behind);
+				offs.push(() => stage.stage?.removeThing(t));
+			};
+			give();
+		}
 		if (onAnimationStart) offs.push(c.on('start', (p) => onAnimationStart(p.action)));
 		if (onAnimationComplete) offs.push(c.on('complete', (p) => onAnimationComplete(p.action)));
 		if (onEvent) offs.push(c.on('frame', (p) => p.event && onEvent(p.event, p.action)));
