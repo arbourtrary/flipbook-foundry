@@ -13,6 +13,7 @@ import {
 	walkRichInlineLineRanges,
 	type RichInlineItem
 } from '@chenglou/pretext/rich-inline';
+import { clearCache } from '@chenglou/pretext';
 import { Character, type Transition } from './character';
 import { cancelFrame, frame, type FrameData } from './frameloop';
 import { type Layer, type Library, getLibrary } from './library';
@@ -36,6 +37,8 @@ interface Run {
 	text: string;
 	font: string;
 	x: number;
+	/** Room reserved before a figure for ink that reaches behind it. */
+	pad: number;
 	y: number;
 	figure: Character | null;
 }
@@ -47,6 +50,7 @@ export class Page {
 	private opts: PageOptions;
 	private library: Library;
 	private items: RichInlineItem[] = [];
+	private itemPad: number[] = [];
 	private itemFigure: (Character | null)[] = [];
 	private runs: Run[] = [];
 	private width = 0;
@@ -62,6 +66,13 @@ export class Page {
 		this.setText(opts.text);
 		this.ro = new ResizeObserver(() => this.layout());
 		this.ro.observe(canvas);
+		// Canvas-only web fonts aren't fetched until asked for. Ask for the
+		// exact font, and re-measure whenever any font finishes loading.
+		// pretext caches widths by font string, and the string is the same
+		// before and after the font arrives — so the cache must be cleared,
+		// or it keeps the fallback font's widths and the spacing goes wrong.
+		document.fonts.load(opts.font).then(this.relayout);
+		document.fonts.addEventListener('loadingdone', this.relayout);
 		frame.update(this.tick, true);
 		frame.render(this.paint, true);
 	}
@@ -76,8 +87,11 @@ export class Page {
 		this.figures.length = 0;
 		this.items = [];
 		this.itemFigure = [];
+		this.itemPad = [];
 		const { family, weight } = this.library.css(this.opts.layer ?? 'regular');
-		const figureFont = `${weight} ${Math.round(this.fontSize * (this.opts.figureScale ?? 1.3))}px "${family}"`;
+		const figurePx = Math.round(this.fontSize * (this.opts.figureScale ?? 1.3));
+		const figureFont = `${weight} ${figurePx}px "${family}"`;
+		const unit = figurePx / this.library.unitsPerEm;
 		// Split on {action} tokens; everything else is ordinary text.
 		const parts = text.split(/(\{[a-z-]+\})/g);
 		parts.forEach((part, i) => {
@@ -90,11 +104,21 @@ export class Page {
 					transition: { inPlace: true, phase: (i * 0.37) % 1, ...(a.loop ? {} : { repeat: Infinity, repeatDelay: 0.8 }), ...this.opts.transition }
 				});
 				this.figures.push(c);
-				this.items.push({ text: c.glyph, font: figureFont, break: 'never' });
+				// Every drawing shares one advance, but a sprawl or a stride can
+				// reach past it. Reserve the action's widest reach, so the figure
+				// never touches the words beside it and the layout still never
+				// changes from frame to frame.
+				const [back, ahead] = this.library.reach(a);
+				const half = this.library.advance / 2;
+				const padL = Math.max(0, back - half) * unit;
+				const padR = Math.max(0, ahead - half) * unit;
+				this.items.push({ text: c.glyph, font: figureFont, break: 'never', extraWidth: padL + padR });
 				this.itemFigure.push(c);
+				this.itemPad.push(padL);
 			} else if (part) {
 				this.items.push({ text: part, font: this.opts.font });
 				this.itemFigure.push(null);
+				this.itemPad.push(0);
 			}
 		});
 		this.layout();
@@ -116,7 +140,8 @@ export class Page {
 			for (const f of l.fragments) {
 				x += f.gapBefore;
 				const item = this.items[f.itemIndex];
-				runs.push({ text: f.text, font: item.font, x, y: baseline, figure: this.itemFigure[f.itemIndex] });
+				const pad = this.itemPad[f.itemIndex];
+				runs.push({ text: f.text, font: item.font, x: x + pad, pad, y: baseline, figure: this.itemFigure[f.itemIndex] });
 				x += f.occupiedWidth;
 			}
 			line++;
@@ -154,7 +179,13 @@ export class Page {
 		}
 	};
 
+	private relayout = () => {
+		clearCache();
+		this.layout();
+	};
+
 	destroy() {
+		document.fonts.removeEventListener('loadingdone', this.relayout);
 		this.ro?.disconnect();
 		cancelFrame(this.tick);
 		cancelFrame(this.paint);

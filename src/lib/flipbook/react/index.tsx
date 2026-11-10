@@ -322,12 +322,14 @@ export function TextFlow(props: TextFlowProps) {
 	latest.current = props;
 	useEffect(() => {
 		let off: (() => void) | null = null;
+		let flowRef: { destroy(): void } | null = null;
 		let alive = true;
-		document.fonts.ready.then(() =>
+		document.fonts.load(latest.current.font).then(() =>
 			handle.whenReady((stage) => {
 				if (!alive) return;
 				const p = latest.current;
 				const flow = createTextFlow({ text: p.text, font: p.font, x: p.x ?? 0, y: p.y ?? 0, width: p.width, lineHeight: p.lineHeight, padding: p.padding });
+				flowRef = flow;
 				off = stage.onBeforeDraw((_, s) => {
 					const q = latest.current;
 					Object.assign(flow.options, { x: q.x ?? 0, y: q.y ?? 0, width: q.width, lineHeight: q.lineHeight });
@@ -341,6 +343,7 @@ export function TextFlow(props: TextFlowProps) {
 		return () => {
 			alive = false;
 			off?.();
+			flowRef?.destroy();
 		};
 	}, [handle]);
 	return null;

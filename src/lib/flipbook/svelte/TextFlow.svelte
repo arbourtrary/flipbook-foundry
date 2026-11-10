@@ -55,10 +55,11 @@
 			if (handle.stage) attach(handle.stage);
 			else raf = requestAnimationFrame(wait);
 		};
-		document.fonts.ready.then(wait);
+		document.fonts.load(font).then(wait);
 		return () => {
 			cancelAnimationFrame(raf);
 			off?.();
+			flow?.destroy();
 		};
 	});
 </script>

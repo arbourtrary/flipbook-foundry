@@ -7,6 +7,7 @@
 // platforms: each word is a ledge a figure can stand, sit or hang on.
 
 import {
+	clearCache,
 	layoutNextLineRange,
 	materializeLineRange,
 	prepareWithSegments,
@@ -55,11 +56,20 @@ export interface TextFlow {
 	/** Ledges: the top edge of each word, for figures to stand on. */
 	ledges(): { x0: number; x1: number; y: number; text: string }[];
 	setText(text: string): void;
+	destroy(): void;
 }
 
 export function createTextFlow(opts: TextFlowOptions): TextFlow {
 	let prepared: PreparedTextWithSegments = prepareWithSegments(opts.text, opts.font);
-	const ascent = ascentOf(opts.font);
+	let ascent = ascentOf(opts.font);
+	// Re-measure when a web font lands: pretext caches widths per font
+	// string, which doesn't change when the real font replaces the fallback.
+	const onFonts = () => {
+		clearCache();
+		prepared = prepareWithSegments(opts.text, opts.font);
+		ascent = ascentOf(opts.font);
+	};
+	if (typeof document !== 'undefined') document.fonts.addEventListener('loadingdone', onFonts);
 	const flow: TextFlow = {
 		options: opts,
 		fragments: [],
@@ -67,6 +77,9 @@ export function createTextFlow(opts: TextFlowOptions): TextFlow {
 		setText(text) {
 			opts.text = text;
 			prepared = prepareWithSegments(text, opts.font);
+		},
+		destroy() {
+			if (typeof document !== 'undefined') document.fonts.removeEventListener('loadingdone', onFonts);
 		},
 		layout(obstacles = []) {
 			const { x, y, width, lineHeight } = opts;

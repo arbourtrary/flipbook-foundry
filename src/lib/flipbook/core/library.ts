@@ -62,6 +62,8 @@ export interface Library {
 	/** Anchor in font units, glyph-local (pelvis x = 0, ground y = 0, y-up). */
 	anchor(action: ActionInfo, frame: number, name: AnchorName): [number, number];
 	spine(action: ActionInfo, frame: number): number;
+	/** Furthest ink [behind, ahead] of the pelvis over all frames (font units). */
+	reach(action: ActionInfo): [number, number];
 	headRot(action: ActionInfo, frame: number): number;
 	/** Transition actions that carry a figure from one hub to another. */
 	route(from: Hub, to: Hub): ActionInfo[];
@@ -74,6 +76,7 @@ export function createLibrary(manifest: Manifest = defaultManifest as unknown as
 	const actions = new Map<string, ActionInfo>();
 	for (const [name, a] of Object.entries(manifest.actions)) actions.set(name, { name, ...a });
 	const glyphCache = new Map<ActionInfo, string[]>();
+	const reachCache = new Map<ActionInfo, [number, number]>();
 
 	// Hub graph: one-shot actions whose from ≠ to are edges. Prefer the
 	// shortest (fewest frames) when two actions connect the same hubs.
@@ -118,6 +121,24 @@ export function createLibrary(manifest: Manifest = defaultManifest as unknown as
 			return [a[i], a[i + 1]];
 		},
 		spine: (action, frame) => action.anchors[frame][16],
+		reach(action) {
+			let r = reachCache.get(action);
+			if (!r) {
+				const half = (manifest.layers.regular?.weight ?? 30) / 2;
+				let back = 0, ahead = 0;
+				for (const a of action.anchors) {
+					for (let i = 0; i < 16; i += 2) {
+						// Head is a disc, not a point.
+						const rad = i === 0 ? Math.max(a[18], a[19]) : half;
+						back = Math.max(back, rad - a[i]);
+						ahead = Math.max(ahead, a[i] + rad);
+					}
+				}
+				r = [back, ahead];
+				reachCache.set(action, r);
+			}
+			return r;
+		},
 		headRot: (action, frame) => action.anchors[frame][17],
 		route(from, to) {
 			if (from === to) return [];
