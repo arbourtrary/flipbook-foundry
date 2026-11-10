@@ -17,6 +17,10 @@ export interface ActionInfo {
 	from: Hub;
 	to: Hub;
 	floor: boolean;
+	/** Ground-line moves [before first frame, after last frame], font units, + = up. */
+	baseline: [number, number];
+	/** Action that automatically follows this one-shot. */
+	next: string | null;
 	dx: number[];
 	air: number[];
 	events: Record<number, string>;

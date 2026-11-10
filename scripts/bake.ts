@@ -91,6 +91,8 @@ async function main() {
 					from: def.from ?? 'stand',
 					to: def.to ?? def.from ?? 'stand',
 					floor: def.floor !== false,
+					baseline: [def.baseline?.start ?? 0, def.baseline?.end ?? 0],
+					next: def.next ?? null,
 					dx: baked.frames.map((f) => Math.round(f.dx * 10) / 10),
 					air: baked.frames.map((f) => Math.round(f.air)),
 					events,

@@ -11,6 +11,7 @@ import {
 	type Joints,
 	type Pose,
 	type PoseInput,
+	type Parts,
 	STAND,
 	drawFigure,
 	fk,
@@ -45,6 +46,7 @@ export type Category =
 	| 'emote'
 	| 'interaction'
 	| 'pratfall'
+	| 'transition'
 	| 'presence';
 
 export interface ActionDef {
@@ -72,6 +74,13 @@ export interface ActionDef {
 	// Hub this action starts from / ends on (default 'stand').
 	from?: Hub;
 	to?: Hub;
+	// Ground-line moves (font units, + = up) for actions drawn relative to a
+	// ledge: `start` applies before frame 0, `end` after the last frame.
+	// sit-on is drawn with the ledge as baseline, so it starts 180 up;
+	// hop-off lands on the floor 180 below, so it ends 180 down.
+	baseline?: { start?: number; end?: number };
+	// One-shot that hands straight on to another action (lift → carry).
+	next?: string;
 	// If false, ink may hang below the baseline — perching on a ledge or
 	// hanging from one, where y = 0 is the ledge rather than the floor.
 	floor?: boolean;
@@ -86,6 +95,11 @@ export interface Anchors {
 	footR: Vec;
 	pelvis: Vec;
 	shoulder: Vec;
+	// Spine angle (deg, + = leaning forward) and head radii/rotation, so a
+	// runtime can stand a letter in for the torso or head.
+	spine: number;
+	headR: [number, number];
+	headRot: number;
 }
 
 export interface BakedFrame {
@@ -238,7 +252,8 @@ export function sample(def: ActionDef): { pose: Pose; key: Key | null; vx?: numb
 		const fa = i === m - 1 && f < T[0] ? f + def.frames : f;
 		const b = at(i + 1);
 		let vx: number | undefined;
-		for (const k of ks) if (k.key.at <= f && k.key.vx !== undefined) vx = k.key.vx;
+		// vx: NaN on a later key releases the override back to foot-lock.
+		for (const k of ks) if (k.key.at <= f && k.key.vx !== undefined) vx = Number.isNaN(k.key.vx) ? undefined : k.key.vx;
 		const key = T[i] === f ? ks[i].key : null;
 		if (!b) {
 			out.push({ pose: ks[i].pose, key, vx });
@@ -288,7 +303,16 @@ function minInk(j: Joints, w: number) {
 	return m;
 }
 
-export function bake(def: ActionDef, build: Build = BUILD, weight = build.weight): BakedAction {
+export interface BakeOptions {
+	build?: Build;
+	weight?: number;
+	parts?: Parts;
+}
+
+export function bake(def: ActionDef, opts: BakeOptions = {}): BakedAction {
+	const build = opts.build ?? BUILD;
+	const weight = opts.weight ?? build.weight;
+	const parts = opts.parts ?? 'full';
 	const samples = sample(def);
 	const mode = def.ground ?? 'plant';
 	const any = def.contacts === 'any';
@@ -313,6 +337,15 @@ export function bake(def: ActionDef, build: Build = BUILD, weight = build.weight
 	// Pass 2: root motion.
 	const air = placed.map((j) => (def.floor === false ? 0 : Math.max(0, minInk(j, weight))));
 	const dx: number[] = new Array(n).fill(0);
+	// Overall direction of travel, from the pelvis-relative drift of the
+	// lowest foot — backward walks (pull, backpedal) lock the right foot too.
+	let drift = 0;
+	for (let i = 1; i < n; i++) {
+		const a = lowest(placed[i - 1], weight, false);
+		const b = lowest(placed[i], weight, false);
+		if (a.name === b.name) drift += a.x - b.x;
+	}
+	const travelSign = drift < 0 ? -1 : 1;
 	if (mode === 'plant') {
 		const grounded: number[] = [];
 		for (let i = 0; i < n; i++) {
@@ -325,14 +358,15 @@ export function bake(def: ActionDef, build: Build = BUILD, weight = build.weight
 				? (['footL', 'footR', 'kneeL', 'kneeR', 'handL', 'handR', 'pelvis', 'shoulder', 'head'] as JointName[])
 				: FEET;
 			// Among contacts within a few units of the floor in both frames,
-			// the one sliding backward under the body is the one bearing
-			// weight; a swing foot still travelling forward is just landing.
+			// the one sliding opposite to the direction of travel under the
+			// body is the one bearing weight; a swing foot still travelling
+			// with the body is just landing.
 			let best: JointName = cands[0];
 			let score = Infinity;
 			for (const c of cands) {
 				const y = Math.max(placed[pi][c][1], placed[i][c][1]);
-				const back = placed[i][c][0] - placed[pi][c][0];
-				const s = y + Math.max(0, back) * 0.6;
+				const along = (placed[i][c][0] - placed[pi][c][0]) * travelSign;
+				const s = y + Math.max(0, along) * 0.6;
 				if (s < score) {
 					score = s;
 					best = c;
@@ -362,7 +396,7 @@ export function bake(def: ActionDef, build: Build = BUILD, weight = build.weight
 	const trailSpeed = def.trailSpeed ?? 70;
 	const puffs: { at: number; x: number }[] = [];
 	const frames: BakedFrame[] = placed.map((j, i) => {
-		const cs = drawFigure(j, weight);
+		const cs = drawFigure(j, weight, parts);
 
 		// Speed lines: trace where each trailing joint was over the last two
 		// frames (in this frame's glyph space, so subtract root motion).
@@ -453,7 +487,10 @@ function anchorsOf(j: Joints): Anchors {
 		footL: R(j.footL),
 		footR: R(j.footR),
 		pelvis: R(j.pelvis),
-		shoulder: R(j.shoulder)
+		shoulder: R(j.shoulder),
+		spine: Math.round((Math.atan2(j.shoulder[0] - j.pelvis[0], j.shoulder[1] - j.pelvis[1]) * 1800) / Math.PI) / 10,
+		headR: [Math.round(j.headRx), Math.round(j.headRy)],
+		headRot: Math.round((-j.headRot * 1800) / Math.PI) / 10
 	};
 }
 

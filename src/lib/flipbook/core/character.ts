@@ -286,6 +286,7 @@ export class Character {
 		this.plays = 0;
 		this.acc = 0;
 		this.waiting = next.delay;
+		if (next.action.baseline[0]) this.y -= next.action.baseline[0] * this.scale;
 		this.dirty = true;
 		this.emit('start', { action: next.action.name, frame: this.frame });
 		this.enterFrame(next);
@@ -347,12 +348,14 @@ export class Character {
 
 	private finish(c: Clip) {
 		this.hub = c.action.loop ? c.action.from : c.action.to;
+		if (c.action.baseline[1]) this.y -= c.action.baseline[1] * this.scale;
 		this.emit('complete', { action: c.action.name, frame: this.frame });
 		const settle = c.settle;
 		c.resolve();
 		if (this.queue.length) return this.advanceClip();
 		this.clip = null;
 		if (settle !== undefined) this.animate(settle);
+		else if (c.action.next && this.library.has(c.action.next)) this.animate(c.action.next, { route: false });
 		else if (c.untilX !== undefined) this.animate(this.variants.idle ?? (this.library.has('idle') ? 'idle' : c.action.name));
 	}
 }

@@ -63,18 +63,20 @@ export interface Pose {
 	strideR: number;
 }
 
+// Relaxed, not at attention: a hair of forward lean, weight a touch onto
+// the back leg, arms hanging just clear of the torso so they read in profile.
 export const STAND: Pose = {
 	x: 0,
 	y: 0,
 	lift: 0,
 	rot: 0,
-	lean: 2,
-	arch: 0,
-	head: 0,
-	armL: [-6, 10],
-	armR: [6, 14],
-	legL: [-3, 2],
-	legR: [4, 4],
+	lean: 3,
+	arch: 3,
+	head: -2,
+	armL: [-12, 16],
+	armR: [9, 22],
+	legL: [-6, 5],
+	legR: [6, 7],
 	squash: 1,
 	headSquash: 1,
 	reachL: 1,
@@ -234,16 +236,20 @@ function spinePoints(j: Joints): Vec[] {
 	return pts;
 }
 
-export function drawFigure(j: Joints, weight: number): Contour[] {
+// 'full' is the figure. 'limbs' drops torso, neck and head so a letter from
+// any font can be drawn in their place — the letter becomes the body.
+export type Parts = 'full' | 'limbs';
+
+export function drawFigure(j: Joints, weight: number, parts: Parts = 'full'): Contour[] {
 	const w = weight;
 	const out: Contour[] = [];
 	out.push(...stroke([j.pelvis, j.kneeL, j.footL], w));
 	out.push(...stroke([j.pelvis, j.kneeR, j.footR], w));
 	// Torso and neck share one outline so the spine has no seams.
-	out.push(...stroke([...spinePoints(j), j.head], w));
+	if (parts === 'full') out.push(...stroke([...spinePoints(j), j.head], w));
 	out.push(...stroke([j.shoulder, j.elbowL, j.handL], w));
 	out.push(...stroke([j.shoulder, j.elbowR, j.handR], w));
-	out.push(orient(ellipse(j.head, j.headRx, j.headRy, j.headRot)));
+	if (parts === 'full') out.push(orient(ellipse(j.head, j.headRx, j.headRy, j.headRot)));
 	return out;
 }
 
