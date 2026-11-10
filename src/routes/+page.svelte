@@ -101,7 +101,7 @@ sue.use(wander(), greet());`;
 				<Stack gap="6">
 					<Text variant="heading">Figures are characters.</Text>
 					<Page
-						text={'Bob {walk} left the house at nine. Sue {wave} waved from the window, and the dog {run} ran after the postman. Halfway down the road Bob {trip} tripped, sat {sit-idle} on the kerb for a while, then got up and {dance} danced it off. Nobody {shrug} minded.'}
+						text={'Bob {walk} left the house at nine. Sue {wave} waved from the window, and the dog {run} ran after the postman. Halfway down the road Bob {trip} tripped, sat {sit-idle} on the curb for a while, then got up and {dance} danced it off. Nobody {shrug} minded.'}
 						font={'400 22px Georgia'}
 					/>
 				</Stack>

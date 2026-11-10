@@ -58,4 +58,14 @@ const run = async (c: Character, ms: number) => {
 	assert.deepEqual(hits, [8, 13, 18]);
 }
 
+// Repeating a one-shot that ends on another hub routes home between plays.
+{
+	const c = new Character({ animate: 'idle' });
+	const seen: string[] = [];
+	c.on('start', (e) => seen.push(e.action));
+	c.animate('trip', { repeat: 1, repeatDelay: 0.2 });
+	await run(c, 12000);
+	assert.deepEqual(seen, ['trip', 'get-up', 'trip']);
+}
+
 console.log('runtime: all checks passed');

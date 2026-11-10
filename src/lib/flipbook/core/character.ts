@@ -338,6 +338,12 @@ export class Character {
 		if (f >= n || f < 0) {
 			this.plays++;
 			if (this.plays > c.repeat) return this.finish(c);
+			// A one-shot that ends somewhere else (trip ends lying down) can't
+			// just restart at frame 0 — that snaps. Rest for repeatDelay, take
+			// the inverse route home (get-up), then play it again.
+			if (!c.action.loop && c.repeatType === 'loop' && c.action.to !== c.action.from) {
+				return this.replayVia(c);
+			}
 			if (c.repeatType === 'loop') f = c.action.loop ? f - n * Math.sign(f) : 0;
 			else {
 				this.dir = -this.dir;
@@ -358,6 +364,15 @@ export class Character {
 		}
 		this.dirty = true;
 		this.enterFrame(c);
+	}
+
+	private replayVia(c: Clip) {
+		const hops = this.library.route(c.action.to, c.action.from).map((a) => this.makeClip(a, {}, () => {}));
+		if (hops.length) hops[0].delay = c.repeatDelay;
+		// The replay keeps the original promise and the repeats still owed.
+		const again: Clip = { ...c, repeat: c.repeat - this.plays, delay: hops.length ? 0 : c.repeatDelay, startFrame: 0 };
+		this.queue.unshift(...hops, again);
+		this.advanceClip();
 	}
 
 	private finish(c: Clip) {

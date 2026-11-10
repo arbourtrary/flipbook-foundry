@@ -49,7 +49,7 @@
 
 	// ----- 4. Say it with verbs -----
 	let prose = $state(
-		'On Monday I walked to work, tripped on the kerb, waved at nobody and danced anyway. ' +
+		'On Monday I walked to work, tripped on the curb, waved at nobody and danced anyway. ' +
 			'My boss shrugged. Everybody laughed, then we all sat down and slept until Tuesday.'
 	);
 	const illustrated = $derived(illustrate(prose, (n) => lib.has(n)));

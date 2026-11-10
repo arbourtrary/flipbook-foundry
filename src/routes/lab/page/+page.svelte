@@ -2,7 +2,7 @@
 	import { Page } from '$lib/flipbook/svelte';
 	let text = $state(
 		'Bob {walk} left the house at nine. Sue {wave} waved from the window, and the dog {run} ran after the postman. ' +
-			'Halfway down the road Bob {trip} tripped, sat {sit-idle} on the kerb for a while, then got up and {dance} danced it off. ' +
+			'Halfway down the road Bob {trip} tripped, sat {sit-idle} on the curb for a while, then got up and {dance} danced it off. ' +
 			'Nobody {shrug} minded. The postman {cheer} cheered. Every figure here is a character in a font, laid out by pretext with the words around it.'
 	);
 </script>
