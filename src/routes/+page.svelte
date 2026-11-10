@@ -1,237 +1,189 @@
 <script lang="ts">
-	import { Container, Stack, Row, Rule, Text, Button, Link } from '$lib/ds';
-	import { FlipbookField, Flipbook } from '$lib/flipbook';
+	import { Container, Stack, Row, Rule, Text, Button, Link, Code } from '$lib/ds';
+	import { getLibrary } from '$lib/flipbook/core';
+	import WorldStrip from '$lib/showcase/WorldStrip.svelte';
+	import FlowDemo from '$lib/showcase/FlowDemo.svelte';
+	import LettersDemo from '$lib/showcase/LettersDemo.svelte';
+	import GlyphStrip from '$lib/showcase/GlyphStrip.svelte';
+	import ActionIndex from '$lib/showcase/ActionIndex.svelte';
 	import BuyButton from '$lib/buy/BuyButton.svelte';
+	import { Figure } from '$lib/flipbook/svelte';
+
+	const lib = getLibrary();
+	const actionCount = lib.names().length;
+	const frameCount = Object.values(lib.manifest.actions).reduce((n, a) => n + a.frames, 0);
+
+	const svelteSnippet = `<script>
+  import { Stage, Figure, TextFlow } from 'flipbook/svelte';
+<\/script>
+
+<!-- Inline: one glyph in a line of text -->
+<p>Hello <Figure animate="wave" whileHover="cheer" /></p>
+
+<!-- A world: canvas, pretext, thousands of figures -->
+<Stage style="height: 400px">
+  <TextFlow text={copy} font="20px Georgia" width={720} lineHeight={30} />
+  <Figure animate="run" x={0} y={300} size={96} />
+  <Figure
+    variants={{ rest: 'idle', happy: { action: 'cheer', transition: { repeat: 2 } } }}
+    animate={mood}
+    exit="bow"
+  />
+</Stage>`;
+
+	const reactSnippet = `import { Stage, Figure, useAnimate, stagger } from 'flipbook/react';
+
+function Parade({ people }) {
+  const animate = useAnimate();
+  const crowd = useRef([]);
+  return (
+    <Stage style={{ height: 300 }}>
+      {people.map((p, i) => (
+        <Figure key={p.id} ref={(c) => (crowd.current[i] = c)}
+                animate="walk" x={i * 60} y={240} />
+      ))}
+      <button onClick={() => animate(crowd.current, 'jump', { delay: stagger(0.05) })}>
+        Everybody jump
+      </button>
+    </Stage>
+  );
+}`;
+
+	const imperativeSnippet = `import { createStage, animate, wander, greet } from 'flipbook';
+
+const stage = createStage(canvas);
+const bob = stage.add({ x: 0, y: 300, size: 80 });
+const sue = stage.add({ x: 600, y: 300, size: 80, facing: -1 });
+
+// Walk until x = 260, high-five on the same frame, then go about the day.
+await animate([
+  [bob, 'walk', { x: 260 }],
+  [sue, 'walk', { x: 340, at: '<' }],
+  [[bob, sue], 'high-five'],
+]);
+bob.use(wander(), greet());
+sue.use(wander(), greet());`;
 </script>
 
 <svelte:head>
-	<title>Flipbook Foundry — a font of stick figures</title>
+	<title>Flipbook — an animation library where every frame is a glyph</title>
 	<meta
 		name="description"
-		content="A typeface where every glyph is a pose. Animated by codepoint cycling. Positioned by pretext. One dollar."
+		content="Stick-figure animation built from a font. {actionCount} actions, {frameCount} drawings, framer-motion-style API for Svelte and React, pretext-powered text that makes room."
 	/>
 </svelte:head>
 
 <main>
+	<WorldStrip title="Flipbook" rows={5} population={64} height={560} />
+
 	<Container>
 		<Stack gap="24">
-			<section class="hero">
-				<Stack gap="8">
-					<FlipbookField
-						text="FLIPBOOK FOUNDRY"
-						animation={[
-							'walk',
-							'run',
-							'jump',
-							'dance',
-							'greet',
-							'cheer',
-							'salute',
-							'extend',
-							'throw',
-							'lunge',
-							'hop',
-							'balance',
-							'swim',
-							'point-right'
-						]}
-						fps={14}
-						font='700 96px "FoundrySans Stick"'
-						glyphSize="96px"
-						lineHeight={120}
-						phaseStep={0.07}
-					/>
+			<section class="lede">
+				<Stack gap="6">
+					<Text variant="title">An animation library where every frame is a glyph.</Text>
 					<Text variant="subheading" color="ink-2">
-						A typeface where every glyph is a pose. The runtime flips through them. The
-						letters walk, run, jump, peek around corners, dance.
+						{actionCount} actions, {frameCount.toLocaleString()} hand-timed drawings, one font. Walk them, trip them, sit
+						them on your headlines. A framer-motion-style API for Svelte and React, and a map of ten thousand figures
+						still draws in under ten milliseconds.
 					</Text>
+					<Row gap="4" wrap>
+						<Button href="/docs">Read the docs</Button>
+						<Button href="/forge" variant="secondary">Open the builder</Button>
+						<BuyButton />
+					</Row>
+					<Text variant="small" color="ink-2">Poke anyone up there. They don't mind.</Text>
 				</Stack>
 			</section>
 
 			<Rule />
 
 			<section>
-				<Stack gap="6">
-					<Text variant="heading">What it is</Text>
-					<Text variant="body">
-						Flipbook Foundry is a font. Each glyph is a stick figure in a different pose. A
-						tiny runtime swaps the rendered codepoint at the framerate you ask for — so the
-						character on the page walks, waves, dances.
-					</Text>
-					<Text variant="body">
-						Layout is handled by <Link href="https://github.com/chenglou/pretext" external>
-							pretext
-						</Link>, which measures and breaks text without ever touching the DOM. That means
-						a paragraph of animated figures reflows on resize without the browser thrashing.
-					</Text>
-				</Stack>
-			</section>
-
-			<Rule />
-
-			<section>
-				<Stack gap="8">
-					<Text variant="heading">In motion</Text>
-					<Stack gap="12">
-						<FlipbookField
-							text="every letter is alive and the page does not care"
-							animation={[
-								'run',
-								'walk',
-								'jump',
-								'dance',
-								'greet',
-								'cheer',
-								'throw',
-								'hop',
-								'lunge',
-								'point-right',
-								'salute',
-								'tap-foot'
-							]}
-							fps={18}
-							font='500 56px "FoundrySans Stick"'
-							glyphSize="56px"
-							lineHeight={72}
-							phaseStep={0.05}
-						/>
-						<FlipbookField
-							text="resize the window and the field reflows without the animation skipping a frame"
-							animation={[
-								'walk',
-								'greet',
-								'clap',
-								'extend',
-								'nod',
-								'shake-head',
-								'yawn',
-								'tip-toe',
-								'balance',
-								'salute',
-								'point-left'
-							]}
-							fps={14}
-							font='400 28px "FoundrySans Stick"'
-							glyphSize="28px"
-							lineHeight={40}
-							phaseStep={0.04}
-						/>
-					</Stack>
-				</Stack>
-			</section>
-
-			<Rule />
-
-			<section>
-				<Stack gap="8">
-					<Stack gap="3">
-						<Text variant="heading">A through Z — an action for every letter</Text>
-						<Text variant="body" color="ink-2">
-							Twenty-six action cycles, one for each letter of the alphabet — applaud,
-							balance, clap, dance, extend, flex, greet, hop, idle, jump, kneel, lunge,
-							march, nod, overhead, point, quake, run, sit, throw, unwind, victory, walk,
-							x-leap, yawn, zen — plus the legacy cheer, salute, swim, shake-head,
-							tap-foot, and tip-toe motions, and eight static stances. Cycle any of them
-							at any framerate.
-						</Text>
-					</Stack>
-					<div class="gallery">
-						{#each [
-							['applaud', 12],
-							['balance', 6],
-							['clap', 14],
-							['dance', 12],
-							['extend', 8],
-							['flex', 6],
-							['greet', 10],
-							['hop', 14],
-							['idle', 8],
-							['jump', 12],
-							['kneel', 10],
-							['lunge', 10],
-							['march', 14],
-							['nod', 8],
-							['overhead', 4],
-							['point-right', 8],
-							['quake', 20],
-							['run', 20],
-							['sit', 8],
-							['throw', 14],
-							['unwind', 8],
-							['victory', 8],
-							['walk', 14],
-							['x-leap', 14],
-							['yawn', 6],
-							['zen', 4]
-						] as [name, fps]}
-							<Stack gap="2" align="center">
-								<div class="cell">
-									<Flipbook animation={name as string} fps={fps as number} size="100px" />
-								</div>
-								<Text variant="mono" color="ink-2">{name}</Text>
-							</Stack>
-						{/each}
-					</div>
-					<Text variant="small" color="ink-2">
-						Full list of poses and animations on the <Link href="/usage">usage page</Link>.
-					</Text>
-				</Stack>
-			</section>
-
-			<Rule />
-
-			<section id="buy">
-				<Row gap="12" align="baseline" wrap>
-					<Text variant="display">
-						<span class="price"><span class="dollar">$</span>1</span>
-					</Text>
+				<div class="two">
 					<Stack gap="4">
-						<Text variant="subheading">One font. One dollar.</Text>
-						<Text variant="body" color="ink-2">
-							Includes the .woff2, the .otf, the license, and a usage snippet. Same price
-							for personal, commercial, t-shirts, billboards, films. The dollar is the
-							joke. The license is real.
+						<Text variant="heading">It's just text.</Text>
+						<Text variant="body">
+							Each drawing is a character in the Flipbook font. A walk is twenty-four of them in a row. Playing an action
+							means swapping one character for the next at the right moment — no canvas paths, no SVG, no skeleton at
+							runtime. Select the line on the right and copy it: you're holding a walk cycle.
 						</Text>
-						<Row gap="4" wrap>
-							<BuyButton />
-							<Button variant="text" href="/license">
-								{#snippet children()}Read the license{/snippet}
-							</Button>
-						</Row>
+						<Text variant="body">
+							Each frame also carries how far the planted foot travelled, so figures cover ground without skating, plus
+							anchors for hands, feet and head so they can carry things and meet each other's hands.
+						</Text>
 					</Stack>
-				</Row>
+					<Stack gap="6">
+						<GlyphStrip action="walk" size={44} />
+						<GlyphStrip action="trip" size={44} />
+					</Stack>
+				</div>
 			</section>
 
 			<Rule />
 
 			<section>
 				<Stack gap="6">
-					<Text variant="heading">Usage</Text>
-					<Text variant="body">
-						Drop the .woff2 into your project, declare an <Text variant="mono">@font-face</Text>,
-						and cycle the codepoints. Full snippets on the <Link href="/usage">usage page</Link>.
+					<Text variant="heading">Text that makes room.</Text>
+					<Text variant="body" color="ink-2">
+						Paragraphs are laid out by Cheng Lou's pretext. It measures once, then wraps with arithmetic, so a
+						paragraph can re-flow around moving figures every frame.
 					</Text>
-					<pre class="snippet"><code>{`@font-face {
-  font-family: 'FoundrySans Stick';
-  src: url('flipbook.woff2') format('woff2');
-}`}</code></pre>
+					<FlowDemo />
 				</Stack>
 			</section>
 
 			<Rule />
 
-			<footer class="footer">
-				<Row gap="8" align="center" justify="between" wrap>
-					<Row gap="3" align="center">
-						<Flipbook animation="greet" fps={3} size="28px" />
-						<Text variant="small" color="ink-2">Flipbook Foundry · 2026</Text>
+			<section>
+				<Stack gap="6">
+					<Text variant="heading">Letters with legs.</Text>
+					<Text variant="body" color="ink-2">
+						Any font, any letter. The letter becomes the body; the limbs come from the Flipbook Limbs font, posed by the
+						same {frameCount.toLocaleString()} drawings.
+					</Text>
+					<LettersDemo />
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="6">
+					<Text variant="heading">Familiar if you've used framer-motion.</Text>
+					<Text variant="body" color="ink-2">
+						<code>animate</code>, <code>initial</code>, <code>exit</code>, <code>variants</code>,
+						<code>transition</code>, <code>whileHover</code>, <code>stagger</code>, sequences with
+						<code>at</code>. Swap a pose for an action name and you already know it. Figures route themselves between
+						rest poses, so <code>animate="sit-idle"</code> from a run plays the stop and the sit-down first.
+					</Text>
+					<div class="two">
+						<Code label="Svelte" code={svelteSnippet} />
+						<Code label="React" code={reactSnippet} />
+					</div>
+					<Code label="Vanilla" code={imperativeSnippet} />
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="6">
+					<Row justify="between" align="baseline">
+						<Text variant="heading">Every action.</Text>
+						<Text variant="mono" color="ink-2">{actionCount} actions · {frameCount} frames</Text>
 					</Row>
-					<Row gap="6" align="center" wrap>
-						<Link href="/usage">Usage</Link>
+					<ActionIndex />
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<footer>
+				<Row justify="between" align="baseline" wrap>
+					<Text variant="small" color="ink-2">
+						Flipbook Foundry. Fonts are $1; the library is free to use with them.
 						<Link href="/license">License</Link>
-						<Link href="https://github.com/chenglou/pretext" external>pretext</Link>
-						<Link href="https://github.com/opentypejs/opentype.js" external>opentype.js</Link>
-					</Row>
+					</Text>
+					<span class="sign"><Figure animate="bow" size={40} transition={{ repeat: Infinity, repeatDelay: 2 }} /></span>
 				</Row>
 			</footer>
 		</Stack>
@@ -240,49 +192,28 @@
 
 <style>
 	main {
-		padding: var(--space-16) 0 var(--space-24);
-	}
-	.hero {
-		padding-top: var(--space-8);
-	}
-	.price {
-		color: var(--accent);
-		font-variant-numeric: tabular-nums;
-		letter-spacing: -0.04em;
-	}
-	.dollar {
-		font-size: 0.55em;
-		vertical-align: 0.55em;
-		margin-right: 0.05em;
-	}
-	.snippet {
-		font-family: var(--font-mono);
-		font-size: var(--size-14);
 		background: var(--paper);
-		border: var(--hairline);
-		padding: var(--space-4) var(--space-6);
-		overflow-x: auto;
-		line-height: var(--leading-body);
+		color: var(--ink);
+		padding-bottom: var(--space-16);
 	}
-	.footer {
-		padding-top: var(--space-4);
+	.lede {
+		padding-top: var(--space-12);
+		max-width: 56rem;
 	}
-	.gallery {
+	.two {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-		gap: var(--space-6);
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: var(--space-12);
+		align-items: start;
 	}
-	.cell {
-		width: 100%;
-		height: 140px;
-		border: var(--hairline);
-		display: flex;
-		align-items: center;
-		justify-content: center;
+	code {
+		font-family: var(--font-mono);
+		font-size: 0.92em;
 	}
-	@media (max-width: 640px) {
-		.snippet {
-			font-size: var(--size-12);
+	@media (max-width: 860px) {
+		.two {
+			grid-template-columns: 1fr;
+			gap: var(--space-8);
 		}
 	}
 </style>

@@ -6,3 +6,4 @@ export { default as Stack } from './Stack.svelte';
 export { default as Row } from './Row.svelte';
 export { default as Container } from './Container.svelte';
 export { default as Rule } from './Rule.svelte';
+export { default as Code } from './Code.svelte';
