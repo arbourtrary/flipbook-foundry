@@ -102,6 +102,9 @@ export class Character {
 	transition: Transition;
 	data: Record<string, unknown>;
 
+	/** Per-frame brains, run by the Stage (see behavior.ts). */
+	behaviors: import('./behavior').Behavior[] = [];
+
 	/** Current action + frame — the only things a renderer needs. */
 	action: ActionInfo;
 	frame = 0;
@@ -141,6 +144,12 @@ export class Character {
 			this.frame = 0;
 		}
 		if (opts.animate !== undefined) this.animate(opts.animate, { route: opts.initial !== undefined });
+	}
+
+	/** Attach behaviours (wander, greet…). Returns this for chaining. */
+	use(...b: import('./behavior').Behavior[]) {
+		this.behaviors.push(...b);
+		return this;
 	}
 
 	/** Units → px for this character's size. */

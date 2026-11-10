@@ -37,6 +37,8 @@ export interface StageOptions {
 	cull?: boolean;
 	/** Cache rasterised glyphs and stamp them (much faster for crowds). Default true. */
 	atlas?: boolean;
+	/** Paper colour for the halo around limbs drawn over letter bodies. Defaults to the background. */
+	paper?: string;
 }
 
 export interface StageStats {
@@ -84,7 +86,8 @@ export class Stage {
 			autoResize: opts.autoResize ?? true,
 			depthSort: opts.depthSort ?? true,
 			cull: opts.cull ?? true,
-			atlas: opts.atlas ?? true
+			atlas: opts.atlas ?? true,
+			paper: opts.paper ?? opts.background ?? paperBehind(canvas)
 		};
 		if (this.options.autoResize && typeof ResizeObserver !== 'undefined') {
 			this.ro = new ResizeObserver(() => this.resize());
@@ -191,6 +194,7 @@ export class Stage {
 	private tick = (data: FrameData) => {
 		const t0 = performance.now();
 		for (const c of this.characters) c.update(data.delta);
+		for (const c of this.characters) for (const b of c.behaviors) b(c, this, data.timestamp);
 		for (const h of this.hooks.update) h(data, this);
 		this.stats.updateMs = performance.now() - t0;
 		this.fpsAcc.t += data.delta;
@@ -284,12 +288,23 @@ export class Stage {
 				ctx.setTransform(c.facing, 0, 0, 1, X, Y);
 				ctx.drawImage(source, cell.sx, cell.sy, cell.w, cell.h, -cell.ox, -cell.oy, cell.w, cell.h);
 			} else {
-				const f = this.fontFor(c.layer, c.size);
-				if (f !== font) ctx.font = font = f;
-				if (col !== fill) ctx.fillStyle = fill = col;
 				ctx.setTransform(z * c.facing, 0, 0, z, X, Y);
-				ctx.fillText(c.glyph, 0, 0);
-				if (c.body) this.drawBody(c);
+				if (col !== fill) ctx.fillStyle = fill = col;
+				if (c.body) {
+					// Letter first, then the limbs over it with a paper halo, so
+					// arms read in front of the body like a comic panel.
+					this.drawBody(c);
+					ctx.font = font = this.fontFor(c.layer, c.size);
+					ctx.lineJoin = 'round';
+					ctx.lineWidth = (this.library.manifest.layers[c.layer]?.weight ?? 30) * c.scale * 1.1;
+					ctx.strokeStyle = this.options.paper;
+					ctx.strokeText(c.glyph, 0, 0);
+					ctx.fillText(c.glyph, 0, 0);
+				} else {
+					const f = this.fontFor(c.layer, c.size);
+					if (f !== font) ctx.font = font = f;
+					ctx.fillText(c.glyph, 0, 0);
+				}
 			}
 			c.dirty = false;
 			drawn++;
@@ -340,14 +355,27 @@ export class Stage {
 		ctx.save();
 		ctx.translate(px * s, -py * s);
 		ctx.rotate(spine);
-		// Cap height ≈ 0.72em for most fonts; letter spans pelvis → head-top.
-		ctx.font = b.font.replace(/(\d+(\.\d+)?)px/, `${(h / 0.72).toFixed(1)}px`);
+		// The letter is torso and head in one: its cap height spans a bit past
+		// pelvis → head-top (cap height ≈ 0.7em in most text faces), sitting
+		// just below the hips so the legs grow out of its base.
+		const cap = h * 1.18;
+		ctx.font = b.font.replace(/(\d+(\.\d+)?)px/, `${(cap / 0.7).toFixed(1)}px`);
 		if (b.color) ctx.fillStyle = b.color;
 		// Un-mirror so the letter reads correctly when facing left.
 		if (c.facing < 0) ctx.scale(-1, 1);
-		ctx.fillText(b.char, 0, h * 0.12);
+		ctx.fillText(b.char, 0, h * 0.1);
 		ctx.restore();
 	}
 }
 
 export const createStage = (canvas: HTMLCanvasElement, opts?: StageOptions) => new Stage(canvas, opts);
+
+// First opaque background colour behind an element.
+function paperBehind(el: Element): string {
+	if (typeof getComputedStyle === 'undefined') return '#fff';
+	for (let e: Element | null = el; e; e = e.parentElement) {
+		const bg = getComputedStyle(e).backgroundColor;
+		if (bg && bg !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(bg)) return bg;
+	}
+	return '#fff';
+}
