@@ -6,9 +6,17 @@
 	// and steals a sentence one letter at a time. The sentence is real text,
 	// set right-aligned by pretext: every stolen letter is removed from the
 	// text and the line re-flows toward the thief, like a conveyor belt.
-	const SENTENCE = 'HAPPY HOLIDAYS, EVERYONE';
-	const SIZE = 120;
-	const H = 300;
+	interface Props {
+		/** Figure size in px; the scene scales from it. */
+		size?: number;
+		sentence?: string;
+	}
+	let { size = 120, sentence = 'HAPPY HOLIDAYS, EVERYONE' }: Props = $props();
+	// svelte-ignore state_referenced_locally
+	const SENTENCE = sentence;
+	// svelte-ignore state_referenced_locally
+	const SIZE = size;
+	const H = Math.round(SIZE * 2.5);
 
 	let canvas: HTMLCanvasElement;
 
@@ -28,14 +36,14 @@
 				const ink = getComputedStyle(canvas).color;
 				stage = new Stage(canvas, { color: ink });
 				const s = stage;
-				const ground = H - 36;
-				const wallX = s.width - 110;
-				const standX = wallX - 210; // where the thief works from
+				const ground = H - SIZE * 0.3;
+				const wallX = s.width - SIZE * 0.92;
+				const standX = wallX - SIZE * 1.75; // where the thief works from
 				let text = SENTENCE;
-				const width = standX - 46 - 16;
+				const width = standX - SIZE * 0.38 - 16;
 				// Largest size (≤ 54px) at which the whole sentence fits on one line.
 				const measure = document.createElement('canvas').getContext('2d')!;
-				let px = 54;
+				let px = Math.round(SIZE * 0.45);
 				for (; px > 18; px -= 2) {
 					measure.font = `700 ${px}px Georgia`;
 					if (measure.measureText(SENTENCE).width < width - 8) break;
@@ -55,7 +63,7 @@
 
 				const wall: Thing = s.addThing({ name: 'wall', x: wallX, y: ground, size: SIZE, layer: 'front' });
 				void wall;
-				const sack: Thing = s.addThing({ name: 'sack', x: wallX + 70, y: ground, size: SIZE, layer: 'back' });
+				const sack: Thing = s.addThing({ name: 'sack', x: wallX + SIZE * 0.58, y: ground, size: SIZE, layer: 'back' });
 				const thief: Character = s.add({ x: wallX + 4, y: ground, size: SIZE, facing: -1 });
 
 				const steal = () =>
@@ -69,13 +77,13 @@
 							text = text.slice(0, last.index) + text.slice(last.index + 1);
 							flow.setText(text.replace(/[\s,]+$/, ''));
 							text = flow.options.text;
-							prop = s.addProp({ text: last.char, font: FONT, x: last.x, y: last.y, attach: { to: thief, anchor: 'handR', dy: 18 } });
+							prop = s.addProp({ text: last.char, font: FONT, x: last.x, y: last.y, attach: { to: thief, anchor: 'handR', dy: SIZE * 0.15 } });
 						});
 						const offRelease = thief.on('release', () => {
 							const p = prop;
 							if (!p) return;
 							const mouth: [number, number] = [sack.x, sack.y - (lib.thing('sack').grip[Math.round(sack.frame)][1] * sack.size) / 1000 + 20];
-							s.fly(p, { to: mouth, height: 90, duration: 0.55, spin: 1.5 }).then(() => {
+							s.fly(p, { to: mouth, height: SIZE * 0.75, duration: 0.55, spin: 1.5 }).then(() => {
 								s.removeProp(p);
 								const stolen = SENTENCE.replace(/[\s,]/g, '').length - text.replace(/[\s,]/g, '').length;
 								sack.frame = Math.min(11, Math.round((stolen / SENTENCE.replace(/[\s,]/g, '').length) * 11));
@@ -99,15 +107,15 @@
 					await thief.animate(act('rub-hands', 'idle'), { repeat: 2 });
 					await thief.animate({ action: act('sneak-off', 'sneak'), x: standX });
 					s.drop(sack);
-					sack.x = standX + 70;
+					sack.x = standX + SIZE * 0.58;
 					thief.facing = -1;
 					while (alive && flow.glyphs().length) await steal();
 					await thief.animate(act('rub-hands', 'cheer'), { repeat: 1 });
 					// Off with the loot.
 					s.hold(sack, thief, 'R', true);
-					await thief.animate({ action: act('drag', 'pull', 'walk'), x: wallX + 40 });
+					await thief.animate({ action: act('drag', 'pull', 'walk'), x: wallX + SIZE * 0.33 });
 					s.drop(sack);
-					sack.x = wallX + 70;
+					sack.x = wallX + SIZE * 0.58;
 					await wait(1.2);
 					// The village writes it all out again.
 					text = '';

@@ -160,4 +160,18 @@ export const clod: ThingDef = {
 	draw: () => [poly(arc(0, 40, 46, 34, 0, Math.PI * 2, 14))]
 };
 
-export const THINGS: ThingDef[] = [shovel, broom, sack, hole, pile, wall, clod];
+export const eraser: ThingDef = {
+	name: 'eraser',
+	description: 'A block eraser with a paper sleeve. Held like a tool; the bare rubber end leads.',
+	frames: 1,
+	hold: 'forearm',
+	grip: () => [0, 0],
+	draw: () => [
+		// Sleeve: solid, gripped in the hand.
+		poly([[-30, -52], [95, -52], [95, 52], [-30, 52]]),
+		// Rubber end: an outline, so it reads as the soft working part.
+		...stroke([[95, -52], [215, -52], [215, 52], [95, 52], [95, -52]], 20)
+	]
+};
+
+export const THINGS: ThingDef[] = [shovel, broom, sack, hole, pile, wall, clod, eraser];

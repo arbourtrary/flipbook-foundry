@@ -17,6 +17,14 @@ export interface Prop {
 	rotate?: number;
 	align?: CanvasTextAlign;
 	z?: number;
+	/** 'back' draws before the figures (letters they walk in front of). Default 'front'. */
+	layer?: 'back' | 'front';
+	/**
+	 * Erased spots, [dx, dy, radius] in stage px from (x, y). The letter's own
+	 * ink is removed there (not painted over), so erasing works on any
+	 * background.
+	 */
+	erase?: [number, number, number][];
 	/** Ride along with a character's anchor (e.g. a letter carried overhead). */
 	attach?: { to: Character; anchor: 'head' | 'top' | 'handL' | 'handR' | 'footL' | 'footR' | 'pelvis' | 'shoulder'; dx?: number; dy?: number };
 	data?: Record<string, unknown>;
@@ -368,6 +376,8 @@ export class Stage {
 		const held = new Map<Character, Thing[]>();
 		for (const t of this.things) if (t.held) held.set(t.held.by, [...(held.get(t.held.by) ?? []), t]);
 		for (const t of this.things) if (!t.held && t.layer === 'back') this.drawThing(t, z);
+		base();
+		this.drawProps('back', z);
 
 		const vx0 = camera.x - 200, vx1 = camera.x + this.width / camera.zoom + 200;
 		const vy0 = camera.y - 200, vy1 = camera.y + this.height / camera.zoom + 400;
@@ -405,6 +415,11 @@ export class Stage {
 				ctx.lineWidth = (this.library.manifest.layers[c.layer]?.weight ?? 30) * c.scale * 1.1;
 				ctx.strokeStyle = this.options.paper;
 				ctx.strokeText(c.glyph, 0, 0);
+			} else if (c.halo) {
+				ctx.lineJoin = 'round';
+				ctx.lineWidth = (this.library.manifest.layers[c.layer]?.weight ?? 30) * c.scale * 1.6;
+				ctx.strokeStyle = this.options.paper;
+				ctx.strokeText(c.glyph, 0, 0);
 			}
 			ctx.fillText(c.glyph, 0, 0);
 			if (hands) {
@@ -419,24 +434,7 @@ export class Stage {
 		for (const t of this.things) if (!t.held && t.layer === 'front') this.drawThing(t, z);
 		base();
 
-		for (const p of this.props) {
-			let x = p.x, y = p.y;
-			if (p.attach) {
-				const [ax, ay] = p.attach.to.anchor(p.attach.anchor);
-				x = p.x = ax + (p.attach.dx ?? 0);
-				y = p.y = ay + (p.attach.dy ?? 0);
-			}
-			ctx.font = p.font;
-			ctx.fillStyle = p.color ?? this.options.color;
-			ctx.textAlign = p.align ?? 'center';
-			if (p.rotate) {
-				ctx.save();
-				ctx.translate(x, y);
-				ctx.rotate(p.rotate);
-				ctx.fillText(p.text, 0, 0);
-				ctx.restore();
-			} else ctx.fillText(p.text, x, y);
-		}
+		this.drawProps('front', z);
 		ctx.textAlign = 'center';
 
 		for (const h of this.hooks.after) {
@@ -447,6 +445,74 @@ export class Stage {
 		this.stats.drawn = drawn;
 		this.stats.drawMs = performance.now() - t0;
 	};
+
+	private drawProps(pass: 'back' | 'front', z: number) {
+		const { ctx } = this;
+		for (const p of this.props) {
+			if ((p.layer ?? 'front') !== pass) continue;
+			let x = p.x, y = p.y;
+			if (p.attach) {
+				const [ax, ay] = p.attach.to.anchor(p.attach.anchor);
+				x = p.x = ax + (p.attach.dx ?? 0);
+				y = p.y = ay + (p.attach.dy ?? 0);
+			}
+			ctx.font = p.font;
+			ctx.fillStyle = p.color ?? this.options.color;
+			ctx.textAlign = p.align ?? 'center';
+			if (p.erase?.length) {
+				this.drawErased(p, x, y, z);
+				continue;
+			}
+			if (p.rotate) {
+				ctx.save();
+				ctx.translate(x, y);
+				ctx.rotate(p.rotate);
+				ctx.fillText(p.text, 0, 0);
+				ctx.restore();
+			} else ctx.fillText(p.text, x, y);
+		}
+		ctx.textAlign = 'center';
+	}
+
+	private scratch: HTMLCanvasElement | null = null;
+
+	// Draw a prop's text into a scratch canvas, cut the erased spots out of
+	// its ink with destination-out, and stamp the result.
+	private drawErased(p: Prop, x: number, y: number, z: number) {
+		const { ctx } = this;
+		const m = ctx.measureText(p.text);
+		const pad = 4;
+		const left = (p.align === 'left' ? 0 : p.align === 'right' ? m.width : m.width / 2) + pad;
+		const w = m.width + pad * 2;
+		const up = m.actualBoundingBoxAscent + pad;
+		const h = up + m.actualBoundingBoxDescent + pad;
+		const c = (this.scratch ??= document.createElement('canvas'));
+		const cw = Math.ceil(w * z), ch = Math.ceil(h * z);
+		if (c.width < cw) c.width = cw;
+		if (c.height < ch) c.height = ch;
+		const s = c.getContext('2d')!;
+		s.setTransform(1, 0, 0, 1, 0, 0);
+		s.clearRect(0, 0, cw, ch);
+		s.setTransform(z, 0, 0, z, 0, 0);
+		s.font = p.font;
+		s.textAlign = 'left';
+		s.textBaseline = 'alphabetic';
+		s.fillStyle = p.color ?? this.options.color;
+		s.fillText(p.text, pad, up);
+		s.globalCompositeOperation = 'destination-out';
+		s.beginPath();
+		for (const [dx, dy, r] of p.erase!) {
+			s.moveTo(left + dx + r, up + dy);
+			s.arc(left + dx, up + dy, r, 0, Math.PI * 2);
+		}
+		s.fill();
+		s.globalCompositeOperation = 'source-over';
+		ctx.save();
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		const cam = this.camera;
+		ctx.drawImage(c, 0, 0, cw, ch, Math.round((x - left - cam.x) * z), Math.round((y - up - cam.y) * z), cw, ch);
+		ctx.restore();
+	}
 
 	private drawThing(t: Thing, z: number) {
 		const { ctx, camera } = this;

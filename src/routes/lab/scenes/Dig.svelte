@@ -6,10 +6,17 @@
 	// figure's right hand and turned with the forearm every frame. The hole
 	// and the pile are Things too — each scoop is one frame deeper, each
 	// toss one frame taller. Dig deep enough and something comes up.
-	const WORD = 'TREASURE';
-	const FONT = '800 40px "Inter Tight"';
-	const SIZE = 120;
-	const H = 320;
+	interface Props {
+		size?: number;
+		word?: string;
+	}
+	let { size = 120, word = 'TREASURE' }: Props = $props();
+	// svelte-ignore state_referenced_locally
+	const WORD = word;
+	// svelte-ignore state_referenced_locally
+	const SIZE = size;
+	const FONT = `800 ${Math.round(SIZE / 3)}px "Inter Tight"`;
+	const H = Math.round(SIZE * 2.65);
 
 	let canvas: HTMLCanvasElement;
 
@@ -28,7 +35,7 @@
 				const ink = getComputedStyle(canvas).color;
 				stage = new Stage(canvas, { color: ink });
 				const s = stage;
-				const ground = H - 90;
+				const ground = H - SIZE * 0.75;
 				const u = SIZE / lib.unitsPerEm; // font units → px
 				const digger: Character = s.add({ x: s.width * 0.38, y: ground, size: SIZE });
 				const shovel: Thing = s.addThing({ name: 'shovel', size: SIZE });
@@ -57,7 +64,7 @@
 				digger.on('toss', () => {
 					const [bx, by] = blade();
 					const clod = s.addThing({ name: 'clod', x: bx, y: by, size: SIZE * 0.8 });
-					s.fly(clod, { to: [pile.x + (Math.random() - 0.5) * 30, ground - (pile.frame / 11) * 150 * u], height: 70, duration: 0.5 }).then(() => {
+					s.fly(clod, { to: [pile.x + (Math.random() - 0.5) * SIZE * 0.25, ground - (pile.frame / 11) * 150 * u], height: SIZE * 0.6, duration: 0.5 }).then(() => {
 						s.removeThing(clod);
 						pile.frame = Math.min(11, pile.frame + 1);
 					});
@@ -76,11 +83,11 @@
 					digger.animate(act('peek', 'look-around'), { inPlace: true });
 					await wait(0.5);
 					// Up it comes, a letter at a time, landing in a row.
-					const startX = hole.x + 70;
+					const startX = hole.x + SIZE * 0.58;
 					for (let i = 0; i < WORD.length; i++) {
-						const p = s.addProp({ text: WORD[i], font: FONT, x: hole.x, y: ground + 10 });
+						const p = s.addProp({ text: WORD[i], font: FONT, x: hole.x, y: ground + SIZE * 0.08 });
 						letters.push(p);
-						s.fly(p, { to: [startX + i * 30, ground - 2], height: 120 + i * 10, duration: 0.7, spin: 1 }).then(() => (p.rotate = 0));
+						s.fly(p, { to: [startX + i * SIZE * 0.25, ground - 2], height: SIZE + i * SIZE * 0.08, duration: 0.7, spin: 1 }).then(() => (p.rotate = 0));
 						await wait(0.18);
 					}
 					await wait(0.9);

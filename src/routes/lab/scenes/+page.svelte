@@ -10,6 +10,7 @@
 	import Queue from './Queue.svelte';
 	import LetterThief from './LetterThief.svelte';
 	import Dig from './Dig.svelte';
+	import Editor from './Editor.svelte';
 
 	const lib = getLibrary();
 
@@ -116,6 +117,36 @@
 					</Text>
 				</Stack>
 			</header>
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">At text size</Text>
+					<Text variant="small" color="ink-2">The same three stories, small enough to sit between paragraphs.</Text>
+					<div class="small">
+						<Text variant="body">An editor removes a word nobody needed.</Text>
+						<Editor size={44} words={['A', 'REALLY', 'GOOD', 'IDEA']} target={1} />
+						<Text variant="body">Someone walks off with the greeting.</Text>
+						<LetterThief size={44} sentence="SEASON'S GREETINGS" />
+						<Text variant="body">And someone else digs for something better.</Text>
+						<Dig size={44} word="GOLD" />
+					</div>
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">The Editor</Text>
+					<Text variant="small" color="ink-2">
+						Ink comes off wherever the eraser tip goes, frame by frame. It's cut out of the letter, not painted over, so it works
+						on any background. Then pretext closes the gap.
+					</Text>
+					<Editor />
+				</Stack>
+			</section>
+
+			<Rule />
 
 			<section>
 				<Stack gap="4">
@@ -260,6 +291,11 @@
 		background: var(--paper);
 		color: var(--ink);
 		padding: var(--space-16) 0 var(--space-24);
+	}
+	.small {
+		max-width: 34rem;
+		display: grid;
+		gap: var(--space-2);
 	}
 	.direction {
 		margin: 0;

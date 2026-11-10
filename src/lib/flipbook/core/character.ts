@@ -58,6 +58,8 @@ export interface CharacterOptions {
 	transition?: Transition;
 	/** Letter (any font) standing in for the body; pairs with the 'limbs' layer. */
 	body?: { char: string; font: string; color?: string };
+	/** Outline the figure in paper colour so it stays legible over ink (Stage only). */
+	halo?: boolean;
 	library?: Library;
 	data?: Record<string, unknown>;
 }
@@ -79,6 +81,8 @@ interface Clip {
 	delay: number;
 	inPlace: boolean;
 	untilX?: number;
+	/** Direction (±1) we're travelling toward untilX in world space. */
+	untilDir?: number;
 	resolve: () => void;
 	settle?: Definition;
 	startFrame: number;
@@ -98,6 +102,7 @@ export class Character {
 	opacity: number;
 	z: number;
 	body: CharacterOptions['body'];
+	halo: boolean;
 	variants: Variants;
 	transition: Transition;
 	data: Record<string, unknown>;
@@ -131,6 +136,7 @@ export class Character {
 		this.opacity = opts.opacity ?? 1;
 		this.z = opts.z ?? 0;
 		this.body = opts.body;
+		this.halo = opts.halo ?? false;
 		this.variants = opts.variants ?? {};
 		this.transition = opts.transition ?? {};
 		this.data = opts.data ?? {};
@@ -225,7 +231,13 @@ export class Character {
 		const t: Transition = { ...this.transition, ...target.transition, ...override };
 		const action = this.library.action(target.action);
 		if (target.facing) this.facing = target.facing;
-		if (target.x !== undefined) this.facing = target.x >= this.x ? 1 : -1;
+		if (target.x !== undefined) {
+			// Face so the action's own travel carries us toward x — forward for
+			// a walk, away from x for a backpedal.
+			const backwards = action.dx.reduce((a, b) => a + b, 0) < 0;
+			const toward = target.x >= this.x ? 1 : -1;
+			this.facing = (backwards ? -toward : toward) as 1 | -1;
+		}
 
 		// Flush the queue; anything waiting on it resolves now (interrupted).
 		for (const c of this.queue) c.resolve();
@@ -243,6 +255,7 @@ export class Character {
 		const finished = new Promise<void>((r) => (resolve = r));
 		const main = this.makeClip(action, t, resolve);
 		main.untilX = target.x;
+		main.untilDir = target.x !== undefined ? (target.x >= this.x ? 1 : -1) : 0;
 		main.settle = target.then;
 		clips.push(main);
 
@@ -382,7 +395,7 @@ export class Character {
 		if (!c.inPlace) {
 			const dx = c.action.dx[this.frame] * this.scale * this.facing * this.dir;
 			this.x += dx;
-			if (c.untilX !== undefined && (this.facing > 0 ? this.x >= c.untilX : this.x <= c.untilX)) {
+			if (c.untilX !== undefined && (c.untilDir! > 0 ? this.x >= c.untilX : this.x <= c.untilX)) {
 				this.x = c.untilX;
 				this.dirty = true;
 				return this.finish(c);

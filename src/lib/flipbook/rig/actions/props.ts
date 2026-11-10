@@ -243,4 +243,24 @@ export const rubHands: ActionDef = {
 	]
 };
 
-export const PROPS: ActionDef[] = [dig, scoop, tossBack, scoopToss, drag, sneakOff, peekOut, rubHands];
+// Erase — scrub a big letter in front with an eraser (right hand), sweeping
+// from overhead down to the knees and back while the left hand braces on
+// the letter. The eraser tip sits ~215 units out along the forearm, so the
+// stroke covers roughly x 300–480, y 150–820: a letter as tall as the figure.
+export const erase: ActionDef = {
+	name: 'erase',
+	category: 'interaction',
+	description: 'Scrub away at something in front with an eraser, overhead down to the knees and back.',
+	frames: 20,
+	fps: 24,
+	loop: true,
+	travel: false,
+	keys: [
+		{ at: 0, ...STAND, lean: 4, head: -4, arch: 2, armR: [148, 14], armL: [78, 12], legL: [-12, 8], legR: [14, 10] },
+		{ at: 5, lean: 8, head: -8, armR: [118, 34], armL: [74, 18], event: 'rub' },
+		{ at: 10, lean: 24, head: -18, arch: 12, armR: [30, 24], armL: [58, 30], legL: [-2, 46], legR: [30, 56] },
+		{ at: 15, lean: 11, head: -9, armR: [82, 8], armL: [72, 20], legL: [-10, 16], legR: [18, 20], event: 'rub' }
+	]
+};
+
+export const PROPS: ActionDef[] = [dig, scoop, tossBack, scoopToss, drag, sneakOff, peekOut, rubHands, erase];

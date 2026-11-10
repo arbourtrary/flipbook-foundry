@@ -84,4 +84,15 @@ const run = async (c: Character, ms: number) => {
 	assert.ok(done);
 }
 
+// Travel-to-x works for actions that move backwards.
+{
+	const c = new Character({ x: 300, size: 100 });
+	let done = false;
+	c.animate({ action: 'backpedal', x: 200 }).then(() => (done = true));
+	await run(c, 8000);
+	assert.equal(Math.round(c.x), 200);
+	assert.equal(c.facing, 1);
+	assert.ok(done);
+}
+
 console.log('runtime: all checks passed');
