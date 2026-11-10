@@ -5,6 +5,15 @@
 
 const PAGE = 2048;
 
+export interface Extents {
+	left: number;
+	right: number;
+	top: number;
+	bottom: number;
+}
+
+const DEFAULT_EXT: Extents = { left: -0.85, right: 0.85, top: 1.1, bottom: -0.5 };
+
 interface Cell {
 	page: number;
 	sx: number;
@@ -41,12 +50,16 @@ export class GlyphAtlas {
 		return p;
 	}
 
-	get(glyph: string, font: string, px: number, color: string): { cell: Cell; source: CanvasImageSource } | null {
+	/**
+	 * `ext` is the font's ink extents in em (pelvis-relative, y-up), from the
+	 * manifest — cells are sized to fit the widest sprawl and highest jump.
+	 */
+	get(glyph: string, font: string, px: number, color: string, ext: Extents = DEFAULT_EXT): { cell: Cell; source: CanvasImageSource } | null {
 		const key = `${font}|${color}|${glyph}`;
 		let cell = this.cells.get(key);
 		if (!cell) {
 			if (this.cells.size >= this.maxCells) this.clear();
-			const made = this.rasterise(glyph, font, px, color);
+			const made = this.rasterise(glyph, font, px, color, ext);
 			if (!made) return null;
 			cell = made;
 			this.cells.set(key, cell);
@@ -54,11 +67,10 @@ export class GlyphAtlas {
 		return { cell, source: this.pages[cell.page].canvas as CanvasImageSource };
 	}
 
-	private rasterise(glyph: string, font: string, px: number, color: string): Cell | null {
-		// Figures reach ~1em up (jumps) and ~0.35em down (perches); lunges and
-		// sprawls spill ~0.8em either side of the pelvis.
-		const w = Math.ceil(px * 1.7) + 2;
-		const h = Math.ceil(px * 1.45) + 2;
+	private rasterise(glyph: string, font: string, px: number, color: string, ext: Extents): Cell | null {
+		const pad = 2;
+		const w = Math.ceil(px * (ext.right - ext.left)) + pad * 2;
+		const h = Math.ceil(px * (ext.top - ext.bottom)) + pad * 2;
 		if (w > PAGE || h > PAGE) return null;
 		let page = this.pages[this.pages.length - 1] ?? this.newPage();
 		if (page.x + w > PAGE) {
@@ -73,8 +85,8 @@ export class GlyphAtlas {
 		const sy = page.shelfY;
 		page.x += w;
 		page.shelfH = Math.max(page.shelfH, h);
-		const ox = Math.round(w / 2);
-		const oy = Math.round(px * 1.08);
+		const ox = Math.round(-ext.left * px) + pad;
+		const oy = Math.round(ext.top * px) + pad;
 		const ctx = page.ctx;
 		ctx.font = font;
 		ctx.fillStyle = color;
@@ -93,3 +105,8 @@ export class GlyphAtlas {
 		this.pages.length = Math.min(this.pages.length, 1);
 	}
 }
+
+// One atlas for every Stage on the page: a gallery of fifty small stages
+// shouldn't allocate fifty texture pages for the same glyphs.
+let shared: GlyphAtlas | null = null;
+export const sharedAtlas = () => (shared ??= new GlyphAtlas());

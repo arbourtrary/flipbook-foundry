@@ -13,13 +13,27 @@ import { createHash } from 'node:crypto';
 import opentype from 'opentype.js';
 import { ACTIONS } from '../src/lib/flipbook/rig/actions/index.ts';
 import { bake, type BakedAction } from '../src/lib/flipbook/rig/timeline.ts';
-import { emit } from '../src/lib/flipbook/rig/geometry.ts';
+import { emit, bounds, removeOverlaps } from '../src/lib/flipbook/rig/geometry.ts';
+import polygonClipping from 'polygon-clipping';
 import { BUILD, type Parts } from '../src/lib/flipbook/rig/skeleton.ts';
 import { exportWoff2 } from '../src/lib/font/exportWoff2.ts';
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
-const fontDir = join(repo, 'static/fonts');
-const genDir = join(repo, 'src/lib/flipbook/generated');
+
+// `--variant <id>` bakes an alternate figure build (proportions / weight)
+// into static/lab/<id>/ for side-by-side review in /lab. Regular layer only.
+const VARIANTS: Record<string, { label: string; build: Partial<typeof BUILD> }> = {
+	a: { label: 'Classic', build: {} },
+	b: { label: 'Inspo — small head, fine line', build: { headR: 62, weight: 22, thigh: 180, shin: 176 } },
+	c: { label: 'Chunky comic', build: { headR: 96, weight: 40, thigh: 150, shin: 144, torso: 180, upperArm: 116, foreArm: 110 } },
+	d: { label: 'Lanky', build: { headR: 60, weight: 24, thigh: 196, shin: 192, torso: 224, upperArm: 146, foreArm: 140 } }
+};
+const vi = process.argv.indexOf('--variant');
+const variant = vi > 0 ? process.argv[vi + 1] : null;
+if (variant && !VARIANTS[variant]) throw new Error(`Unknown variant ${variant}`);
+const build = { ...BUILD, ...(variant ? VARIANTS[variant].build : {}) };
+const fontDir = variant ? join(repo, 'static/lab', variant) : join(repo, 'static/fonts');
+const genDir = variant ? fontDir : join(repo, 'src/lib/flipbook/generated');
 
 const UPM = 1000;
 const ASCENDER = 900;
@@ -36,16 +50,20 @@ interface Layer {
 	parts: Parts;
 }
 
-const LAYERS: Layer[] = [
-	{ id: 'regular', family: 'Flipbook', style: 'Regular', weight: BUILD.weight, parts: 'full' },
-	{ id: 'bold', family: 'Flipbook', style: 'Bold', weight: 46, parts: 'full' },
-	{ id: 'limbs', family: 'Flipbook Limbs', style: 'Regular', weight: BUILD.weight, parts: 'limbs' },
-	{ id: 'limbs-bold', family: 'Flipbook Limbs', style: 'Bold', weight: 46, parts: 'limbs' }
+const ALL_LAYERS: Layer[] = [
+	{ id: 'regular', family: 'Flipbook', style: 'Regular', weight: build.weight, parts: 'full' },
+	{ id: 'bold', family: 'Flipbook', style: 'Bold', weight: Math.round(build.weight * 1.55), parts: 'full' },
+	{ id: 'limbs', family: 'Flipbook Limbs', style: 'Regular', weight: build.weight, parts: 'limbs' },
+	{ id: 'limbs-bold', family: 'Flipbook Limbs', style: 'Bold', weight: Math.round(build.weight * 1.55), parts: 'limbs' }
 ];
+const LAYERS = variant
+	? ALL_LAYERS.slice(0, 1).map((l) => ({ ...l, family: `Flipbook ${variant.toUpperCase()}` }))
+	: ALL_LAYERS;
 
 function glyphFor(name: string, cp: number, frame: BakedAction['frames'][number]) {
 	const path = new opentype.Path();
-	emit(frame.contours, path, ADVANCE / 2);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	emit(removeOverlaps(frame.contours, polygonClipping.union as any), path, ADVANCE / 2);
 	return new opentype.Glyph({ name, unicode: cp, advanceWidth: ADVANCE, path });
 }
 
@@ -67,14 +85,24 @@ async function main() {
 	if (cp > 0xf8ff) throw new Error(`Out of BMP private-use space (${cp.toString(16)})`);
 
 	const manifestActions: Record<string, unknown> = {};
+	// Ink extents across every glyph of every layer, pelvis-relative, so
+	// renderers can size raster caches without clipping jumps or hangs.
+	const ext = { left: 0, right: 0, top: 0, bottom: 0 };
 	const files: Record<string, string> = {};
 
 	for (const layer of LAYERS) {
 		const glyphs = [notdef(), new opentype.Glyph({ name: 'space', unicode: 32, advanceWidth: ADVANCE / 2, path: new opentype.Path() })];
 		for (const def of ACTIONS) {
-			const baked = bake(def, { weight: layer.weight, parts: layer.parts });
+			const baked = bake(def, { build, weight: layer.weight, parts: layer.parts });
 			const start = starts.get(def.name)!;
-			baked.frames.forEach((f, i) => glyphs.push(glyphFor(`${def.name}.${i}`, start + i, f)));
+			baked.frames.forEach((f, i) => {
+				glyphs.push(glyphFor(`${def.name}.${i}`, start + i, f));
+				const b = bounds(f.contours);
+				ext.left = Math.min(ext.left, b.x0);
+				ext.right = Math.max(ext.right, b.x1);
+				ext.bottom = Math.min(ext.bottom, b.y0);
+				ext.top = Math.max(ext.top, b.y1);
+			});
 
 			if (layer.id === 'regular') {
 				const events: Record<number, string> = {};
@@ -131,7 +159,9 @@ async function main() {
 		ascender: ASCENDER,
 		descender: DESCENDER,
 		advance: ADVANCE,
-		build: BUILD,
+		extents: { left: Math.floor(ext.left), right: Math.ceil(ext.right), top: Math.ceil(ext.top), bottom: Math.floor(ext.bottom) },
+		build,
+		label: variant ? VARIANTS[variant].label : 'Flipbook',
 		layers: Object.fromEntries(LAYERS.map((l) => [l.id, { family: l.family, style: l.style, weight: l.weight, parts: l.parts, file: files[l.id] }])),
 		actions: manifestActions
 	};

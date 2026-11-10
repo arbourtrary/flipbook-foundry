@@ -6,7 +6,7 @@
 import { Character, type CharacterOptions, type Definition } from './character';
 import { cancelFrame, frame, type FrameData } from './frameloop';
 import { type Layer, type Library, getLibrary } from './library';
-import { GlyphAtlas } from './atlas';
+import { sharedAtlas } from './atlas';
 
 export interface Prop {
 	id: number;
@@ -201,7 +201,15 @@ export class Stage {
 		}
 	};
 
-	private atlas = new GlyphAtlas();
+	private atlas = sharedAtlas();
+	private get extents() {
+		const e = this.library.manifest.extents;
+		const u = this.library.unitsPerEm;
+		// Small margin for the bold layer's thicker line.
+		return e
+			? { left: e.left / u - 0.03, right: e.right / u + 0.03, top: e.top / u + 0.03, bottom: e.bottom / u - 0.03 }
+			: undefined;
+	}
 	private fontCache = new Map<string, string>();
 	private fontFor(layer: Layer, size: number) {
 		const key = `${layer}|${size}`;
@@ -269,7 +277,7 @@ export class Stage {
 			const Y = (c.y - camera.y) * z;
 			// Device-pixel size, rounded so the atlas sees a stable key.
 			const px = Math.round(c.size * z);
-			const hit = useAtlas && !c.body ? this.atlas.get(c.glyph, this.fontFor(c.layer, px), px, col) : null;
+			const hit = useAtlas && !c.body ? this.atlas.get(c.glyph, this.fontFor(c.layer, px), px, col, this.extents) : null;
 			if (hit) {
 				const { cell, source } = hit;
 				// Mirror by flipping the x axis around the character's root.

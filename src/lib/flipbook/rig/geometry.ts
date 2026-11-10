@@ -253,3 +253,105 @@ export function bounds(cs: Contour[]) {
 	}
 	return { x0, y0, x1, y1 };
 }
+
+// ----- overlap removal -----
+
+type Ring = [number, number][];
+
+// Flatten a contour into a polyline; `tol` is the max chord error (units).
+export function flatten(c: Contour, tol = 0.8): Ring {
+	const out: Ring = [[c.start[0], c.start[1]]];
+	let p = c.start;
+	for (const s of c.segs) {
+		if (s.t === 'L') out.push([s.p[0], s.p[1]]);
+		else {
+			const est = len(sub(s.c1, p)) + len(sub(s.c2, s.c1)) + len(sub(s.p, s.c2));
+			const n = Math.max(2, Math.min(24, Math.ceil(Math.sqrt(est / (tol * 8)) * 2)));
+			for (let i = 1; i <= n; i++) {
+				const t = i / n, u = 1 - t;
+				const a = u * u * u, b = 3 * u * u * t, cc = 3 * u * t * t, d = t * t * t;
+				out.push([
+					a * p[0] + b * s.c1[0] + cc * s.c2[0] + d * s.p[0],
+					a * p[1] + b * s.c1[1] + cc * s.c2[1] + d * s.p[1]
+				]);
+			}
+		}
+		p = s.p;
+	}
+	return out;
+}
+
+// Douglas–Peucker on a closed ring: split at the point farthest from the
+// start so neither half has a degenerate (zero-length) chord.
+function simplify(ring: Ring, tol: number): Ring {
+	let r = ring;
+	if (r.length > 1 && r[0][0] === r[r.length - 1][0] && r[0][1] === r[r.length - 1][1]) r = r.slice(0, -1);
+	if (r.length < 5) return r;
+	let far = 0, fd = -1;
+	for (let i = 1; i < r.length; i++) {
+		const d = Math.hypot(r[i][0] - r[0][0], r[i][1] - r[0][1]);
+		if (d > fd) { fd = d; far = i; }
+	}
+	const a = simplifyOpen(r.slice(0, far + 1), tol);
+	const b = simplifyOpen([...r.slice(far), r[0]], tol);
+	return [...a, ...b.slice(1, -1)];
+}
+
+function simplifyOpen(r: Ring, tol: number): Ring {
+	if (r.length < 3) return r;
+	const keep = new Uint8Array(r.length);
+	keep[0] = keep[r.length - 1] = 1;
+	const stack: [number, number][] = [[0, r.length - 1]];
+	while (stack.length) {
+		const [a, b] = stack.pop()!;
+		let max = 0, idx = -1;
+		const [ax, ay] = r[a], [bx, by] = r[b];
+		const dx = bx - ax, dy = by - ay;
+		const L = Math.hypot(dx, dy) || 1;
+		for (let i = a + 1; i < b; i++) {
+			const d = Math.abs((r[i][0] - ax) * dy - (r[i][1] - ay) * dx) / L;
+			if (d > max) { max = d; idx = i; }
+		}
+		if (max > tol && idx > 0) {
+			keep[idx] = 1;
+			stack.push([a, idx], [idx, b]);
+		}
+	}
+	return r.filter((_, i) => keep[i]);
+}
+
+/**
+ * Boolean-union every contour into non-overlapping outlines. Font
+ * rasterisers disagree about overlapping contours — Chrome punched holes
+ * where two legs nearly coincide — so fonts ship overlap-free glyphs.
+ * `union` is injected (polygon-clipping) to keep this module dependency-free.
+ */
+export function removeOverlaps(
+	cs: Contour[],
+	union: (...geoms: Ring[][][]) => Ring[][],
+	tol = 0.8
+): Contour[] {
+	if (cs.length === 0) return cs;
+	const polys = cs.map((c) => {
+		const ring = orient(c) === c ? flatten(c, tol) : flatten(orient(c), tol);
+		return [ring];
+	});
+	let merged: Ring[][];
+	try {
+		merged = union(...polys);
+	} catch {
+		return cs;
+	}
+	const out: Contour[] = [];
+	for (const poly of merged) {
+		poly.forEach((ring, ri) => {
+			const r = simplify(ring, tol * 0.6);
+			if (r.length < 3) return;
+			const c: Contour = { start: r[0] as Vec, segs: r.slice(1).map((p) => ({ t: 'L' as const, p: p as Vec })) };
+			// Outer rings positive, holes negative — so holes stay holes.
+			const a = signedArea(c);
+			out.push(ri === 0 ? (a < 0 ? reverse(c) : c) : a > 0 ? reverse(c) : c);
+		});
+	}
+	return out;
+}

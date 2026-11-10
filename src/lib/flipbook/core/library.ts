@@ -33,6 +33,8 @@ export interface Manifest {
 	ascender: number;
 	descender: number;
 	advance: number;
+	/** Ink extents of all glyphs, pelvis-relative font units (y-up). */
+	extents?: { left: number; right: number; top: number; bottom: number };
 	layers: Record<Layer, { family: string; style: string; weight: number; parts: string; file: string }>;
 	actions: Record<string, Omit<ActionInfo, 'name'>>;
 }
