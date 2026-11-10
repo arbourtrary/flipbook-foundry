@@ -1,0 +1,45 @@
+:root {
+	--paper: #FAFAF7;
+	--ink: #0F0F0E;
+	--ink-2: #6B6B68;
+	--rule: var(--ink);
+	--accent: #FF3B00;
+
+	--font-sans: "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	--font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+	--font-flipbook: "FoundrySans Stick", var(--font-sans);
+
+	--size-12: 0.75rem;
+	--size-14: 0.875rem;
+	--size-16: 1rem;
+	--size-20: 1.25rem;
+	--size-28: 1.75rem;
+	--size-40: 2.5rem;
+	--size-64: 4rem;
+	--size-96: 6rem;
+
+	--weight-regular: 400;
+	--weight-medium: 500;
+	--weight-bold: 700;
+
+	--leading-tight: 1.05;
+	--leading-snug: 1.2;
+	--leading-body: 1.5;
+
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-6: 24px;
+	--space-8: 32px;
+	--space-12: 48px;
+	--space-16: 64px;
+	--space-24: 96px;
+
+	--hairline: 1px solid var(--rule);
+
+	--container: 1120px;
+	--column-gutter: var(--space-6);
+
+	--transition-fast: 80ms ease;
+}

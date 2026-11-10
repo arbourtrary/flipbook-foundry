@@ -1,0 +1,2563 @@
+{
+	"fontFamily": "FoundrySans Stick",
+	"styleName": "Regular",
+	"unitsPerEm": 1000,
+	"ascender": 800,
+	"descender": -200,
+	"defaultAdvanceWidth": 1000,
+	"viewBox": 1000,
+	"poses": [
+		{
+			"name": "stand",
+			"codepoint": "U+E001",
+			"file": "stand.svg"
+		},
+		{
+			"name": "hands-on-hips",
+			"codepoint": "U+E002",
+			"file": "hands-on-hips.svg"
+		},
+		{
+			"name": "think",
+			"codepoint": "U+E003",
+			"file": "think.svg"
+		},
+		{
+			"name": "shrug",
+			"codepoint": "U+E004",
+			"file": "shrug.svg"
+		},
+		{
+			"name": "head-emerging-up",
+			"codepoint": "U+E005",
+			"file": "head-emerging-up.svg"
+		},
+		{
+			"name": "head-emerging-down",
+			"codepoint": "U+E006",
+			"file": "head-emerging-down.svg"
+		},
+		{
+			"name": "head-emerging-left",
+			"codepoint": "U+E007",
+			"file": "head-emerging-left.svg"
+		},
+		{
+			"name": "head-emerging-right",
+			"codepoint": "U+E008",
+			"file": "head-emerging-right.svg"
+		},
+		{
+			"name": "letter-a",
+			"codepoint": "U+0041",
+			"file": "letter-a.svg"
+		},
+		{
+			"name": "letter-a-lc",
+			"codepoint": "U+0061",
+			"file": "letter-a.svg"
+		},
+		{
+			"name": "letter-b",
+			"codepoint": "U+0042",
+			"file": "letter-b.svg"
+		},
+		{
+			"name": "letter-b-lc",
+			"codepoint": "U+0062",
+			"file": "letter-b.svg"
+		},
+		{
+			"name": "letter-c",
+			"codepoint": "U+0043",
+			"file": "letter-c.svg"
+		},
+		{
+			"name": "letter-c-lc",
+			"codepoint": "U+0063",
+			"file": "letter-c.svg"
+		},
+		{
+			"name": "letter-d",
+			"codepoint": "U+0044",
+			"file": "letter-d.svg"
+		},
+		{
+			"name": "letter-d-lc",
+			"codepoint": "U+0064",
+			"file": "letter-d.svg"
+		},
+		{
+			"name": "letter-e",
+			"codepoint": "U+0045",
+			"file": "letter-e.svg"
+		},
+		{
+			"name": "letter-e-lc",
+			"codepoint": "U+0065",
+			"file": "letter-e.svg"
+		},
+		{
+			"name": "letter-f",
+			"codepoint": "U+0046",
+			"file": "letter-f.svg"
+		},
+		{
+			"name": "letter-f-lc",
+			"codepoint": "U+0066",
+			"file": "letter-f.svg"
+		},
+		{
+			"name": "letter-g",
+			"codepoint": "U+0047",
+			"file": "letter-g.svg"
+		},
+		{
+			"name": "letter-g-lc",
+			"codepoint": "U+0067",
+			"file": "letter-g.svg"
+		},
+		{
+			"name": "letter-h",
+			"codepoint": "U+0048",
+			"file": "letter-h.svg"
+		},
+		{
+			"name": "letter-h-lc",
+			"codepoint": "U+0068",
+			"file": "letter-h.svg"
+		},
+		{
+			"name": "letter-i",
+			"codepoint": "U+0049",
+			"file": "letter-i.svg"
+		},
+		{
+			"name": "letter-i-lc",
+			"codepoint": "U+0069",
+			"file": "letter-i.svg"
+		},
+		{
+			"name": "letter-j",
+			"codepoint": "U+004A",
+			"file": "letter-j.svg"
+		},
+		{
+			"name": "letter-j-lc",
+			"codepoint": "U+006A",
+			"file": "letter-j.svg"
+		},
+		{
+			"name": "letter-k",
+			"codepoint": "U+004B",
+			"file": "letter-k.svg"
+		},
+		{
+			"name": "letter-k-lc",
+			"codepoint": "U+006B",
+			"file": "letter-k.svg"
+		},
+		{
+			"name": "letter-l",
+			"codepoint": "U+004C",
+			"file": "letter-l.svg"
+		},
+		{
+			"name": "letter-l-lc",
+			"codepoint": "U+006C",
+			"file": "letter-l.svg"
+		},
+		{
+			"name": "letter-m",
+			"codepoint": "U+004D",
+			"file": "letter-m.svg"
+		},
+		{
+			"name": "letter-m-lc",
+			"codepoint": "U+006D",
+			"file": "letter-m.svg"
+		},
+		{
+			"name": "letter-n",
+			"codepoint": "U+004E",
+			"file": "letter-n.svg"
+		},
+		{
+			"name": "letter-n-lc",
+			"codepoint": "U+006E",
+			"file": "letter-n.svg"
+		},
+		{
+			"name": "letter-o",
+			"codepoint": "U+004F",
+			"file": "letter-o.svg"
+		},
+		{
+			"name": "letter-o-lc",
+			"codepoint": "U+006F",
+			"file": "letter-o.svg"
+		},
+		{
+			"name": "letter-p",
+			"codepoint": "U+0050",
+			"file": "letter-p.svg"
+		},
+		{
+			"name": "letter-p-lc",
+			"codepoint": "U+0070",
+			"file": "letter-p.svg"
+		},
+		{
+			"name": "letter-q",
+			"codepoint": "U+0051",
+			"file": "letter-q.svg"
+		},
+		{
+			"name": "letter-q-lc",
+			"codepoint": "U+0071",
+			"file": "letter-q.svg"
+		},
+		{
+			"name": "letter-r",
+			"codepoint": "U+0052",
+			"file": "letter-r.svg"
+		},
+		{
+			"name": "letter-r-lc",
+			"codepoint": "U+0072",
+			"file": "letter-r.svg"
+		},
+		{
+			"name": "letter-s",
+			"codepoint": "U+0053",
+			"file": "letter-s.svg"
+		},
+		{
+			"name": "letter-s-lc",
+			"codepoint": "U+0073",
+			"file": "letter-s.svg"
+		},
+		{
+			"name": "letter-t",
+			"codepoint": "U+0054",
+			"file": "letter-t.svg"
+		},
+		{
+			"name": "letter-t-lc",
+			"codepoint": "U+0074",
+			"file": "letter-t.svg"
+		},
+		{
+			"name": "letter-u",
+			"codepoint": "U+0055",
+			"file": "letter-u.svg"
+		},
+		{
+			"name": "letter-u-lc",
+			"codepoint": "U+0075",
+			"file": "letter-u.svg"
+		},
+		{
+			"name": "letter-v",
+			"codepoint": "U+0056",
+			"file": "letter-v.svg"
+		},
+		{
+			"name": "letter-v-lc",
+			"codepoint": "U+0076",
+			"file": "letter-v.svg"
+		},
+		{
+			"name": "letter-w",
+			"codepoint": "U+0057",
+			"file": "letter-w.svg"
+		},
+		{
+			"name": "letter-w-lc",
+			"codepoint": "U+0077",
+			"file": "letter-w.svg"
+		},
+		{
+			"name": "letter-x",
+			"codepoint": "U+0058",
+			"file": "letter-x.svg"
+		},
+		{
+			"name": "letter-x-lc",
+			"codepoint": "U+0078",
+			"file": "letter-x.svg"
+		},
+		{
+			"name": "letter-y",
+			"codepoint": "U+0059",
+			"file": "letter-y.svg"
+		},
+		{
+			"name": "letter-y-lc",
+			"codepoint": "U+0079",
+			"file": "letter-y.svg"
+		},
+		{
+			"name": "letter-z",
+			"codepoint": "U+005A",
+			"file": "letter-z.svg"
+		},
+		{
+			"name": "letter-z-lc",
+			"codepoint": "U+007A",
+			"file": "letter-z.svg"
+		},
+		{
+			"name": "walk-01",
+			"codepoint": "U+E100",
+			"file": "walk-01.svg"
+		},
+		{
+			"name": "walk-02",
+			"codepoint": "U+E101",
+			"file": "walk-02.svg"
+		},
+		{
+			"name": "walk-03",
+			"codepoint": "U+E102",
+			"file": "walk-03.svg"
+		},
+		{
+			"name": "walk-04",
+			"codepoint": "U+E103",
+			"file": "walk-04.svg"
+		},
+		{
+			"name": "walk-05",
+			"codepoint": "U+E104",
+			"file": "walk-05.svg"
+		},
+		{
+			"name": "walk-06",
+			"codepoint": "U+E105",
+			"file": "walk-06.svg"
+		},
+		{
+			"name": "walk-07",
+			"codepoint": "U+E106",
+			"file": "walk-07.svg"
+		},
+		{
+			"name": "walk-08",
+			"codepoint": "U+E107",
+			"file": "walk-08.svg"
+		},
+		{
+			"name": "walk-09",
+			"codepoint": "U+E108",
+			"file": "walk-09.svg"
+		},
+		{
+			"name": "walk-10",
+			"codepoint": "U+E109",
+			"file": "walk-10.svg"
+		},
+		{
+			"name": "walk-11",
+			"codepoint": "U+E10A",
+			"file": "walk-11.svg"
+		},
+		{
+			"name": "walk-12",
+			"codepoint": "U+E10B",
+			"file": "walk-12.svg"
+		},
+		{
+			"name": "walk-13",
+			"codepoint": "U+E10C",
+			"file": "walk-13.svg"
+		},
+		{
+			"name": "walk-14",
+			"codepoint": "U+E10D",
+			"file": "walk-14.svg"
+		},
+		{
+			"name": "walk-15",
+			"codepoint": "U+E10E",
+			"file": "walk-15.svg"
+		},
+		{
+			"name": "walk-16",
+			"codepoint": "U+E10F",
+			"file": "walk-16.svg"
+		},
+		{
+			"name": "walk-17",
+			"codepoint": "U+E110",
+			"file": "walk-17.svg"
+		},
+		{
+			"name": "walk-18",
+			"codepoint": "U+E111",
+			"file": "walk-18.svg"
+		},
+		{
+			"name": "walk-19",
+			"codepoint": "U+E112",
+			"file": "walk-19.svg"
+		},
+		{
+			"name": "walk-20",
+			"codepoint": "U+E113",
+			"file": "walk-20.svg"
+		},
+		{
+			"name": "run-01",
+			"codepoint": "U+E120",
+			"file": "run-01.svg"
+		},
+		{
+			"name": "run-02",
+			"codepoint": "U+E121",
+			"file": "run-02.svg"
+		},
+		{
+			"name": "run-03",
+			"codepoint": "U+E122",
+			"file": "run-03.svg"
+		},
+		{
+			"name": "run-04",
+			"codepoint": "U+E123",
+			"file": "run-04.svg"
+		},
+		{
+			"name": "run-05",
+			"codepoint": "U+E124",
+			"file": "run-05.svg"
+		},
+		{
+			"name": "run-06",
+			"codepoint": "U+E125",
+			"file": "run-06.svg"
+		},
+		{
+			"name": "run-07",
+			"codepoint": "U+E126",
+			"file": "run-07.svg"
+		},
+		{
+			"name": "run-08",
+			"codepoint": "U+E127",
+			"file": "run-08.svg"
+		},
+		{
+			"name": "run-09",
+			"codepoint": "U+E128",
+			"file": "run-09.svg"
+		},
+		{
+			"name": "run-10",
+			"codepoint": "U+E129",
+			"file": "run-10.svg"
+		},
+		{
+			"name": "run-11",
+			"codepoint": "U+E12A",
+			"file": "run-11.svg"
+		},
+		{
+			"name": "run-12",
+			"codepoint": "U+E12B",
+			"file": "run-12.svg"
+		},
+		{
+			"name": "run-13",
+			"codepoint": "U+E12C",
+			"file": "run-13.svg"
+		},
+		{
+			"name": "run-14",
+			"codepoint": "U+E12D",
+			"file": "run-14.svg"
+		},
+		{
+			"name": "run-15",
+			"codepoint": "U+E12E",
+			"file": "run-15.svg"
+		},
+		{
+			"name": "run-16",
+			"codepoint": "U+E12F",
+			"file": "run-16.svg"
+		},
+		{
+			"name": "run-17",
+			"codepoint": "U+E130",
+			"file": "run-17.svg"
+		},
+		{
+			"name": "run-18",
+			"codepoint": "U+E131",
+			"file": "run-18.svg"
+		},
+		{
+			"name": "run-19",
+			"codepoint": "U+E132",
+			"file": "run-19.svg"
+		},
+		{
+			"name": "run-20",
+			"codepoint": "U+E133",
+			"file": "run-20.svg"
+		},
+		{
+			"name": "jump-01",
+			"codepoint": "U+E140",
+			"file": "jump-01.svg"
+		},
+		{
+			"name": "jump-02",
+			"codepoint": "U+E141",
+			"file": "jump-02.svg"
+		},
+		{
+			"name": "jump-03",
+			"codepoint": "U+E142",
+			"file": "jump-03.svg"
+		},
+		{
+			"name": "jump-04",
+			"codepoint": "U+E143",
+			"file": "jump-04.svg"
+		},
+		{
+			"name": "jump-05",
+			"codepoint": "U+E144",
+			"file": "jump-05.svg"
+		},
+		{
+			"name": "jump-06",
+			"codepoint": "U+E145",
+			"file": "jump-06.svg"
+		},
+		{
+			"name": "jump-07",
+			"codepoint": "U+E146",
+			"file": "jump-07.svg"
+		},
+		{
+			"name": "jump-08",
+			"codepoint": "U+E147",
+			"file": "jump-08.svg"
+		},
+		{
+			"name": "jump-09",
+			"codepoint": "U+E148",
+			"file": "jump-09.svg"
+		},
+		{
+			"name": "jump-10",
+			"codepoint": "U+E149",
+			"file": "jump-10.svg"
+		},
+		{
+			"name": "jump-11",
+			"codepoint": "U+E14A",
+			"file": "jump-11.svg"
+		},
+		{
+			"name": "jump-12",
+			"codepoint": "U+E14B",
+			"file": "jump-12.svg"
+		},
+		{
+			"name": "jump-13",
+			"codepoint": "U+E14C",
+			"file": "jump-13.svg"
+		},
+		{
+			"name": "jump-14",
+			"codepoint": "U+E14D",
+			"file": "jump-14.svg"
+		},
+		{
+			"name": "jump-15",
+			"codepoint": "U+E14E",
+			"file": "jump-15.svg"
+		},
+		{
+			"name": "jump-16",
+			"codepoint": "U+E14F",
+			"file": "jump-16.svg"
+		},
+		{
+			"name": "jump-17",
+			"codepoint": "U+E150",
+			"file": "jump-17.svg"
+		},
+		{
+			"name": "jump-18",
+			"codepoint": "U+E151",
+			"file": "jump-18.svg"
+		},
+		{
+			"name": "jump-19",
+			"codepoint": "U+E152",
+			"file": "jump-19.svg"
+		},
+		{
+			"name": "jump-20",
+			"codepoint": "U+E153",
+			"file": "jump-20.svg"
+		},
+		{
+			"name": "dance-01",
+			"codepoint": "U+E160",
+			"file": "dance-01.svg"
+		},
+		{
+			"name": "dance-02",
+			"codepoint": "U+E161",
+			"file": "dance-02.svg"
+		},
+		{
+			"name": "dance-03",
+			"codepoint": "U+E162",
+			"file": "dance-03.svg"
+		},
+		{
+			"name": "dance-04",
+			"codepoint": "U+E163",
+			"file": "dance-04.svg"
+		},
+		{
+			"name": "dance-05",
+			"codepoint": "U+E164",
+			"file": "dance-05.svg"
+		},
+		{
+			"name": "dance-06",
+			"codepoint": "U+E165",
+			"file": "dance-06.svg"
+		},
+		{
+			"name": "dance-07",
+			"codepoint": "U+E166",
+			"file": "dance-07.svg"
+		},
+		{
+			"name": "dance-08",
+			"codepoint": "U+E167",
+			"file": "dance-08.svg"
+		},
+		{
+			"name": "dance-09",
+			"codepoint": "U+E168",
+			"file": "dance-09.svg"
+		},
+		{
+			"name": "dance-10",
+			"codepoint": "U+E169",
+			"file": "dance-10.svg"
+		},
+		{
+			"name": "greet-01",
+			"codepoint": "U+E170",
+			"file": "greet-01.svg"
+		},
+		{
+			"name": "greet-02",
+			"codepoint": "U+E171",
+			"file": "greet-02.svg"
+		},
+		{
+			"name": "greet-03",
+			"codepoint": "U+E172",
+			"file": "greet-03.svg"
+		},
+		{
+			"name": "greet-04",
+			"codepoint": "U+E173",
+			"file": "greet-04.svg"
+		},
+		{
+			"name": "greet-05",
+			"codepoint": "U+E174",
+			"file": "greet-05.svg"
+		},
+		{
+			"name": "greet-06",
+			"codepoint": "U+E175",
+			"file": "greet-06.svg"
+		},
+		{
+			"name": "greet-07",
+			"codepoint": "U+E176",
+			"file": "greet-07.svg"
+		},
+		{
+			"name": "greet-08",
+			"codepoint": "U+E177",
+			"file": "greet-08.svg"
+		},
+		{
+			"name": "greet-09",
+			"codepoint": "U+E178",
+			"file": "greet-09.svg"
+		},
+		{
+			"name": "greet-10",
+			"codepoint": "U+E179",
+			"file": "greet-10.svg"
+		},
+		{
+			"name": "cheer-01",
+			"codepoint": "U+E180",
+			"file": "cheer-01.svg"
+		},
+		{
+			"name": "cheer-02",
+			"codepoint": "U+E181",
+			"file": "cheer-02.svg"
+		},
+		{
+			"name": "cheer-03",
+			"codepoint": "U+E182",
+			"file": "cheer-03.svg"
+		},
+		{
+			"name": "cheer-04",
+			"codepoint": "U+E183",
+			"file": "cheer-04.svg"
+		},
+		{
+			"name": "cheer-05",
+			"codepoint": "U+E184",
+			"file": "cheer-05.svg"
+		},
+		{
+			"name": "cheer-06",
+			"codepoint": "U+E185",
+			"file": "cheer-06.svg"
+		},
+		{
+			"name": "cheer-07",
+			"codepoint": "U+E186",
+			"file": "cheer-07.svg"
+		},
+		{
+			"name": "cheer-08",
+			"codepoint": "U+E187",
+			"file": "cheer-08.svg"
+		},
+		{
+			"name": "cheer-09",
+			"codepoint": "U+E188",
+			"file": "cheer-09.svg"
+		},
+		{
+			"name": "cheer-10",
+			"codepoint": "U+E189",
+			"file": "cheer-10.svg"
+		},
+		{
+			"name": "sit-01",
+			"codepoint": "U+E190",
+			"file": "sit-01.svg"
+		},
+		{
+			"name": "sit-02",
+			"codepoint": "U+E191",
+			"file": "sit-02.svg"
+		},
+		{
+			"name": "sit-03",
+			"codepoint": "U+E192",
+			"file": "sit-03.svg"
+		},
+		{
+			"name": "sit-04",
+			"codepoint": "U+E193",
+			"file": "sit-04.svg"
+		},
+		{
+			"name": "sit-05",
+			"codepoint": "U+E194",
+			"file": "sit-05.svg"
+		},
+		{
+			"name": "sit-06",
+			"codepoint": "U+E195",
+			"file": "sit-06.svg"
+		},
+		{
+			"name": "sit-07",
+			"codepoint": "U+E196",
+			"file": "sit-07.svg"
+		},
+		{
+			"name": "sit-08",
+			"codepoint": "U+E197",
+			"file": "sit-08.svg"
+		},
+		{
+			"name": "sit-09",
+			"codepoint": "U+E198",
+			"file": "sit-09.svg"
+		},
+		{
+			"name": "sit-10",
+			"codepoint": "U+E199",
+			"file": "sit-10.svg"
+		},
+		{
+			"name": "idle-01",
+			"codepoint": "U+E1A0",
+			"file": "idle-01.svg"
+		},
+		{
+			"name": "idle-02",
+			"codepoint": "U+E1A1",
+			"file": "idle-02.svg"
+		},
+		{
+			"name": "idle-03",
+			"codepoint": "U+E1A2",
+			"file": "idle-03.svg"
+		},
+		{
+			"name": "idle-04",
+			"codepoint": "U+E1A3",
+			"file": "idle-04.svg"
+		},
+		{
+			"name": "idle-05",
+			"codepoint": "U+E1A4",
+			"file": "idle-05.svg"
+		},
+		{
+			"name": "idle-06",
+			"codepoint": "U+E1A5",
+			"file": "idle-06.svg"
+		},
+		{
+			"name": "idle-07",
+			"codepoint": "U+E1A6",
+			"file": "idle-07.svg"
+		},
+		{
+			"name": "idle-08",
+			"codepoint": "U+E1A7",
+			"file": "idle-08.svg"
+		},
+		{
+			"name": "idle-09",
+			"codepoint": "U+E1A8",
+			"file": "idle-09.svg"
+		},
+		{
+			"name": "idle-10",
+			"codepoint": "U+E1A9",
+			"file": "idle-10.svg"
+		},
+		{
+			"name": "kneel-01",
+			"codepoint": "U+E1B0",
+			"file": "kneel-01.svg"
+		},
+		{
+			"name": "kneel-02",
+			"codepoint": "U+E1B1",
+			"file": "kneel-02.svg"
+		},
+		{
+			"name": "kneel-03",
+			"codepoint": "U+E1B2",
+			"file": "kneel-03.svg"
+		},
+		{
+			"name": "kneel-04",
+			"codepoint": "U+E1B3",
+			"file": "kneel-04.svg"
+		},
+		{
+			"name": "kneel-05",
+			"codepoint": "U+E1B4",
+			"file": "kneel-05.svg"
+		},
+		{
+			"name": "kneel-06",
+			"codepoint": "U+E1B5",
+			"file": "kneel-06.svg"
+		},
+		{
+			"name": "kneel-07",
+			"codepoint": "U+E1B6",
+			"file": "kneel-07.svg"
+		},
+		{
+			"name": "kneel-08",
+			"codepoint": "U+E1B7",
+			"file": "kneel-08.svg"
+		},
+		{
+			"name": "kneel-09",
+			"codepoint": "U+E1B8",
+			"file": "kneel-09.svg"
+		},
+		{
+			"name": "kneel-10",
+			"codepoint": "U+E1B9",
+			"file": "kneel-10.svg"
+		},
+		{
+			"name": "clap-01",
+			"codepoint": "U+E1C0",
+			"file": "clap-01.svg"
+		},
+		{
+			"name": "clap-02",
+			"codepoint": "U+E1C1",
+			"file": "clap-02.svg"
+		},
+		{
+			"name": "clap-03",
+			"codepoint": "U+E1C2",
+			"file": "clap-03.svg"
+		},
+		{
+			"name": "clap-04",
+			"codepoint": "U+E1C3",
+			"file": "clap-04.svg"
+		},
+		{
+			"name": "clap-05",
+			"codepoint": "U+E1C4",
+			"file": "clap-05.svg"
+		},
+		{
+			"name": "clap-06",
+			"codepoint": "U+E1C5",
+			"file": "clap-06.svg"
+		},
+		{
+			"name": "clap-07",
+			"codepoint": "U+E1C6",
+			"file": "clap-07.svg"
+		},
+		{
+			"name": "clap-08",
+			"codepoint": "U+E1C7",
+			"file": "clap-08.svg"
+		},
+		{
+			"name": "clap-09",
+			"codepoint": "U+E1C8",
+			"file": "clap-09.svg"
+		},
+		{
+			"name": "clap-10",
+			"codepoint": "U+E1C9",
+			"file": "clap-10.svg"
+		},
+		{
+			"name": "extend-01",
+			"codepoint": "U+E1D0",
+			"file": "extend-01.svg"
+		},
+		{
+			"name": "extend-02",
+			"codepoint": "U+E1D1",
+			"file": "extend-02.svg"
+		},
+		{
+			"name": "extend-03",
+			"codepoint": "U+E1D2",
+			"file": "extend-03.svg"
+		},
+		{
+			"name": "extend-04",
+			"codepoint": "U+E1D3",
+			"file": "extend-04.svg"
+		},
+		{
+			"name": "extend-05",
+			"codepoint": "U+E1D4",
+			"file": "extend-05.svg"
+		},
+		{
+			"name": "extend-06",
+			"codepoint": "U+E1D5",
+			"file": "extend-06.svg"
+		},
+		{
+			"name": "extend-07",
+			"codepoint": "U+E1D6",
+			"file": "extend-07.svg"
+		},
+		{
+			"name": "extend-08",
+			"codepoint": "U+E1D7",
+			"file": "extend-08.svg"
+		},
+		{
+			"name": "extend-09",
+			"codepoint": "U+E1D8",
+			"file": "extend-09.svg"
+		},
+		{
+			"name": "extend-10",
+			"codepoint": "U+E1D9",
+			"file": "extend-10.svg"
+		},
+		{
+			"name": "nod-01",
+			"codepoint": "U+E1E0",
+			"file": "nod-01.svg"
+		},
+		{
+			"name": "nod-02",
+			"codepoint": "U+E1E1",
+			"file": "nod-02.svg"
+		},
+		{
+			"name": "nod-03",
+			"codepoint": "U+E1E2",
+			"file": "nod-03.svg"
+		},
+		{
+			"name": "nod-04",
+			"codepoint": "U+E1E3",
+			"file": "nod-04.svg"
+		},
+		{
+			"name": "nod-05",
+			"codepoint": "U+E1E4",
+			"file": "nod-05.svg"
+		},
+		{
+			"name": "nod-06",
+			"codepoint": "U+E1E5",
+			"file": "nod-06.svg"
+		},
+		{
+			"name": "nod-07",
+			"codepoint": "U+E1E6",
+			"file": "nod-07.svg"
+		},
+		{
+			"name": "nod-08",
+			"codepoint": "U+E1E7",
+			"file": "nod-08.svg"
+		},
+		{
+			"name": "nod-09",
+			"codepoint": "U+E1E8",
+			"file": "nod-09.svg"
+		},
+		{
+			"name": "nod-10",
+			"codepoint": "U+E1E9",
+			"file": "nod-10.svg"
+		},
+		{
+			"name": "shake-head-01",
+			"codepoint": "U+E1F0",
+			"file": "shake-head-01.svg"
+		},
+		{
+			"name": "shake-head-02",
+			"codepoint": "U+E1F1",
+			"file": "shake-head-02.svg"
+		},
+		{
+			"name": "shake-head-03",
+			"codepoint": "U+E1F2",
+			"file": "shake-head-03.svg"
+		},
+		{
+			"name": "shake-head-04",
+			"codepoint": "U+E1F3",
+			"file": "shake-head-04.svg"
+		},
+		{
+			"name": "shake-head-05",
+			"codepoint": "U+E1F4",
+			"file": "shake-head-05.svg"
+		},
+		{
+			"name": "shake-head-06",
+			"codepoint": "U+E1F5",
+			"file": "shake-head-06.svg"
+		},
+		{
+			"name": "shake-head-07",
+			"codepoint": "U+E1F6",
+			"file": "shake-head-07.svg"
+		},
+		{
+			"name": "shake-head-08",
+			"codepoint": "U+E1F7",
+			"file": "shake-head-08.svg"
+		},
+		{
+			"name": "shake-head-09",
+			"codepoint": "U+E1F8",
+			"file": "shake-head-09.svg"
+		},
+		{
+			"name": "shake-head-10",
+			"codepoint": "U+E1F9",
+			"file": "shake-head-10.svg"
+		},
+		{
+			"name": "yawn-01",
+			"codepoint": "U+E200",
+			"file": "yawn-01.svg"
+		},
+		{
+			"name": "yawn-02",
+			"codepoint": "U+E201",
+			"file": "yawn-02.svg"
+		},
+		{
+			"name": "yawn-03",
+			"codepoint": "U+E202",
+			"file": "yawn-03.svg"
+		},
+		{
+			"name": "yawn-04",
+			"codepoint": "U+E203",
+			"file": "yawn-04.svg"
+		},
+		{
+			"name": "yawn-05",
+			"codepoint": "U+E204",
+			"file": "yawn-05.svg"
+		},
+		{
+			"name": "yawn-06",
+			"codepoint": "U+E205",
+			"file": "yawn-06.svg"
+		},
+		{
+			"name": "yawn-07",
+			"codepoint": "U+E206",
+			"file": "yawn-07.svg"
+		},
+		{
+			"name": "yawn-08",
+			"codepoint": "U+E207",
+			"file": "yawn-08.svg"
+		},
+		{
+			"name": "yawn-09",
+			"codepoint": "U+E208",
+			"file": "yawn-09.svg"
+		},
+		{
+			"name": "yawn-10",
+			"codepoint": "U+E209",
+			"file": "yawn-10.svg"
+		},
+		{
+			"name": "point-left-01",
+			"codepoint": "U+E210",
+			"file": "point-left-01.svg"
+		},
+		{
+			"name": "point-left-02",
+			"codepoint": "U+E211",
+			"file": "point-left-02.svg"
+		},
+		{
+			"name": "point-left-03",
+			"codepoint": "U+E212",
+			"file": "point-left-03.svg"
+		},
+		{
+			"name": "point-left-04",
+			"codepoint": "U+E213",
+			"file": "point-left-04.svg"
+		},
+		{
+			"name": "point-left-05",
+			"codepoint": "U+E214",
+			"file": "point-left-05.svg"
+		},
+		{
+			"name": "point-left-06",
+			"codepoint": "U+E215",
+			"file": "point-left-06.svg"
+		},
+		{
+			"name": "point-left-07",
+			"codepoint": "U+E216",
+			"file": "point-left-07.svg"
+		},
+		{
+			"name": "point-left-08",
+			"codepoint": "U+E217",
+			"file": "point-left-08.svg"
+		},
+		{
+			"name": "point-left-09",
+			"codepoint": "U+E218",
+			"file": "point-left-09.svg"
+		},
+		{
+			"name": "point-left-10",
+			"codepoint": "U+E219",
+			"file": "point-left-10.svg"
+		},
+		{
+			"name": "point-right-01",
+			"codepoint": "U+E220",
+			"file": "point-right-01.svg"
+		},
+		{
+			"name": "point-right-02",
+			"codepoint": "U+E221",
+			"file": "point-right-02.svg"
+		},
+		{
+			"name": "point-right-03",
+			"codepoint": "U+E222",
+			"file": "point-right-03.svg"
+		},
+		{
+			"name": "point-right-04",
+			"codepoint": "U+E223",
+			"file": "point-right-04.svg"
+		},
+		{
+			"name": "point-right-05",
+			"codepoint": "U+E224",
+			"file": "point-right-05.svg"
+		},
+		{
+			"name": "point-right-06",
+			"codepoint": "U+E225",
+			"file": "point-right-06.svg"
+		},
+		{
+			"name": "point-right-07",
+			"codepoint": "U+E226",
+			"file": "point-right-07.svg"
+		},
+		{
+			"name": "point-right-08",
+			"codepoint": "U+E227",
+			"file": "point-right-08.svg"
+		},
+		{
+			"name": "point-right-09",
+			"codepoint": "U+E228",
+			"file": "point-right-09.svg"
+		},
+		{
+			"name": "point-right-10",
+			"codepoint": "U+E229",
+			"file": "point-right-10.svg"
+		},
+		{
+			"name": "swim-01",
+			"codepoint": "U+E230",
+			"file": "swim-01.svg"
+		},
+		{
+			"name": "swim-02",
+			"codepoint": "U+E231",
+			"file": "swim-02.svg"
+		},
+		{
+			"name": "swim-03",
+			"codepoint": "U+E232",
+			"file": "swim-03.svg"
+		},
+		{
+			"name": "swim-04",
+			"codepoint": "U+E233",
+			"file": "swim-04.svg"
+		},
+		{
+			"name": "swim-05",
+			"codepoint": "U+E234",
+			"file": "swim-05.svg"
+		},
+		{
+			"name": "swim-06",
+			"codepoint": "U+E235",
+			"file": "swim-06.svg"
+		},
+		{
+			"name": "swim-07",
+			"codepoint": "U+E236",
+			"file": "swim-07.svg"
+		},
+		{
+			"name": "swim-08",
+			"codepoint": "U+E237",
+			"file": "swim-08.svg"
+		},
+		{
+			"name": "swim-09",
+			"codepoint": "U+E238",
+			"file": "swim-09.svg"
+		},
+		{
+			"name": "swim-10",
+			"codepoint": "U+E239",
+			"file": "swim-10.svg"
+		},
+		{
+			"name": "x-leap-01",
+			"codepoint": "U+E240",
+			"file": "x-leap-01.svg"
+		},
+		{
+			"name": "x-leap-02",
+			"codepoint": "U+E241",
+			"file": "x-leap-02.svg"
+		},
+		{
+			"name": "x-leap-03",
+			"codepoint": "U+E242",
+			"file": "x-leap-03.svg"
+		},
+		{
+			"name": "x-leap-04",
+			"codepoint": "U+E243",
+			"file": "x-leap-04.svg"
+		},
+		{
+			"name": "x-leap-05",
+			"codepoint": "U+E244",
+			"file": "x-leap-05.svg"
+		},
+		{
+			"name": "x-leap-06",
+			"codepoint": "U+E245",
+			"file": "x-leap-06.svg"
+		},
+		{
+			"name": "x-leap-07",
+			"codepoint": "U+E246",
+			"file": "x-leap-07.svg"
+		},
+		{
+			"name": "x-leap-08",
+			"codepoint": "U+E247",
+			"file": "x-leap-08.svg"
+		},
+		{
+			"name": "x-leap-09",
+			"codepoint": "U+E248",
+			"file": "x-leap-09.svg"
+		},
+		{
+			"name": "x-leap-10",
+			"codepoint": "U+E249",
+			"file": "x-leap-10.svg"
+		},
+		{
+			"name": "tip-toe-01",
+			"codepoint": "U+E250",
+			"file": "tip-toe-01.svg"
+		},
+		{
+			"name": "tip-toe-02",
+			"codepoint": "U+E251",
+			"file": "tip-toe-02.svg"
+		},
+		{
+			"name": "tip-toe-03",
+			"codepoint": "U+E252",
+			"file": "tip-toe-03.svg"
+		},
+		{
+			"name": "tip-toe-04",
+			"codepoint": "U+E253",
+			"file": "tip-toe-04.svg"
+		},
+		{
+			"name": "tip-toe-05",
+			"codepoint": "U+E254",
+			"file": "tip-toe-05.svg"
+		},
+		{
+			"name": "tip-toe-06",
+			"codepoint": "U+E255",
+			"file": "tip-toe-06.svg"
+		},
+		{
+			"name": "tip-toe-07",
+			"codepoint": "U+E256",
+			"file": "tip-toe-07.svg"
+		},
+		{
+			"name": "tip-toe-08",
+			"codepoint": "U+E257",
+			"file": "tip-toe-08.svg"
+		},
+		{
+			"name": "tip-toe-09",
+			"codepoint": "U+E258",
+			"file": "tip-toe-09.svg"
+		},
+		{
+			"name": "tip-toe-10",
+			"codepoint": "U+E259",
+			"file": "tip-toe-10.svg"
+		},
+		{
+			"name": "balance-01",
+			"codepoint": "U+E260",
+			"file": "balance-01.svg"
+		},
+		{
+			"name": "balance-02",
+			"codepoint": "U+E261",
+			"file": "balance-02.svg"
+		},
+		{
+			"name": "balance-03",
+			"codepoint": "U+E262",
+			"file": "balance-03.svg"
+		},
+		{
+			"name": "balance-04",
+			"codepoint": "U+E263",
+			"file": "balance-04.svg"
+		},
+		{
+			"name": "balance-05",
+			"codepoint": "U+E264",
+			"file": "balance-05.svg"
+		},
+		{
+			"name": "balance-06",
+			"codepoint": "U+E265",
+			"file": "balance-06.svg"
+		},
+		{
+			"name": "balance-07",
+			"codepoint": "U+E266",
+			"file": "balance-07.svg"
+		},
+		{
+			"name": "balance-08",
+			"codepoint": "U+E267",
+			"file": "balance-08.svg"
+		},
+		{
+			"name": "balance-09",
+			"codepoint": "U+E268",
+			"file": "balance-09.svg"
+		},
+		{
+			"name": "balance-10",
+			"codepoint": "U+E269",
+			"file": "balance-10.svg"
+		},
+		{
+			"name": "throw-01",
+			"codepoint": "U+E270",
+			"file": "throw-01.svg"
+		},
+		{
+			"name": "throw-02",
+			"codepoint": "U+E271",
+			"file": "throw-02.svg"
+		},
+		{
+			"name": "throw-03",
+			"codepoint": "U+E272",
+			"file": "throw-03.svg"
+		},
+		{
+			"name": "throw-04",
+			"codepoint": "U+E273",
+			"file": "throw-04.svg"
+		},
+		{
+			"name": "throw-05",
+			"codepoint": "U+E274",
+			"file": "throw-05.svg"
+		},
+		{
+			"name": "throw-06",
+			"codepoint": "U+E275",
+			"file": "throw-06.svg"
+		},
+		{
+			"name": "throw-07",
+			"codepoint": "U+E276",
+			"file": "throw-07.svg"
+		},
+		{
+			"name": "throw-08",
+			"codepoint": "U+E277",
+			"file": "throw-08.svg"
+		},
+		{
+			"name": "throw-09",
+			"codepoint": "U+E278",
+			"file": "throw-09.svg"
+		},
+		{
+			"name": "throw-10",
+			"codepoint": "U+E279",
+			"file": "throw-10.svg"
+		},
+		{
+			"name": "lunge-01",
+			"codepoint": "U+E280",
+			"file": "lunge-01.svg"
+		},
+		{
+			"name": "lunge-02",
+			"codepoint": "U+E281",
+			"file": "lunge-02.svg"
+		},
+		{
+			"name": "lunge-03",
+			"codepoint": "U+E282",
+			"file": "lunge-03.svg"
+		},
+		{
+			"name": "lunge-04",
+			"codepoint": "U+E283",
+			"file": "lunge-04.svg"
+		},
+		{
+			"name": "lunge-05",
+			"codepoint": "U+E284",
+			"file": "lunge-05.svg"
+		},
+		{
+			"name": "lunge-06",
+			"codepoint": "U+E285",
+			"file": "lunge-06.svg"
+		},
+		{
+			"name": "lunge-07",
+			"codepoint": "U+E286",
+			"file": "lunge-07.svg"
+		},
+		{
+			"name": "lunge-08",
+			"codepoint": "U+E287",
+			"file": "lunge-08.svg"
+		},
+		{
+			"name": "lunge-09",
+			"codepoint": "U+E288",
+			"file": "lunge-09.svg"
+		},
+		{
+			"name": "lunge-10",
+			"codepoint": "U+E289",
+			"file": "lunge-10.svg"
+		},
+		{
+			"name": "hop-01",
+			"codepoint": "U+E290",
+			"file": "hop-01.svg"
+		},
+		{
+			"name": "hop-02",
+			"codepoint": "U+E291",
+			"file": "hop-02.svg"
+		},
+		{
+			"name": "hop-03",
+			"codepoint": "U+E292",
+			"file": "hop-03.svg"
+		},
+		{
+			"name": "hop-04",
+			"codepoint": "U+E293",
+			"file": "hop-04.svg"
+		},
+		{
+			"name": "hop-05",
+			"codepoint": "U+E294",
+			"file": "hop-05.svg"
+		},
+		{
+			"name": "hop-06",
+			"codepoint": "U+E295",
+			"file": "hop-06.svg"
+		},
+		{
+			"name": "hop-07",
+			"codepoint": "U+E296",
+			"file": "hop-07.svg"
+		},
+		{
+			"name": "hop-08",
+			"codepoint": "U+E297",
+			"file": "hop-08.svg"
+		},
+		{
+			"name": "hop-09",
+			"codepoint": "U+E298",
+			"file": "hop-09.svg"
+		},
+		{
+			"name": "hop-10",
+			"codepoint": "U+E299",
+			"file": "hop-10.svg"
+		},
+		{
+			"name": "salute-01",
+			"codepoint": "U+E2A0",
+			"file": "salute-01.svg"
+		},
+		{
+			"name": "salute-02",
+			"codepoint": "U+E2A1",
+			"file": "salute-02.svg"
+		},
+		{
+			"name": "salute-03",
+			"codepoint": "U+E2A2",
+			"file": "salute-03.svg"
+		},
+		{
+			"name": "salute-04",
+			"codepoint": "U+E2A3",
+			"file": "salute-04.svg"
+		},
+		{
+			"name": "salute-05",
+			"codepoint": "U+E2A4",
+			"file": "salute-05.svg"
+		},
+		{
+			"name": "salute-06",
+			"codepoint": "U+E2A5",
+			"file": "salute-06.svg"
+		},
+		{
+			"name": "salute-07",
+			"codepoint": "U+E2A6",
+			"file": "salute-07.svg"
+		},
+		{
+			"name": "salute-08",
+			"codepoint": "U+E2A7",
+			"file": "salute-08.svg"
+		},
+		{
+			"name": "salute-09",
+			"codepoint": "U+E2A8",
+			"file": "salute-09.svg"
+		},
+		{
+			"name": "salute-10",
+			"codepoint": "U+E2A9",
+			"file": "salute-10.svg"
+		},
+		{
+			"name": "tap-foot-01",
+			"codepoint": "U+E2B0",
+			"file": "tap-foot-01.svg"
+		},
+		{
+			"name": "tap-foot-02",
+			"codepoint": "U+E2B1",
+			"file": "tap-foot-02.svg"
+		},
+		{
+			"name": "tap-foot-03",
+			"codepoint": "U+E2B2",
+			"file": "tap-foot-03.svg"
+		},
+		{
+			"name": "tap-foot-04",
+			"codepoint": "U+E2B3",
+			"file": "tap-foot-04.svg"
+		},
+		{
+			"name": "tap-foot-05",
+			"codepoint": "U+E2B4",
+			"file": "tap-foot-05.svg"
+		},
+		{
+			"name": "tap-foot-06",
+			"codepoint": "U+E2B5",
+			"file": "tap-foot-06.svg"
+		},
+		{
+			"name": "tap-foot-07",
+			"codepoint": "U+E2B6",
+			"file": "tap-foot-07.svg"
+		},
+		{
+			"name": "tap-foot-08",
+			"codepoint": "U+E2B7",
+			"file": "tap-foot-08.svg"
+		},
+		{
+			"name": "tap-foot-09",
+			"codepoint": "U+E2B8",
+			"file": "tap-foot-09.svg"
+		},
+		{
+			"name": "tap-foot-10",
+			"codepoint": "U+E2B9",
+			"file": "tap-foot-10.svg"
+		},
+		{
+			"name": "applaud-01",
+			"codepoint": "U+E2C0",
+			"file": "applaud-01.svg"
+		},
+		{
+			"name": "applaud-02",
+			"codepoint": "U+E2C1",
+			"file": "applaud-02.svg"
+		},
+		{
+			"name": "applaud-03",
+			"codepoint": "U+E2C2",
+			"file": "applaud-03.svg"
+		},
+		{
+			"name": "applaud-04",
+			"codepoint": "U+E2C3",
+			"file": "applaud-04.svg"
+		},
+		{
+			"name": "applaud-05",
+			"codepoint": "U+E2C4",
+			"file": "applaud-05.svg"
+		},
+		{
+			"name": "applaud-06",
+			"codepoint": "U+E2C5",
+			"file": "applaud-06.svg"
+		},
+		{
+			"name": "applaud-07",
+			"codepoint": "U+E2C6",
+			"file": "applaud-07.svg"
+		},
+		{
+			"name": "applaud-08",
+			"codepoint": "U+E2C7",
+			"file": "applaud-08.svg"
+		},
+		{
+			"name": "applaud-09",
+			"codepoint": "U+E2C8",
+			"file": "applaud-09.svg"
+		},
+		{
+			"name": "applaud-10",
+			"codepoint": "U+E2C9",
+			"file": "applaud-10.svg"
+		},
+		{
+			"name": "flex-01",
+			"codepoint": "U+E2D0",
+			"file": "flex-01.svg"
+		},
+		{
+			"name": "flex-02",
+			"codepoint": "U+E2D1",
+			"file": "flex-02.svg"
+		},
+		{
+			"name": "flex-03",
+			"codepoint": "U+E2D2",
+			"file": "flex-03.svg"
+		},
+		{
+			"name": "flex-04",
+			"codepoint": "U+E2D3",
+			"file": "flex-04.svg"
+		},
+		{
+			"name": "flex-05",
+			"codepoint": "U+E2D4",
+			"file": "flex-05.svg"
+		},
+		{
+			"name": "flex-06",
+			"codepoint": "U+E2D5",
+			"file": "flex-06.svg"
+		},
+		{
+			"name": "flex-07",
+			"codepoint": "U+E2D6",
+			"file": "flex-07.svg"
+		},
+		{
+			"name": "flex-08",
+			"codepoint": "U+E2D7",
+			"file": "flex-08.svg"
+		},
+		{
+			"name": "flex-09",
+			"codepoint": "U+E2D8",
+			"file": "flex-09.svg"
+		},
+		{
+			"name": "flex-10",
+			"codepoint": "U+E2D9",
+			"file": "flex-10.svg"
+		},
+		{
+			"name": "march-01",
+			"codepoint": "U+E2E0",
+			"file": "march-01.svg"
+		},
+		{
+			"name": "march-02",
+			"codepoint": "U+E2E1",
+			"file": "march-02.svg"
+		},
+		{
+			"name": "march-03",
+			"codepoint": "U+E2E2",
+			"file": "march-03.svg"
+		},
+		{
+			"name": "march-04",
+			"codepoint": "U+E2E3",
+			"file": "march-04.svg"
+		},
+		{
+			"name": "march-05",
+			"codepoint": "U+E2E4",
+			"file": "march-05.svg"
+		},
+		{
+			"name": "march-06",
+			"codepoint": "U+E2E5",
+			"file": "march-06.svg"
+		},
+		{
+			"name": "march-07",
+			"codepoint": "U+E2E6",
+			"file": "march-07.svg"
+		},
+		{
+			"name": "march-08",
+			"codepoint": "U+E2E7",
+			"file": "march-08.svg"
+		},
+		{
+			"name": "march-09",
+			"codepoint": "U+E2E8",
+			"file": "march-09.svg"
+		},
+		{
+			"name": "march-10",
+			"codepoint": "U+E2E9",
+			"file": "march-10.svg"
+		},
+		{
+			"name": "overhead-01",
+			"codepoint": "U+E2F0",
+			"file": "overhead-01.svg"
+		},
+		{
+			"name": "overhead-02",
+			"codepoint": "U+E2F1",
+			"file": "overhead-02.svg"
+		},
+		{
+			"name": "overhead-03",
+			"codepoint": "U+E2F2",
+			"file": "overhead-03.svg"
+		},
+		{
+			"name": "overhead-04",
+			"codepoint": "U+E2F3",
+			"file": "overhead-04.svg"
+		},
+		{
+			"name": "overhead-05",
+			"codepoint": "U+E2F4",
+			"file": "overhead-05.svg"
+		},
+		{
+			"name": "overhead-06",
+			"codepoint": "U+E2F5",
+			"file": "overhead-06.svg"
+		},
+		{
+			"name": "overhead-07",
+			"codepoint": "U+E2F6",
+			"file": "overhead-07.svg"
+		},
+		{
+			"name": "overhead-08",
+			"codepoint": "U+E2F7",
+			"file": "overhead-08.svg"
+		},
+		{
+			"name": "overhead-09",
+			"codepoint": "U+E2F8",
+			"file": "overhead-09.svg"
+		},
+		{
+			"name": "overhead-10",
+			"codepoint": "U+E2F9",
+			"file": "overhead-10.svg"
+		},
+		{
+			"name": "quake-01",
+			"codepoint": "U+E300",
+			"file": "quake-01.svg"
+		},
+		{
+			"name": "quake-02",
+			"codepoint": "U+E301",
+			"file": "quake-02.svg"
+		},
+		{
+			"name": "quake-03",
+			"codepoint": "U+E302",
+			"file": "quake-03.svg"
+		},
+		{
+			"name": "quake-04",
+			"codepoint": "U+E303",
+			"file": "quake-04.svg"
+		},
+		{
+			"name": "quake-05",
+			"codepoint": "U+E304",
+			"file": "quake-05.svg"
+		},
+		{
+			"name": "quake-06",
+			"codepoint": "U+E305",
+			"file": "quake-06.svg"
+		},
+		{
+			"name": "quake-07",
+			"codepoint": "U+E306",
+			"file": "quake-07.svg"
+		},
+		{
+			"name": "quake-08",
+			"codepoint": "U+E307",
+			"file": "quake-08.svg"
+		},
+		{
+			"name": "quake-09",
+			"codepoint": "U+E308",
+			"file": "quake-09.svg"
+		},
+		{
+			"name": "quake-10",
+			"codepoint": "U+E309",
+			"file": "quake-10.svg"
+		},
+		{
+			"name": "unwind-01",
+			"codepoint": "U+E310",
+			"file": "unwind-01.svg"
+		},
+		{
+			"name": "unwind-02",
+			"codepoint": "U+E311",
+			"file": "unwind-02.svg"
+		},
+		{
+			"name": "unwind-03",
+			"codepoint": "U+E312",
+			"file": "unwind-03.svg"
+		},
+		{
+			"name": "unwind-04",
+			"codepoint": "U+E313",
+			"file": "unwind-04.svg"
+		},
+		{
+			"name": "unwind-05",
+			"codepoint": "U+E314",
+			"file": "unwind-05.svg"
+		},
+		{
+			"name": "unwind-06",
+			"codepoint": "U+E315",
+			"file": "unwind-06.svg"
+		},
+		{
+			"name": "unwind-07",
+			"codepoint": "U+E316",
+			"file": "unwind-07.svg"
+		},
+		{
+			"name": "unwind-08",
+			"codepoint": "U+E317",
+			"file": "unwind-08.svg"
+		},
+		{
+			"name": "unwind-09",
+			"codepoint": "U+E318",
+			"file": "unwind-09.svg"
+		},
+		{
+			"name": "unwind-10",
+			"codepoint": "U+E319",
+			"file": "unwind-10.svg"
+		},
+		{
+			"name": "victory-01",
+			"codepoint": "U+E320",
+			"file": "victory-01.svg"
+		},
+		{
+			"name": "victory-02",
+			"codepoint": "U+E321",
+			"file": "victory-02.svg"
+		},
+		{
+			"name": "victory-03",
+			"codepoint": "U+E322",
+			"file": "victory-03.svg"
+		},
+		{
+			"name": "victory-04",
+			"codepoint": "U+E323",
+			"file": "victory-04.svg"
+		},
+		{
+			"name": "victory-05",
+			"codepoint": "U+E324",
+			"file": "victory-05.svg"
+		},
+		{
+			"name": "victory-06",
+			"codepoint": "U+E325",
+			"file": "victory-06.svg"
+		},
+		{
+			"name": "victory-07",
+			"codepoint": "U+E326",
+			"file": "victory-07.svg"
+		},
+		{
+			"name": "victory-08",
+			"codepoint": "U+E327",
+			"file": "victory-08.svg"
+		},
+		{
+			"name": "victory-09",
+			"codepoint": "U+E328",
+			"file": "victory-09.svg"
+		},
+		{
+			"name": "victory-10",
+			"codepoint": "U+E329",
+			"file": "victory-10.svg"
+		},
+		{
+			"name": "zen-01",
+			"codepoint": "U+E330",
+			"file": "zen-01.svg"
+		},
+		{
+			"name": "zen-02",
+			"codepoint": "U+E331",
+			"file": "zen-02.svg"
+		},
+		{
+			"name": "zen-03",
+			"codepoint": "U+E332",
+			"file": "zen-03.svg"
+		},
+		{
+			"name": "zen-04",
+			"codepoint": "U+E333",
+			"file": "zen-04.svg"
+		},
+		{
+			"name": "zen-05",
+			"codepoint": "U+E334",
+			"file": "zen-05.svg"
+		},
+		{
+			"name": "zen-06",
+			"codepoint": "U+E335",
+			"file": "zen-06.svg"
+		},
+		{
+			"name": "zen-07",
+			"codepoint": "U+E336",
+			"file": "zen-07.svg"
+		},
+		{
+			"name": "zen-08",
+			"codepoint": "U+E337",
+			"file": "zen-08.svg"
+		},
+		{
+			"name": "zen-09",
+			"codepoint": "U+E338",
+			"file": "zen-09.svg"
+		},
+		{
+			"name": "zen-10",
+			"codepoint": "U+E339",
+			"file": "zen-10.svg"
+		}
+	],
+	"animations": {
+		"stand": [
+			"U+E001"
+		],
+		"hands-on-hips": [
+			"U+E002"
+		],
+		"think": [
+			"U+E003"
+		],
+		"shrug": [
+			"U+E004"
+		],
+		"head-emerging-up": [
+			"U+E005"
+		],
+		"head-emerging-down": [
+			"U+E006"
+		],
+		"head-emerging-left": [
+			"U+E007"
+		],
+		"head-emerging-right": [
+			"U+E008"
+		],
+		"walk": [
+			"U+E100",
+			"U+E101",
+			"U+E102",
+			"U+E103",
+			"U+E104",
+			"U+E105",
+			"U+E106",
+			"U+E107",
+			"U+E108",
+			"U+E109",
+			"U+E10A",
+			"U+E10B",
+			"U+E10C",
+			"U+E10D",
+			"U+E10E",
+			"U+E10F",
+			"U+E110",
+			"U+E111",
+			"U+E112",
+			"U+E113"
+		],
+		"run": [
+			"U+E120",
+			"U+E121",
+			"U+E122",
+			"U+E123",
+			"U+E124",
+			"U+E125",
+			"U+E126",
+			"U+E127",
+			"U+E128",
+			"U+E129",
+			"U+E12A",
+			"U+E12B",
+			"U+E12C",
+			"U+E12D",
+			"U+E12E",
+			"U+E12F",
+			"U+E130",
+			"U+E131",
+			"U+E132",
+			"U+E133"
+		],
+		"jump": [
+			"U+E140",
+			"U+E141",
+			"U+E142",
+			"U+E143",
+			"U+E144",
+			"U+E145",
+			"U+E146",
+			"U+E147",
+			"U+E148",
+			"U+E149",
+			"U+E14A",
+			"U+E14B",
+			"U+E14C",
+			"U+E14D",
+			"U+E14E",
+			"U+E14F",
+			"U+E150",
+			"U+E151",
+			"U+E152",
+			"U+E153"
+		],
+		"dance": [
+			"U+E160",
+			"U+E161",
+			"U+E162",
+			"U+E163",
+			"U+E164",
+			"U+E165",
+			"U+E166",
+			"U+E167",
+			"U+E168",
+			"U+E169"
+		],
+		"greet": [
+			"U+E170",
+			"U+E171",
+			"U+E172",
+			"U+E173",
+			"U+E174",
+			"U+E175",
+			"U+E176",
+			"U+E177",
+			"U+E178",
+			"U+E179"
+		],
+		"cheer": [
+			"U+E180",
+			"U+E181",
+			"U+E182",
+			"U+E183",
+			"U+E184",
+			"U+E185",
+			"U+E186",
+			"U+E187",
+			"U+E188",
+			"U+E189"
+		],
+		"sit": [
+			"U+E190",
+			"U+E191",
+			"U+E192",
+			"U+E193",
+			"U+E194",
+			"U+E195",
+			"U+E196",
+			"U+E197",
+			"U+E198",
+			"U+E199"
+		],
+		"idle": [
+			"U+E1A0",
+			"U+E1A1",
+			"U+E1A2",
+			"U+E1A3",
+			"U+E1A4",
+			"U+E1A5",
+			"U+E1A6",
+			"U+E1A7",
+			"U+E1A8",
+			"U+E1A9"
+		],
+		"kneel": [
+			"U+E1B0",
+			"U+E1B1",
+			"U+E1B2",
+			"U+E1B3",
+			"U+E1B4",
+			"U+E1B5",
+			"U+E1B6",
+			"U+E1B7",
+			"U+E1B8",
+			"U+E1B9"
+		],
+		"clap": [
+			"U+E1C0",
+			"U+E1C1",
+			"U+E1C2",
+			"U+E1C3",
+			"U+E1C4",
+			"U+E1C5",
+			"U+E1C6",
+			"U+E1C7",
+			"U+E1C8",
+			"U+E1C9"
+		],
+		"extend": [
+			"U+E1D0",
+			"U+E1D1",
+			"U+E1D2",
+			"U+E1D3",
+			"U+E1D4",
+			"U+E1D5",
+			"U+E1D6",
+			"U+E1D7",
+			"U+E1D8",
+			"U+E1D9"
+		],
+		"nod": [
+			"U+E1E0",
+			"U+E1E1",
+			"U+E1E2",
+			"U+E1E3",
+			"U+E1E4",
+			"U+E1E5",
+			"U+E1E6",
+			"U+E1E7",
+			"U+E1E8",
+			"U+E1E9"
+		],
+		"shake-head": [
+			"U+E1F0",
+			"U+E1F1",
+			"U+E1F2",
+			"U+E1F3",
+			"U+E1F4",
+			"U+E1F5",
+			"U+E1F6",
+			"U+E1F7",
+			"U+E1F8",
+			"U+E1F9"
+		],
+		"yawn": [
+			"U+E200",
+			"U+E201",
+			"U+E202",
+			"U+E203",
+			"U+E204",
+			"U+E205",
+			"U+E206",
+			"U+E207",
+			"U+E208",
+			"U+E209"
+		],
+		"point-left": [
+			"U+E210",
+			"U+E211",
+			"U+E212",
+			"U+E213",
+			"U+E214",
+			"U+E215",
+			"U+E216",
+			"U+E217",
+			"U+E218",
+			"U+E219"
+		],
+		"point-right": [
+			"U+E220",
+			"U+E221",
+			"U+E222",
+			"U+E223",
+			"U+E224",
+			"U+E225",
+			"U+E226",
+			"U+E227",
+			"U+E228",
+			"U+E229"
+		],
+		"swim": [
+			"U+E230",
+			"U+E231",
+			"U+E232",
+			"U+E233",
+			"U+E234",
+			"U+E235",
+			"U+E236",
+			"U+E237",
+			"U+E238",
+			"U+E239"
+		],
+		"x-leap": [
+			"U+E240",
+			"U+E241",
+			"U+E242",
+			"U+E243",
+			"U+E244",
+			"U+E245",
+			"U+E246",
+			"U+E247",
+			"U+E248",
+			"U+E249"
+		],
+		"tip-toe": [
+			"U+E250",
+			"U+E251",
+			"U+E252",
+			"U+E253",
+			"U+E254",
+			"U+E255",
+			"U+E256",
+			"U+E257",
+			"U+E258",
+			"U+E259"
+		],
+		"balance": [
+			"U+E260",
+			"U+E261",
+			"U+E262",
+			"U+E263",
+			"U+E264",
+			"U+E265",
+			"U+E266",
+			"U+E267",
+			"U+E268",
+			"U+E269"
+		],
+		"throw": [
+			"U+E270",
+			"U+E271",
+			"U+E272",
+			"U+E273",
+			"U+E274",
+			"U+E275",
+			"U+E276",
+			"U+E277",
+			"U+E278",
+			"U+E279"
+		],
+		"lunge": [
+			"U+E280",
+			"U+E281",
+			"U+E282",
+			"U+E283",
+			"U+E284",
+			"U+E285",
+			"U+E286",
+			"U+E287",
+			"U+E288",
+			"U+E289"
+		],
+		"hop": [
+			"U+E290",
+			"U+E291",
+			"U+E292",
+			"U+E293",
+			"U+E294",
+			"U+E295",
+			"U+E296",
+			"U+E297",
+			"U+E298",
+			"U+E299"
+		],
+		"salute": [
+			"U+E2A0",
+			"U+E2A1",
+			"U+E2A2",
+			"U+E2A3",
+			"U+E2A4",
+			"U+E2A5",
+			"U+E2A6",
+			"U+E2A7",
+			"U+E2A8",
+			"U+E2A9"
+		],
+		"tap-foot": [
+			"U+E2B0",
+			"U+E2B1",
+			"U+E2B2",
+			"U+E2B3",
+			"U+E2B4",
+			"U+E2B5",
+			"U+E2B6",
+			"U+E2B7",
+			"U+E2B8",
+			"U+E2B9"
+		],
+		"applaud": [
+			"U+E2C0",
+			"U+E2C1",
+			"U+E2C2",
+			"U+E2C3",
+			"U+E2C4",
+			"U+E2C5",
+			"U+E2C6",
+			"U+E2C7",
+			"U+E2C8",
+			"U+E2C9"
+		],
+		"flex": [
+			"U+E2D0",
+			"U+E2D1",
+			"U+E2D2",
+			"U+E2D3",
+			"U+E2D4",
+			"U+E2D5",
+			"U+E2D6",
+			"U+E2D7",
+			"U+E2D8",
+			"U+E2D9"
+		],
+		"march": [
+			"U+E2E0",
+			"U+E2E1",
+			"U+E2E2",
+			"U+E2E3",
+			"U+E2E4",
+			"U+E2E5",
+			"U+E2E6",
+			"U+E2E7",
+			"U+E2E8",
+			"U+E2E9"
+		],
+		"overhead": [
+			"U+E2F0",
+			"U+E2F1",
+			"U+E2F2",
+			"U+E2F3",
+			"U+E2F4",
+			"U+E2F5",
+			"U+E2F6",
+			"U+E2F7",
+			"U+E2F8",
+			"U+E2F9"
+		],
+		"quake": [
+			"U+E300",
+			"U+E301",
+			"U+E302",
+			"U+E303",
+			"U+E304",
+			"U+E305",
+			"U+E306",
+			"U+E307",
+			"U+E308",
+			"U+E309"
+		],
+		"unwind": [
+			"U+E310",
+			"U+E311",
+			"U+E312",
+			"U+E313",
+			"U+E314",
+			"U+E315",
+			"U+E316",
+			"U+E317",
+			"U+E318",
+			"U+E319"
+		],
+		"victory": [
+			"U+E320",
+			"U+E321",
+			"U+E322",
+			"U+E323",
+			"U+E324",
+			"U+E325",
+			"U+E326",
+			"U+E327",
+			"U+E328",
+			"U+E329"
+		],
+		"zen": [
+			"U+E330",
+			"U+E331",
+			"U+E332",
+			"U+E333",
+			"U+E334",
+			"U+E335",
+			"U+E336",
+			"U+E337",
+			"U+E338",
+			"U+E339"
+		]
+	}
+}
