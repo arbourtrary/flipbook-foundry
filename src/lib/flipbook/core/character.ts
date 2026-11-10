@@ -171,10 +171,15 @@ export class Character {
 		return [this.x + ax * this.scale * this.facing, this.y - ay * this.scale];
 	}
 
-	/** Approximate ink box in stage px (from anchors). */
+	/** Approximate ink box in stage px — from anchors when loaded, else from the action's reach. */
 	bounds() {
 		const s = this.scale;
-		const a = this.action.anchors[this.frame];
+		const a = this.action.anchors?.[this.frame];
+		if (!a) {
+			const [back, ahead] = this.action.reach;
+			const x0 = this.facing > 0 ? this.x - back * s : this.x - ahead * s;
+			return { x: x0, y: this.y - this.action.height * s, width: (back + ahead) * s, height: this.action.height * s };
+		}
 		let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
 		for (let i = 0; i < 16; i += 2) {
 			const x = this.x + a[i] * s * this.facing;

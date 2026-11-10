@@ -22,9 +22,19 @@ export interface ActionInfo {
 	/** Action that automatically follows this one-shot. */
 	next: string | null;
 	dx: number[];
-	air: number[];
 	events: Record<number, string>;
-	anchors: number[][];
+	/** Furthest ink [behind, ahead] of the pelvis over all frames (font units). */
+	reach: [number, number];
+	/** Highest ink above the ground over all frames (font units). */
+	height: number;
+	/** Per-frame anchors; filled in by library.loadAnchors() (the Stage does this). */
+	anchors?: number[][];
+}
+
+interface Chunk {
+	file: string;
+	from: number;
+	to: number;
 }
 
 export interface Manifest {
@@ -35,7 +45,7 @@ export interface Manifest {
 	advance: number;
 	/** Ink extents of all glyphs, pelvis-relative font units (y-up). */
 	extents?: { left: number; right: number; top: number; bottom: number };
-	layers: Record<Layer, { family: string; style: string; weight: number; parts: string; file: string }>;
+	layers: Record<Layer, { family: string; style: string; weight: number; parts: string; file: string; chunks?: Chunk[] | null }>;
 	actions: Record<string, Omit<ActionInfo, 'name'>>;
 }
 
@@ -59,7 +69,10 @@ export interface Library {
 	action(name: string): ActionInfo;
 	byCategory(): Record<string, ActionInfo[]>;
 	glyph(action: ActionInfo, frame: number): string;
-	/** Anchor in font units, glyph-local (pelvis x = 0, ground y = 0, y-up). */
+	/** Fetch per-frame anchors (hands, feet, head…). Needed for carrying,
+	 *  letter bodies and precise hit-tests; text layout doesn't need them. */
+	loadAnchors(): Promise<void>;
+	/** Anchor in font units, glyph-local (pelvis x = 0, ground y = 0, y-up). [0,0] until loaded. */
 	anchor(action: ActionInfo, frame: number, name: AnchorName): [number, number];
 	spine(action: ActionInfo, frame: number): number;
 	/** Furthest ink [behind, ahead] of the pelvis over all frames (font units). */
@@ -69,14 +82,19 @@ export interface Library {
 	route(from: Hub, to: Hub): ActionInfo[];
 	/** CSS font-family + weight for a layer. */
 	css(layer: Layer): { family: string; weight: number };
-	load(layers?: Layer[], baseUrl?: string): Promise<void>;
+	/**
+	 * Register the font(s). Fonts are split into per-category chunks with
+	 * unicode-range, so the browser fetches only the drawings in use; pass
+	 * `actions` to fetch exactly the chunks those actions live in now.
+	 */
+	load(layers?: Layer[], baseUrl?: string, actions?: string[]): Promise<void>;
 }
 
 export function createLibrary(manifest: Manifest = defaultManifest as unknown as Manifest): Library {
 	const actions = new Map<string, ActionInfo>();
 	for (const [name, a] of Object.entries(manifest.actions)) actions.set(name, { name, ...a });
 	const glyphCache = new Map<ActionInfo, string[]>();
-	const reachCache = new Map<ActionInfo, [number, number]>();
+	let anchorsP: Promise<void> | null = null;
 
 	// Hub graph: one-shot actions whose from ≠ to are edges. Prefer the
 	// shortest (fewest frames) when two actions connect the same hubs.
@@ -89,7 +107,7 @@ export function createLibrary(manifest: Manifest = defaultManifest as unknown as
 	}
 	for (const list of edges.values()) list.sort((a, b) => routeCost(a) - routeCost(b));
 	const routes = new Map<string, ActionInfo[]>();
-	const loading = new Map<string, Promise<void>>();
+	const registered = new Map<string, { from: number; to: number; face: FontFace }[]>();
 
 	const lib: Library = {
 		manifest,
@@ -115,31 +133,24 @@ export function createLibrary(manifest: Manifest = defaultManifest as unknown as
 			}
 			return g[frame];
 		},
+		loadAnchors() {
+			return (anchorsP ??= import('../generated/anchors.json').then((m) => {
+				const data = (m.default ?? m) as Record<string, number[][]>;
+				for (const [name, a] of Object.entries(data)) {
+					const act = actions.get(name);
+					if (act) act.anchors = a;
+				}
+			}));
+		},
 		anchor(action, frame, name) {
-			const a = action.anchors[frame];
+			const a = action.anchors?.[frame];
+			if (!a) return name === 'top' || name === 'head' ? [0, action.height] : [0, 0];
 			const i = ANCHOR_INDEX[name];
 			return [a[i], a[i + 1]];
 		},
-		spine: (action, frame) => action.anchors[frame][16],
-		reach(action) {
-			let r = reachCache.get(action);
-			if (!r) {
-				const half = (manifest.layers.regular?.weight ?? 30) / 2;
-				let back = 0, ahead = 0;
-				for (const a of action.anchors) {
-					for (let i = 0; i < 16; i += 2) {
-						// Head is a disc, not a point.
-						const rad = i === 0 ? Math.max(a[18], a[19]) : half;
-						back = Math.max(back, rad - a[i]);
-						ahead = Math.max(ahead, a[i] + rad);
-					}
-				}
-				r = [back, ahead];
-				reachCache.set(action, r);
-			}
-			return r;
-		},
-		headRot: (action, frame) => action.anchors[frame][17],
+		spine: (action, frame) => action.anchors?.[frame][16] ?? 0,
+		reach: (action) => action.reach,
+		headRot: (action, frame) => action.anchors?.[frame][17] ?? 0,
 		route(from, to) {
 			if (from === to) return [];
 			const key = `${from}>${to}`;
@@ -174,24 +185,43 @@ export function createLibrary(manifest: Manifest = defaultManifest as unknown as
 			const l = manifest.layers[layer];
 			return { family: l.family, weight: l.style === 'Bold' ? 700 : 400 };
 		},
-		async load(layers = ['regular'], baseUrl = '/fonts/') {
+		async load(layers = ['regular'], baseUrl = '/fonts/', want) {
 			if (typeof document === 'undefined' || typeof FontFace === 'undefined') return;
-			await Promise.all(
-				layers.map((id) => {
-					const key = `${baseUrl}|${id}`;
-					let p = loading.get(key);
-					if (!p) loading.set(key, (p = loadOne(id)));
-					return p;
-				})
-			);
-			async function loadOne(id: Layer) {
+			const ranges = want?.filter((n) => actions.has(n)).map((n) => {
+				const a = actions.get(n)!;
+				return [a.start, a.start + a.frames - 1];
+			});
+			await Promise.all(layers.map((id) => loadLayer(id, ranges)));
+
+			// Register every chunk once (unloaded faces cost nothing; the
+			// browser fetches one when text needs a codepoint in its range).
+			// Then load the chunks asked for — or all of them.
+			function faces(id: Layer) {
+				const key = `${baseUrl}|${id}`;
+				let f = registered.get(key);
+				if (f) return f;
 				const l = manifest.layers[id];
 				const { family, weight } = lib.css(id);
-				const face = new FontFace(family, `url(${baseUrl}${l.file}?v=${manifest.version})`, {
-					weight: String(weight),
-					display: 'block'
-				});
-				document.fonts.add(await face.load());
+				const desc = { weight: String(weight), display: 'block' as const };
+				const v = `?v=${manifest.version}`;
+				f = l.chunks?.length
+					? l.chunks.map((c) => ({
+							from: c.from,
+							to: c.to,
+							face: new FontFace(family, `url(${baseUrl}${c.file}${v})`, {
+								...desc,
+								unicodeRange: `U+${c.from.toString(16)}-${c.to.toString(16)}`
+							})
+						}))
+					: [{ from: 0, to: 0x10ffff, face: new FontFace(family, `url(${baseUrl}${l.file}${v})`, desc) }];
+				for (const x of f) document.fonts.add(x.face);
+				registered.set(key, f);
+				return f;
+			}
+			async function loadLayer(id: Layer, ranges?: number[][]) {
+				const list = faces(id);
+				const needed = ranges ? list.filter((c) => ranges.some(([a, b]) => a <= c.to && b >= c.from)) : list;
+				await Promise.all(needed.map((c) => c.face.load()));
 			}
 		}
 	};

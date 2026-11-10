@@ -85,6 +85,21 @@ async function main() {
 	if (cp > 0xf8ff) throw new Error(`Out of BMP private-use space (${cp.toString(16)})`);
 
 	const manifestActions: Record<string, unknown> = {};
+	// Anchors are only needed for canvas interactions (carrying, letter
+	// bodies, hit-tests); they ship as a separate file the Stage lazy-loads.
+	const anchorsOut: Record<string, number[][]> = {};
+	// Categories are contiguous runs of codepoints, so each becomes a font
+	// chunk with its own unicode-range — pages download only what they show.
+	const chunkDefs: { id: string; from: number; to: number; actions: typeof ACTIONS }[] = [];
+	for (const def of ACTIONS) {
+		const last = chunkDefs[chunkDefs.length - 1];
+		const start = starts.get(def.name)!;
+		if (last && last.id === def.category) {
+			last.to = start + def.frames - 1;
+			last.actions.push(def);
+		} else chunkDefs.push({ id: def.category, from: start, to: start + def.frames - 1, actions: [def] });
+	}
+	const chunkFiles: Record<string, { file: string; from: number; to: number }[]> = {};
 	// Ink extents across every glyph of every layer, pelvis-relative, so
 	// renderers can size raster caches without clipping jumps or hangs.
 	const ext = { left: 0, right: 0, top: 0, bottom: 0 };
@@ -92,11 +107,16 @@ async function main() {
 
 	for (const layer of LAYERS) {
 		const glyphs = [notdef(), new opentype.Glyph({ name: 'space', unicode: 32, advanceWidth: ADVANCE / 2, path: new opentype.Path() })];
+		const byAction = new Map<string, opentype.Glyph[]>();
 		for (const def of ACTIONS) {
 			const baked = bake(def, { build, weight: layer.weight, parts: layer.parts });
 			const start = starts.get(def.name)!;
+			const mine: opentype.Glyph[] = [];
+			byAction.set(def.name, mine);
 			baked.frames.forEach((f, i) => {
-				glyphs.push(glyphFor(`${def.name}.${i}`, start + i, f));
+				const g = glyphFor(`${def.name}.${i}`, start + i, f);
+				glyphs.push(g);
+				mine.push(g);
 				const b = bounds(f.contours);
 				ext.left = Math.min(ext.left, b.x0);
 				ext.right = Math.max(ext.right, b.x1);
@@ -122,19 +142,25 @@ async function main() {
 					baseline: [def.baseline?.start ?? 0, def.baseline?.end ?? 0],
 					next: def.next ?? null,
 					dx: baked.frames.map((f) => Math.round(f.dx * 10) / 10),
-					air: baked.frames.map((f) => Math.round(f.air)),
 					events,
-					// Flattened per frame: head(x,y) top(x,y) handL handR footL footR
-					// pelvis shoulder → 16 ints, then spine°, headRot°, headRx, headRy.
-					anchors: baked.frames.map((f) => {
-						const a = f.anchors;
-						return [
-							...a.head, ...a.top, ...a.handL, ...a.handR,
-							...a.footL, ...a.footR, ...a.pelvis, ...a.shoulder,
-							a.spine, a.headRot, a.headR[0], a.headR[1]
-						];
-					})
+					// Furthest ink [behind, ahead] of the pelvis and above the
+					// ground, over all frames — enough to lay a figure out in text.
+					reach: [
+						Math.ceil(Math.max(...baked.frames.map((f) => -bounds(f.contours).x0))),
+						Math.ceil(Math.max(...baked.frames.map((f) => bounds(f.contours).x1)))
+					],
+					height: Math.ceil(Math.max(...baked.frames.map((f) => bounds(f.contours).y1)))
 				};
+				// Flattened per frame: head(x,y) top(x,y) handL handR footL footR
+				// pelvis shoulder → 16 ints, then spine°, headRot°, headRx, headRy.
+				anchorsOut[def.name] = baked.frames.map((f) => {
+					const a = f.anchors;
+					return [
+						...a.head, ...a.top, ...a.handL, ...a.handR,
+						...a.footL, ...a.footR, ...a.pelvis, ...a.shoulder,
+						a.spine, a.headRot, a.headR[0], a.headR[1]
+					];
+				});
 			}
 		}
 		const font = new opentype.Font({
@@ -150,6 +176,24 @@ async function main() {
 		await writeFile(join(fontDir, `flipbook-${layer.id}.otf`), otf);
 		await writeFile(join(fontDir, `flipbook-${layer.id}.woff2`), woff2);
 		files[layer.id] = `flipbook-${layer.id}.woff2`;
+		if (!variant) {
+			chunkFiles[layer.id] = [];
+			for (const c of chunkDefs) {
+				const sub = new opentype.Font({
+					familyName: layer.family,
+					styleName: layer.style,
+					unitsPerEm: UPM,
+					ascender: ASCENDER,
+					descender: DESCENDER,
+					glyphs: [notdef(), ...c.actions.flatMap((d) => byAction.get(d.name)!)]
+				});
+				const w = await exportWoff2(new Uint8Array(sub.toArrayBuffer()));
+				const file = `chunks/flipbook-${layer.id}.${chunkDefs.indexOf(c)}-${c.id}.woff2`;
+				await mkdir(join(fontDir, 'chunks'), { recursive: true });
+				await writeFile(join(fontDir, file), w);
+				chunkFiles[layer.id].push({ file, from: c.from, to: c.to });
+			}
+		}
 		console.log(`${layer.id}: ${glyphs.length} glyphs · ${(otf.byteLength / 1024).toFixed(0)}KB otf · ${(woff2.byteLength / 1024).toFixed(0)}KB woff2`);
 	}
 
@@ -162,12 +206,15 @@ async function main() {
 		extents: { left: Math.floor(ext.left), right: Math.ceil(ext.right), top: Math.ceil(ext.top), bottom: Math.floor(ext.bottom) },
 		build,
 		label: variant ? VARIANTS[variant].label : 'Flipbook',
-		layers: Object.fromEntries(LAYERS.map((l) => [l.id, { family: l.family, style: l.style, weight: l.weight, parts: l.parts, file: files[l.id] }])),
+		layers: Object.fromEntries(
+			LAYERS.map((l) => [l.id, { family: l.family, style: l.style, weight: l.weight, parts: l.parts, file: files[l.id], chunks: chunkFiles[l.id] ?? null }])
+		),
 		actions: manifestActions
 	};
 	const json = JSON.stringify(manifest);
 	manifest.version = createHash('sha256').update(json).digest('hex').slice(0, 10);
 	await writeFile(join(genDir, 'manifest.json'), JSON.stringify(manifest));
+	await writeFile(join(genDir, 'anchors.json'), JSON.stringify(anchorsOut));
 	console.log(`${ACTIONS.length} actions, ${cp - START_CP} frames → manifest v${manifest.version}`);
 }
 

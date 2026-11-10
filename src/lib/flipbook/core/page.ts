@@ -19,7 +19,12 @@ import { cancelFrame, frame, type FrameData } from './frameloop';
 import { type Layer, type Library, getLibrary } from './library';
 
 export interface PageOptions {
-	/** Text with figures written as {action}, e.g. 'Bob {walk} home.' */
+	/**
+	 * Text with figures written as {action}, e.g. 'Bob {walk} home.'
+	 * `{idle|sneak|run}` makes a figure that may switch between those actions
+	 * (via page.figures[i].animate) — room is reserved for the widest, so the
+	 * line never shifts. A newline starts a new paragraph.
+	 */
 	text: string;
 	/** Canvas font shorthand for the words, e.g. '400 20px Georgia'. */
 	font: string;
@@ -30,6 +35,15 @@ export interface PageOptions {
 	layer?: Layer;
 	color?: string;
 	transition?: Transition;
+	/** Paragraph alignment. */
+	align?: 'left' | 'center';
+	/** Ink colour for figures (defaults to the text colour). */
+	figureColor?: string;
+	/**
+	 * Start each looping figure at a phase (0–1) from its position on the
+	 * page — e.g. ({ x, width }) => x / width for a stadium wave.
+	 */
+	phase?: (p: { x: number; y: number; index: number; width: number; height: number }) => number;
 	library?: Library;
 }
 
@@ -49,14 +63,15 @@ export class Page {
 	private ctx: CanvasRenderingContext2D;
 	private opts: PageOptions;
 	private library: Library;
-	private items: RichInlineItem[] = [];
-	private itemPad: number[] = [];
-	private itemFigure: (Character | null)[] = [];
+	private paras: { items: RichInlineItem[]; pad: number[]; figure: (Character | null)[] }[] = [];
+	/** Last paint duration in ms, for the curious. */
+	stats = { paintMs: 0, figures: 0 };
 	private runs: Run[] = [];
 	private width = 0;
 	private dpr = 1;
 	private ro: ResizeObserver | null = null;
 	private needsPaint = true;
+	private ink: string | null = null;
 
 	constructor(canvas: HTMLCanvasElement, opts: PageOptions) {
 		this.canvas = canvas;
@@ -85,72 +100,103 @@ export class Page {
 		this.opts.text = text;
 		for (const c of this.figures) c.stop();
 		this.figures.length = 0;
-		this.items = [];
-		this.itemFigure = [];
-		this.itemPad = [];
+		this.paras = [];
 		const { family, weight } = this.library.css(this.opts.layer ?? 'regular');
 		const figurePx = Math.round(this.fontSize * (this.opts.figureScale ?? 1.3));
 		const figureFont = `${weight} ${figurePx}px "${family}"`;
 		const unit = figurePx / this.library.unitsPerEm;
-		// Split on {action} tokens; everything else is ordinary text.
-		const parts = text.split(/(\{[a-z-]+\})/g);
-		parts.forEach((part, i) => {
-			const m = part.match(/^\{([a-z-]+)\}$/);
-			if (m && this.library.has(m[1])) {
-				const a = this.library.action(m[1]);
-				const c = new Character({
-					library: this.library,
-					animate: m[1],
-					transition: { inPlace: true, phase: (i * 0.37) % 1, ...(a.loop ? {} : { repeat: Infinity, repeatDelay: 0.8 }), ...this.opts.transition }
-				});
-				this.figures.push(c);
-				// Every drawing shares one advance, but a sprawl or a stride can
-				// reach past it. Reserve the action's widest reach, so the figure
-				// never touches the words beside it and the layout still never
-				// changes from frame to frame.
-				const [back, ahead] = this.library.reach(a);
-				const half = this.library.advance / 2;
-				const padL = Math.max(0, back - half) * unit;
-				const padR = Math.max(0, ahead - half) * unit;
-				this.items.push({ text: c.glyph, font: figureFont, break: 'never', extraWidth: padL + padR });
-				this.itemFigure.push(c);
-				this.itemPad.push(padL);
-			} else if (part) {
-				this.items.push({ text: part, font: this.opts.font });
-				this.itemFigure.push(null);
-				this.itemPad.push(0);
+		const half = this.library.advance / 2;
+		let n = 0;
+		for (const paragraph of text.split('\n')) {
+			const para = { items: [] as RichInlineItem[], pad: [] as number[], figure: [] as (Character | null)[] };
+			this.paras.push(para);
+			// Split on {action} / {a|b|c} tokens; everything else is ordinary text.
+			for (const part of paragraph.split(/(\{[a-z-]+(?:\|[a-z-]+)*\})/g)) {
+				const m = part.match(/^\{([a-z-|]+)\}$/);
+				const alts = m ? m[1].split('|').filter((a) => this.library.has(a)) : [];
+				if (alts.length) {
+					const a = this.library.action(alts[0]);
+					const c = new Character({
+						library: this.library,
+						animate: alts[0],
+						transition: { inPlace: true, phase: (n++ * 0.37) % 1, ...(a.loop ? {} : { repeat: Infinity, repeatDelay: 0.8 }), ...this.opts.transition }
+					});
+					c.data.alts = alts;
+					this.figures.push(c);
+					// Every drawing shares one advance, but a sprawl or a stride
+					// can reach past it. Reserve the widest reach of any action
+					// this figure may play, so it never touches the words beside
+					// it and the layout never changes from frame to frame.
+					let back = 0, ahead = 0;
+					for (const name of alts) {
+						const r = this.library.action(name).reach;
+						back = Math.max(back, r[0]);
+						ahead = Math.max(ahead, r[1]);
+					}
+					const padL = Math.max(0, back - half) * unit;
+					const padR = Math.max(0, ahead - half) * unit;
+					para.items.push({ text: c.glyph, font: figureFont, break: 'never', extraWidth: padL + padR });
+					para.figure.push(c);
+					para.pad.push(padL);
+				} else if (part) {
+					para.items.push({ text: part, font: this.opts.font });
+					para.figure.push(null);
+					para.pad.push(0);
+				}
 			}
-		});
+		}
+		this.stats.figures = this.figures.length;
+		// Fetch only the font chunks these actions live in.
+		const used = this.figures.flatMap((c) => c.data.alts as string[]);
+		this.library.load([this.opts.layer ?? 'regular'], undefined, used).then(this.relayout);
 		this.layout();
 	}
 
 	/** pretext line breaking. Runs on text change and resize only. */
 	layout() {
+		this.ink = null;
 		const r = this.canvas.getBoundingClientRect();
 		this.dpr = Math.min(2, devicePixelRatio || 1);
 		this.width = r.width;
 		const lh = this.opts.lineHeight ?? this.fontSize * 1.6;
-		const prepared = prepareRichInline(this.items);
 		const runs: Run[] = [];
 		let line = 0;
-		walkRichInlineLineRanges(prepared, this.width, (range) => {
-			const l = materializeRichInlineLineRange(prepared, range);
-			let x = 0;
-			const baseline = line * lh + lh * 0.75;
-			for (const f of l.fragments) {
-				x += f.gapBefore;
-				const item = this.items[f.itemIndex];
-				const pad = this.itemPad[f.itemIndex];
-				runs.push({ text: f.text, font: item.font, x: x + pad, pad, y: baseline, figure: this.itemFigure[f.itemIndex] });
-				x += f.occupiedWidth;
+		for (const para of this.paras) {
+			if (!para.items.length) {
+				line++; // blank line
+				continue;
 			}
-			line++;
-		});
+			const prepared = prepareRichInline(para.items);
+			walkRichInlineLineRanges(prepared, this.width, (range) => {
+				const l = materializeRichInlineLineRange(prepared, range);
+				let x = this.opts.align === 'center' ? Math.max(0, (this.width - l.width) / 2) : 0;
+				const baseline = line * lh + lh * 0.75;
+				for (const f of l.fragments) {
+					x += f.gapBefore;
+					const pad = para.pad[f.itemIndex];
+					const figure = para.figure[f.itemIndex];
+					runs.push({ text: f.text, font: para.items[f.itemIndex].font, x: x + pad, pad, y: baseline, figure });
+					if (figure) {
+						figure.data.pageX = x + pad;
+						figure.data.pageY = baseline;
+					}
+					x += f.occupiedWidth;
+				}
+				line++;
+			});
+		}
 		this.runs = runs;
 		const h = Math.ceil(line * lh);
 		this.canvas.style.height = `${h}px`;
 		this.canvas.width = Math.max(1, Math.round(this.width * this.dpr));
 		this.canvas.height = Math.max(1, Math.round(h * this.dpr));
+		if (this.opts.phase) {
+			this.figures.forEach((c, index) => {
+				if (!c.action.loop) return;
+				const phase = this.opts.phase!({ x: c.data.pageX as number, y: c.data.pageY as number, index, width: this.width, height: h });
+				c.animate(c.action.name, { inPlace: true, ...this.opts.transition, phase: ((phase % 1) + 1) % 1 });
+			});
+		}
 		this.needsPaint = true;
 	}
 
@@ -165,18 +211,25 @@ export class Page {
 	private paint = () => {
 		if (!this.needsPaint) return;
 		this.needsPaint = false;
+		const t0 = performance.now();
 		const { ctx } = this;
 		ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
 		ctx.clearRect(0, 0, this.width, this.canvas.height);
-		ctx.fillStyle = this.opts.color ?? getComputedStyle(this.canvas).color;
+		const ink = (this.ink ??= this.opts.color ?? getComputedStyle(this.canvas).color);
+		ctx.fillStyle = ink;
 		ctx.textAlign = 'left';
 		ctx.textBaseline = 'alphabetic';
 		let font = '';
 		for (const r of this.runs) {
 			if (r.font !== font) ctx.font = font = r.font;
-			ctx.fillText(r.figure ? r.figure.glyph : r.text, r.x, r.y);
-			if (r.figure) r.figure.dirty = false;
+			if (r.figure) {
+				if (this.opts.figureColor) ctx.fillStyle = this.opts.figureColor;
+				ctx.fillText(r.figure.glyph, r.x, r.y);
+				if (this.opts.figureColor) ctx.fillStyle = ink;
+				r.figure.dirty = false;
+			} else ctx.fillText(r.text, r.x, r.y);
 		}
+		this.stats.paintMs = performance.now() - t0;
 	};
 
 	private relayout = () => {

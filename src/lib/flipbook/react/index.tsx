@@ -247,7 +247,8 @@ export function Figure(props: FigureProps) {
 		} else {
 			inline = new InlineFigure(span.current!, { ...opts(), travel: latest.current.travel });
 			c = inline.character;
-			getLibrary().load([c.layer]);
+			// Just this action's font chunk; others load when first shown.
+			getLibrary().load([c.layer], undefined, [c.action.name]);
 		}
 		charRef.current = c;
 		assignRef(latest.current.ref, c);
@@ -397,18 +398,9 @@ export function Page({ className, style, ...opts }: PageProps) {
 	const canvas = useRef<HTMLCanvasElement>(null);
 	const key = JSON.stringify(opts);
 	useEffect(() => {
-		let page: CorePage | null = null;
-		let alive = true;
-		getLibrary()
-			.load([opts.layer ?? 'regular'])
-			.then(() => document.fonts.ready)
-			.then(() => {
-				if (alive && canvas.current) page = new CorePage(canvas.current, opts);
-			});
-		return () => {
-			alive = false;
-			page?.destroy();
-		};
+		// Page fetches the font chunks its figures need on its own.
+		const page = new CorePage(canvas.current!, opts);
+		return () => page.destroy();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [key]);
 	return <canvas ref={canvas} className={className} style={{ display: 'block', width: '100%', ...style }} />;

@@ -94,7 +94,8 @@
 		if (!stage && el) {
 			inline = new InlineFigure(el, { ...opts, travel });
 			character = inline.character;
-			getLibrary().load([opts.layer as Layer]);
+			// Just this action's font chunk; others load when first shown.
+			getLibrary().load([opts.layer as Layer], undefined, [inline.character.action.name]);
 		}
 		const c = character!;
 		const offs: (() => void)[] = [];

@@ -1,29 +1,29 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { Page, getLibrary, type PageOptions } from '../core';
+	import { onMount, untrack } from 'svelte';
+	import { Page, type PageOptions } from '../core';
 
 	// A paragraph laid out by pretext where {action} tokens are stick figures.
-	let { class: cls = '', ...opts }: Omit<PageOptions, 'library'> & { class?: string } = $props();
+	let {
+		class: cls = '',
+		page = $bindable(null),
+		...opts
+	}: Omit<PageOptions, 'library'> & { class?: string; page?: Page | null } = $props();
 	let canvas: HTMLCanvasElement;
-	let page: Page | null = null;
 
 	onMount(() => {
-		let alive = true;
-		getLibrary()
-			.load([opts.layer ?? 'regular'])
-			.then(() => document.fonts.ready)
-			.then(() => {
-				if (alive) page = new Page(canvas, { ...opts });
-			});
-		return () => {
-			alive = false;
-			page?.destroy();
-		};
+		// Page fetches the font chunks its figures need on its own.
+		page = new Page(canvas, { ...opts });
+		return () => page?.destroy();
 	});
 
+	// Re-typeset only when the text actually changes.
+	let last = untrack(() => opts.text);
 	$effect(() => {
 		const t = opts.text;
-		if (page && t !== undefined) page.setText(t);
+		if (page && t !== last) {
+			last = t;
+			page.setText(t);
+		}
 	});
 </script>
 

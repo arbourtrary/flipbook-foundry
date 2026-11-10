@@ -98,6 +98,8 @@ export class Stage {
 			});
 			this.io.observe(canvas);
 		}
+		// Stages are where figures carry things and meet hands: fetch anchors.
+		this.library.loadAnchors();
 		this.resize();
 		this.start();
 	}
