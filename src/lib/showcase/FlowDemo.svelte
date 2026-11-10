@@ -27,9 +27,9 @@
 <div bind:clientWidth={width}>
 	<Stage style="height: {height}px" onUpdate={wrap}>
 		<TextFlow text={copy + ' ' + copy} font={'400 25px Georgia'} x={0} y={8} {width} lineHeight={LH} padding={12} />
-		<Figure animate="run" x={40} y={line(3)} size={110} />
-		<Figure animate="walk" x={width * 0.55} y={line(6)} size={110} facing={-1} />
-		<Figure animate="sneak" x={width * 0.2} y={line(9)} size={110} />
-		<Figure animate="cheer" x={width * 0.82} y={line(9)} size={110} transition={{ inPlace: true }} />
+		<Figure animate="run" x={40} y={line(3)} size={56} />
+		<Figure animate="walk" x={width * 0.55} y={line(6)} size={56} facing={-1} />
+		<Figure animate="sneak" x={width * 0.2} y={line(9)} size={56} />
+		<Figure animate="cheer" x={width * 0.82} y={line(9)} size={56} transition={{ inPlace: true }} />
 	</Stage>
 </div>

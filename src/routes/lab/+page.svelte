@@ -127,7 +127,7 @@
 							</div>
 							<div class="strip">
 								{#if variants[b.id]}
-									<LabStrip actions={BUILD_ACTIONS} library={variants[b.id]} fontBase="/lab/{b.id}/" size={110} height={170} />
+									<LabStrip actions={BUILD_ACTIONS} library={variants[b.id]} fontBase="/lab/{b.id}/" size={56} height={90} />
 								{/if}
 							</div>
 						</div>
@@ -156,7 +156,7 @@
 								</Stack>
 							</div>
 							<div class="strip">
-								<LabStrip actions={TIMING_ACTIONS} transition={t.transition} size={110} height={170} />
+								<LabStrip actions={TIMING_ACTIONS} transition={t.transition} size={56} height={90} />
 							</div>
 						</div>
 					{/each}
@@ -214,7 +214,7 @@
 								{#each list as a (a.name)}
 									{@const p = picks.actions[a.name] ?? {}}
 									<div class="card" class:keep={p.verdict === 'keep'} class:redo={p.verdict === 'redo'}>
-										<LabStrip actions={[a.name]} size={100} height={150} />
+										<LabStrip actions={[a.name]} size={48} height={84} />
 										<div class="meta">
 											<Row justify="between" align="baseline">
 												<Text variant="body"><strong>{a.name}</strong></Text>

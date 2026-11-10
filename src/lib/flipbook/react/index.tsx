@@ -26,6 +26,8 @@ import {
 	Character,
 	InlineFigure,
 	Stage as CoreStage,
+	Page as CorePage,
+	type PageOptions,
 	animate as coreAnimate,
 	createTextFlow,
 	gestures,
@@ -224,7 +226,7 @@ export function Figure(props: FigureProps) {
 		return {
 			x: p.x ?? 0,
 			y: p.y ?? 0,
-			size: p.size ?? config.size ?? (handle ? 48 : undefined),
+			size: p.size ?? config.size ?? (handle ? 32 : undefined),
 			facing: p.facing ?? 1,
 			layer: p.layer ?? config.layer ?? (p.body ? ('limbs' as Layer) : ('regular' as Layer)),
 			color: p.color ?? config.color,
@@ -378,4 +380,33 @@ export function useStageFrame(fn: (data: FrameData, stage: CoreStage) => void) {
 			off();
 		};
 	}, [stage]);
+}
+
+// ----- page -----
+
+export interface PageProps extends Omit<PageOptions, 'library'> {
+	className?: string;
+	style?: CSSProperties;
+}
+
+/** A paragraph laid out by pretext where {action} tokens are stick figures. */
+export function Page({ className, style, ...opts }: PageProps) {
+	const canvas = useRef<HTMLCanvasElement>(null);
+	const key = JSON.stringify(opts);
+	useEffect(() => {
+		let page: CorePage | null = null;
+		let alive = true;
+		getLibrary()
+			.load([opts.layer ?? 'regular'])
+			.then(() => document.fonts.ready)
+			.then(() => {
+				if (alive && canvas.current) page = new CorePage(canvas.current, opts);
+			});
+		return () => {
+			alive = false;
+			page?.destroy();
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [key]);
+	return <canvas ref={canvas} className={className} style={{ display: 'block', width: '100%', ...style }} />;
 }

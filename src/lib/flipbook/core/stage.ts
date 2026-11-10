@@ -6,7 +6,6 @@
 import { Character, type CharacterOptions, type Definition } from './character';
 import { cancelFrame, frame, type FrameData } from './frameloop';
 import { type Layer, type Library, getLibrary } from './library';
-import { sharedAtlas } from './atlas';
 
 export interface Prop {
 	id: number;
@@ -35,8 +34,6 @@ export interface StageOptions {
 	depthSort?: boolean;
 	/** Skip drawing figures outside the viewport. Default true. */
 	cull?: boolean;
-	/** Cache rasterised glyphs and stamp them (much faster for crowds). Default true. */
-	atlas?: boolean;
 	/** Paper colour for the halo around limbs drawn over letter bodies. Defaults to the background. */
 	paper?: string;
 }
@@ -68,6 +65,9 @@ export class Stage {
 
 	private dpr = 1;
 	private ro: ResizeObserver | null = null;
+	private io: IntersectionObserver | null = null;
+	/** False while the canvas is scrolled out of view — drawing is skipped. */
+	visible = true;
 	private hooks = { update: new Set<Hook>(), before: new Set<Hook>(), after: new Set<Hook>() };
 	private running = false;
 	private fpsAcc = { t: 0, n: 0 };
@@ -86,12 +86,17 @@ export class Stage {
 			autoResize: opts.autoResize ?? true,
 			depthSort: opts.depthSort ?? true,
 			cull: opts.cull ?? true,
-			atlas: opts.atlas ?? true,
 			paper: opts.paper ?? opts.background ?? paperBehind(canvas)
 		};
 		if (this.options.autoResize && typeof ResizeObserver !== 'undefined') {
 			this.ro = new ResizeObserver(() => this.resize());
 			this.ro.observe(canvas);
+		}
+		if (typeof IntersectionObserver !== 'undefined') {
+			this.io = new IntersectionObserver((entries) => {
+				for (const e of entries) this.visible = e.isIntersecting;
+			});
+			this.io.observe(canvas);
 		}
 		this.resize();
 		this.start();
@@ -187,6 +192,7 @@ export class Stage {
 	destroy() {
 		this.stop();
 		this.ro?.disconnect();
+		this.io?.disconnect();
 		this.characters.length = 0;
 		this.props.length = 0;
 	}
@@ -205,15 +211,6 @@ export class Stage {
 		}
 	};
 
-	private atlas = sharedAtlas();
-	private get extents() {
-		const e = this.library.manifest.extents;
-		const u = this.library.unitsPerEm;
-		// Small margin for the bold layer's thicker line.
-		return e
-			? { left: e.left / u - 0.03, right: e.right / u + 0.03, top: e.top / u + 0.03, bottom: e.bottom / u - 0.03 }
-			: undefined;
-	}
 	private fontCache = new Map<string, string>();
 	private fontFor(layer: Layer, size: number) {
 		const key = `${layer}|${size}`;
@@ -229,6 +226,8 @@ export class Stage {
 	private sorted: Character[] = [];
 
 	private draw = (data: FrameData) => {
+		// Offscreen stages keep simulating (cheap) but don't paint.
+		if (!this.visible) return;
 		const t0 = performance.now();
 		const { ctx, dpr, camera } = this;
 		const z = camera.zoom * dpr;
@@ -272,40 +271,29 @@ export class Stage {
 		let fill = '';
 		let alpha = 1;
 		let drawn = 0;
-		const useAtlas = this.options.atlas;
 		for (const c of list) {
 			if (this.options.cull && (c.x < vx0 || c.x > vx1 || c.y < vy0 || c.y > vy1)) continue;
 			const col = c.color === 'currentColor' ? this.options.color : c.color;
 			if (c.opacity !== alpha) ctx.globalAlpha = alpha = c.opacity;
 			const X = (c.x - camera.x) * z;
 			const Y = (c.y - camera.y) * z;
-			// Device-pixel size, rounded so the atlas sees a stable key.
-			const px = Math.round(c.size * z);
-			const hit = useAtlas && !c.body ? this.atlas.get(c.glyph, this.fontFor(c.layer, px), px, col, this.extents) : null;
-			if (hit) {
-				const { cell, source } = hit;
-				// Mirror by flipping the x axis around the character's root.
-				ctx.setTransform(c.facing, 0, 0, 1, X, Y);
-				ctx.drawImage(source, cell.sx, cell.sy, cell.w, cell.h, -cell.ox, -cell.oy, cell.w, cell.h);
-			} else {
-				ctx.setTransform(z * c.facing, 0, 0, z, X, Y);
-				if (col !== fill) ctx.fillStyle = fill = col;
-				if (c.body) {
-					// Letter first, then the limbs over it with a paper halo, so
-					// arms read in front of the body like a comic panel.
-					this.drawBody(c);
-					ctx.font = font = this.fontFor(c.layer, c.size);
-					ctx.lineJoin = 'round';
-					ctx.lineWidth = (this.library.manifest.layers[c.layer]?.weight ?? 30) * c.scale * 1.1;
-					ctx.strokeStyle = this.options.paper;
-					ctx.strokeText(c.glyph, 0, 0);
-					ctx.fillText(c.glyph, 0, 0);
-				} else {
-					const f = this.fontFor(c.layer, c.size);
-					if (f !== font) ctx.font = font = f;
-					ctx.fillText(c.glyph, 0, 0);
-				}
+			// A figure is a character: set the font, fillText the glyph.
+			// Mirroring is a flipped x axis around the figure's root.
+			ctx.setTransform(z * c.facing, 0, 0, z, X, Y);
+			if (col !== fill) ctx.fillStyle = fill = col;
+			const f = this.fontFor(c.layer, c.size);
+			if (f !== font) ctx.font = font = f;
+			if (c.body) {
+				// Letter first, then the limbs over it with a paper halo, so
+				// arms read in front of the body like a comic panel.
+				this.drawBody(c);
+				ctx.font = f;
+				ctx.lineJoin = 'round';
+				ctx.lineWidth = (this.library.manifest.layers[c.layer]?.weight ?? 30) * c.scale * 1.1;
+				ctx.strokeStyle = this.options.paper;
+				ctx.strokeText(c.glyph, 0, 0);
 			}
+			ctx.fillText(c.glyph, 0, 0);
 			c.dirty = false;
 			drawn++;
 		}

@@ -7,9 +7,10 @@ character that gets swapped for the next drawing. The API follows framer-motion
 `stagger`, sequences), with bindings for Svelte and React.
 
 Text in any real font is laid out with [pretext](https://github.com/chenglou/pretext),
-so paragraphs can re-wrap around moving figures every frame. A canvas Stage
-stamps glyphs from an atlas the browser rasterises once from the font, so ten
-thousand figures still draw in under ten milliseconds.
+and figures are just characters in that layout: `{walk}` in a sentence is a
+stick figure sized like the text around it. Every drawing of an action shares
+one advance width, so animating is swapping a character — the layout never
+moves. A canvas Stage draws larger scenes the same way: one `fillText` per figure.
 
 ## Layout
 
@@ -18,7 +19,7 @@ src/lib/flipbook/
   rig/          build time only — skeleton, spline timeline, ground solver
     actions/    the action library (69 actions, 1,868 drawings)
   core/         runtime — frameloop, library, Character, Stage, animate,
-                stagger, textflow (pretext), behaviors, glyph atlas
+                stagger, page + textflow (pretext), behaviors
   svelte/       <Stage> <Figure> <TextFlow> <FlipbookConfig> use:figure
   react/        <Stage> <Figure> <TextFlow> <FlipbookConfig> useAnimate useStage
   generated/    manifest.json (written by the baker)
@@ -42,7 +43,7 @@ static/fonts/   flipbook-{regular,bold,limbs,limbs-bold}.{woff2,otf}
 - `/docs` API reference
 - `/forge` character and action builder (IK handles, timeline, TS export)
 - `/lab` check-in gallery: build variants, timing, per-action review → `lab/picks.json`
-- `/lab/world`, `/lab/letters`, `/lab/perf?n=10000`, `/lab/react`
+- `/lab/page`, `/lab/world`, `/lab/letters`, `/lab/perf?n=10000`, `/lab/react`
 
 ## How motion stays grounded
 

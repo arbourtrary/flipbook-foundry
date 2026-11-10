@@ -72,7 +72,7 @@
 	const opts = untrack(() => ({
 		x,
 		y,
-		size: size ?? config.size ?? (stage ? 48 : undefined),
+		size: size ?? config.size ?? (stage ? 32 : undefined),
 		facing,
 		layer: layer ?? config.layer ?? (body ? 'limbs' : 'regular'),
 		color: color ?? config.color,

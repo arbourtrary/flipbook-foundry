@@ -9,6 +9,7 @@
 
 	const toc = [
 		['start', 'Getting started'],
+		['page', 'Page'],
 		['figure', 'Figure'],
 		['transition', 'Transition'],
 		['variants', 'Variants'],
@@ -33,6 +34,12 @@ import { createStage, animate, stagger } from 'flipbook';
 
 // Serve static/fonts/flipbook-*.woff2 at /fonts/. Components load what they use;
 // call getLibrary().load(['regular', 'bold']) yourself to preload.`;
+
+	const pageEx = `<Page
+  text="Bob {walk} left the house. Sue {wave} waved. The dog {run} gave chase."
+  font="400 20px Georgia"   // any CSS font for the words
+  figureScale={1.3}         // figure size relative to the text (default 1.3)
+/>`;
 
 	const figureEx = `<Figure
   animate="walk"            // action or variant to play; change it to play another
@@ -98,7 +105,7 @@ stage.stats                               // { fps, characters, drawn, updateMs,
     padding={10}               // breathing room around figures
     avoid                      // re-wrap around every figure, every frame
   />
-  <Figure animate="run" x={0} y={160} size={100} />
+  <Figure animate="run" x={0} y={160} size={64} />
 </Stage>
 
 // Without components:
@@ -214,6 +221,19 @@ export const shrug: ActionDef = {
 
 					<Rule />
 
+					<section id="page">
+						<Stack gap="4">
+							<Text variant="heading">Page</Text>
+							<Text variant="body">
+								The simplest way in. Write a sentence and drop actions into it as <code>{'{walk}'}</code>. pretext lays
+								the paragraph out once, with words in your font and figures in the Flipbook font, all at text size.
+								Every drawing of an action has the same width, so animating a figure only swaps its character and the
+								layout never moves.
+							</Text>
+							<Code code={pageEx} />
+						</Stack>
+					</section>
+
 					<section id="figure">
 						<Stack gap="4">
 							<Text variant="heading">Figure</Text>
@@ -257,9 +277,7 @@ export const shrug: ActionDef = {
 						<Stack gap="4">
 							<Text variant="heading">Stage</Text>
 							<Text variant="body">
-								A canvas world. Figures are depth-sorted by their ground line, culled offscreen and stamped from a
-								glyph atlas: the browser rasterises each drawing once, from the font, and every later frame is a copy.
-								Ten thousand figures draw in under ten milliseconds.
+								A canvas world. Each figure is one <code>fillText</code> of its current glyph, depth-sorted by its ground line and skipped when offscreen; a stage that's scrolled out of view stops painting. A thousand figures draw in a few milliseconds.
 							</Text>
 							<Code code={stageEx} />
 						</Stack>

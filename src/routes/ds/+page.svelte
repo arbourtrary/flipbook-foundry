@@ -151,7 +151,7 @@
 				<Row gap="8" align="end" wrap>
 					{#each ['walk', 'run', 'jump', 'dance'] as a}
 						<Stack gap="2" align="center">
-							<Figure animate={a} size={120} whileHover="cheer" transition={{ repeat: Infinity, repeatDelay: 0.5 }} />
+							<Figure animate={a} size={64} whileHover="cheer" transition={{ repeat: Infinity, repeatDelay: 0.5 }} />
 							<Text variant="mono" color="ink-2">{a}</Text>
 						</Stack>
 					{/each}

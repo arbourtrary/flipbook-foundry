@@ -25,7 +25,7 @@
 			lineHeight={30}
 		/>
 		{#each Array(12) as _, i}
-			<Figure animate={actions[i % 2]} x={i * 80} y={140 + (i % 4) * 100} size={90} transition={{ phase: i / 12 }} />
+			<Figure animate={actions[i % 2]} x={i * 80} y={140 + (i % 4) * 100} size={48} transition={{ phase: i / 12 }} />
 		{/each}
 	</Stage>
 	<p>{stats}</p>

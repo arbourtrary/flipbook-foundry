@@ -20,8 +20,8 @@
 		library,
 		fontBase = '/fonts/',
 		layer = 'regular',
-		size = 96,
-		height = 150,
+		size = 48,
+		height = 84,
 		transition = {},
 		rest = 0.6
 	}: Props = $props();

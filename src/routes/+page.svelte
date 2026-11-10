@@ -7,7 +7,7 @@
 	import GlyphStrip from '$lib/showcase/GlyphStrip.svelte';
 	import ActionIndex from '$lib/showcase/ActionIndex.svelte';
 	import BuyButton from '$lib/buy/BuyButton.svelte';
-	import { Figure } from '$lib/flipbook/svelte';
+	import { Figure, Page } from '$lib/flipbook/svelte';
 
 	const lib = getLibrary();
 	const actionCount = lib.names().length;
@@ -23,7 +23,7 @@
 <!-- A world: canvas, pretext, thousands of figures -->
 <Stage style="height: 400px">
   <TextFlow text={copy} font="20px Georgia" width={720} lineHeight={30} />
-  <Figure animate="run" x={0} y={300} size={96} />
+  <Figure animate="run" x={0} y={300} size={64} />
   <Figure
     variants={{ rest: 'idle', happy: { action: 'cheer', transition: { repeat: 2 } } }}
     animate={mood}
@@ -83,8 +83,8 @@ sue.use(wander(), greet());`;
 					<Text variant="title">An animation library where every frame is a glyph.</Text>
 					<Text variant="subheading" color="ink-2">
 						{actionCount} actions, {frameCount.toLocaleString()} hand-timed drawings, one font. Walk them, trip them, sit
-						them on your headlines. A framer-motion-style API for Svelte and React, and a map of ten thousand figures
-						still draws in under ten milliseconds.
+						them on your headlines. A framer-motion-style API for Svelte and React. Every figure is a character in a font,
+						laid out by pretext like any other.
 					</Text>
 					<Row gap="4" wrap>
 						<Button href="/docs">Read the docs</Button>
@@ -92,6 +92,18 @@ sue.use(wander(), greet());`;
 						<BuyButton />
 					</Row>
 					<Text variant="small" color="ink-2">Poke anyone up there. They don't mind.</Text>
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="6">
+					<Text variant="heading">Figures are characters.</Text>
+					<Page
+						text={'Bob {walk} left the house at nine. Sue {wave} waved from the window, and the dog {run} ran after the postman. Halfway down the road Bob {trip} tripped, sat {sit-idle} on the kerb for a while, then got up and {dance} danced it off. Nobody {shrug} minded.'}
+						font={'400 22px Georgia'}
+					/>
 				</Stack>
 			</section>
 

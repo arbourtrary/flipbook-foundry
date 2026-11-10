@@ -23,5 +23,6 @@ export {
 export { Stage, createStage, type StageOptions, type Prop, type StageStats } from './stage';
 export { animate, stagger, type AnimateOptions, type SequenceStep } from './animate';
 export { InlineFigure, mountFigure, gestures, type InlineOptions } from './inline';
+export { Page, createPage, type PageOptions } from './page';
 export { createTextFlow, type TextFlow, type TextFlowOptions, type Fragment, type Rect } from './textflow';
 export { wander, greet, type Behavior, type WanderOptions, type GreetOptions } from './behavior';

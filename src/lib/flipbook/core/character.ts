@@ -124,7 +124,7 @@ export class Character {
 		this.library = opts.library ?? getLibrary();
 		this.x = opts.x ?? 0;
 		this.y = opts.y ?? 0;
-		this.size = opts.size ?? 64;
+		this.size = opts.size ?? 32;
 		this.facing = opts.facing ?? 1;
 		this.layer = opts.layer ?? (opts.body ? 'limbs' : 'regular');
 		this.color = opts.color ?? 'currentColor';

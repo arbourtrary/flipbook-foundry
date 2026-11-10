@@ -7,7 +7,7 @@
 {#each fonts as font, fi}
 	<Stage layers={['limbs', 'regular']} style="height: 220px; border-bottom: 1px solid">
 		{#each word.split('') as ch, i}
-			<Figure animate={acts[(i + fi) % acts.length]} body={{ char: ch, font }} x={120 + i * 150} y={190} size={170} transition={{ inPlace: true, phase: i / 5 }} />
+			<Figure animate={acts[(i + fi) % acts.length]} body={{ char: ch, font }} x={80 + i * 100} y={120} size={96} transition={{ inPlace: true, phase: i / 5 }} />
 		{/each}
 	</Stage>
 {/each}
