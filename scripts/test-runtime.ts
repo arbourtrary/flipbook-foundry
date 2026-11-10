@@ -3,8 +3,12 @@
 import assert from 'node:assert/strict';
 import { Character } from '../src/lib/flipbook/core/character.ts';
 
+// Like a browser: a frame, then pending promise callbacks, then the next frame.
 const run = async (c: Character, ms: number) => {
-	for (let t = 0; t < ms; t += 16) c.update(16);
+	for (let t = 0; t < ms; t += 16) {
+		c.update(16);
+		await Promise.resolve();
+	}
 	await new Promise((r) => setTimeout(r, 0));
 };
 
@@ -66,6 +70,18 @@ const run = async (c: Character, ms: number) => {
 	c.animate('trip', { repeat: 1, repeatDelay: 0.2 });
 	await run(c, 12000);
 	assert.deepEqual(seen, ['trip', 'get-up', 'trip']);
+}
+
+// Sequences chain actions and route between rest poses on their own.
+{
+	const c = new Character({ animate: 'idle' });
+	const seen: string[] = [];
+	c.on('start', (e) => seen.push(e.action));
+	let done = false;
+	c.sequence(['trip', 'wave', 'walk']).then(() => (done = true));
+	await run(c, 15000);
+	assert.deepEqual(seen, ['trip', 'get-up', 'wave', 'walk']);
+	assert.ok(done);
 }
 
 console.log('runtime: all checks passed');

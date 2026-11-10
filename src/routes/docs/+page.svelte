@@ -39,7 +39,15 @@ import { createStage, animate, stagger } from 'flipbook';
   text="Bob {walk} left the house. Sue {wave} waved. The dog {run} gave chase."
   font="400 20px Georgia"   // any CSS font for the words
   figureScale={1.3}         // figure size relative to the text (default 1.3)
-/>`;
+  align="center"            // or left
+  phase={({ x, width }) => x / width}   // loops start by position: a wave
+  bind:page                 // page.figures[i] are Characters you can direct
+/>
+
+{trip>get-up>dust-off}   a sequence, looped
+{idle|sneak|run}         a figure that may switch between these
+                         (room is reserved for the widest, so the line never moves)
+a newline                starts a new paragraph`;
 
 	const figureEx = `<Figure
   animate="walk"            // action or variant to play; change it to play another
@@ -139,7 +147,11 @@ c.on('frame', ({ action, frame }) => …);
 c.anchor('handR');                 // [x, y] stage px — where to put the letter
 c.bounds();                        // ink box, for hit-tests and text flow
 c.glyph;                           // the current character to draw
-c.use(wander(), greet());          // behaviours`;
+c.use(wander(), greet());          // behaviours
+
+// Compose: actions play in order; rest-pose routes (get-up, stand-up…)
+// are inserted for you. Loops play one cycle each.
+c.sequence(['sneak', 'trip', 'dust-off', 'wave'], { loop: true });`;
 
 	const behaviorsEx = `import { wander, greet } from 'flipbook';
 

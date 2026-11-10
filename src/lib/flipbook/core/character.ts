@@ -219,7 +219,8 @@ export class Character {
 	 * routing through hub transitions first if needed. Resolves when a
 	 * one-shot (or finite repeat, or travel-to-x) completes.
 	 */
-	animate(def: Definition, override: Transition = {}): PlaybackControls {
+	animate(def: Definition, override: Transition = {}, fromSequence = false): PlaybackControls {
+		if (!fromSequence) this.seqId++;
 		const target = this.resolve(def);
 		const t: Transition = { ...this.transition, ...target.transition, ...override };
 		const action = this.library.action(target.action);
@@ -256,8 +257,33 @@ export class Character {
 		};
 	}
 
+	private seqId = 0;
+
+	/**
+	 * Play actions one after another — each loop action plays one cycle —
+	 * routing between rest poses as needed. `loop` repeats the whole chain.
+	 *   bob.sequence(['sneak', 'trip', 'get-up', 'dust-off'], { loop: true })
+	 * Calling animate() or sequence() again cancels it.
+	 */
+	sequence(defs: Definition[], opts: { loop?: boolean; transition?: Transition } = {}): PlaybackControls {
+		const id = ++this.seqId;
+		let resolve!: () => void;
+		const finished = new Promise<void>((r) => (resolve = r));
+		const step = (i: number): void => {
+			if (id !== this.seqId) return resolve();
+			if (i >= defs.length) {
+				if (!opts.loop) return resolve();
+				i = 0;
+			}
+			this.animate(defs[i], { repeat: 0, ...opts.transition }, true).then(() => step(i + 1));
+		};
+		step(0);
+		return { then: (a, b) => finished.then(a, b), stop: () => this.stop(), finished };
+	}
+
 	/** Freeze on the current frame. */
 	stop() {
+		this.seqId++;
 		for (const c of this.queue) c.resolve();
 		if (this.clip) this.clip.resolve();
 		this.queue = [];

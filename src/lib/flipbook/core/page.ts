@@ -23,7 +23,8 @@ export interface PageOptions {
 	 * Text with figures written as {action}, e.g. 'Bob {walk} home.'
 	 * `{idle|sneak|run}` makes a figure that may switch between those actions
 	 * (via page.figures[i].animate) — room is reserved for the widest, so the
-	 * line never shifts. A newline starts a new paragraph.
+	 * line never shifts. `{trip>get-up>dust-off}` plays a sequence on a loop.
+	 * A newline starts a new paragraph.
 	 */
 	text: string;
 	/** Canvas font shorthand for the words, e.g. '400 20px Georgia'. */
@@ -111,16 +112,20 @@ export class Page {
 			const para = { items: [] as RichInlineItem[], pad: [] as number[], figure: [] as (Character | null)[] };
 			this.paras.push(para);
 			// Split on {action} / {a|b|c} tokens; everything else is ordinary text.
-			for (const part of paragraph.split(/(\{[a-z-]+(?:\|[a-z-]+)*\})/g)) {
-				const m = part.match(/^\{([a-z-|]+)\}$/);
-				const alts = m ? m[1].split('|').filter((a) => this.library.has(a)) : [];
+			for (const part of paragraph.split(/(\{[a-z-]+(?:[|>][a-z-]+)*\})/g)) {
+				const m = part.match(/^\{([a-z->|]+)\}$/);
+				const isSeq = !!m && m[1].includes('>');
+				const alts = m ? m[1].split(/[|>]/).filter((a) => this.library.has(a)) : [];
 				if (alts.length) {
 					const a = this.library.action(alts[0]);
+					const base: Transition = { inPlace: true, ...this.opts.transition };
 					const c = new Character({
 						library: this.library,
-						animate: alts[0],
-						transition: { inPlace: true, phase: (n++ * 0.37) % 1, ...(a.loop ? {} : { repeat: Infinity, repeatDelay: 0.8 }), ...this.opts.transition }
+						animate: isSeq ? undefined : alts[0],
+						initial: isSeq ? alts[0] : undefined,
+						transition: { ...base, phase: (n++ * 0.37) % 1, ...(a.loop || isSeq ? {} : { repeat: Infinity, repeatDelay: 0.8 }) }
 					});
+					if (isSeq) c.sequence(alts, { loop: true, transition: base });
 					c.data.alts = alts;
 					this.figures.push(c);
 					// Every drawing shares one advance, but a sprawl or a stride

@@ -4,6 +4,10 @@
 	import { Page } from '$lib/flipbook/svelte';
 	import { getLibrary, type Page as PageT } from '$lib/flipbook/core';
 	import { illustrate } from './verbs';
+	import Domino from './Domino.svelte';
+	import Bedtime from './Bedtime.svelte';
+	import ReadingRace from './ReadingRace.svelte';
+	import Queue from './Queue.svelte';
 
 	const lib = getLibrary();
 
@@ -138,6 +142,46 @@
 						phase={({ x, y, width }) => 1 - x / width + y / 900}
 					/>
 					<Text variant="mono" color="ink-2">{waveStats}</Text>
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">Dominoes</Text>
+					<Text variant="small" color="ink-2">Tap the sentence. Line breaks are where pretext put them, so they're longer pauses.</Text>
+					<Domino />
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">Reading race</Text>
+					<Text variant="small" color="ink-2">The ground is the tops of the words. Long words are hard going.</Text>
+					<ReadingRace />
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">The queue</Text>
+					<Text variant="small" color="ink-2">Everyone moves up exactly one place. Everyone is impatient in their own way.</Text>
+					<Queue />
+				</Stack>
+			</section>
+
+			<Rule />
+
+			<section>
+				<Stack gap="4">
+					<Text variant="heading">Bedtime story</Text>
+					<Text variant="small" color="ink-2">Scroll slowly. Sitting down and lying down happen on their own.</Text>
+					<Bedtime />
 				</Stack>
 			</section>
 
