@@ -6,6 +6,7 @@
 import { Character, type CharacterOptions, type Definition } from './character';
 import { cancelFrame, frame, type FrameData } from './frameloop';
 import { type Layer, type Library, getLibrary } from './library';
+import { GlyphAtlas } from './atlas';
 
 export interface Prop {
 	id: number;
@@ -34,6 +35,8 @@ export interface StageOptions {
 	depthSort?: boolean;
 	/** Skip drawing figures outside the viewport. Default true. */
 	cull?: boolean;
+	/** Cache rasterised glyphs and stamp them (much faster for crowds). Default true. */
+	atlas?: boolean;
 }
 
 export interface StageStats {
@@ -80,7 +83,8 @@ export class Stage {
 			pixelRatio: opts.pixelRatio ?? 2,
 			autoResize: opts.autoResize ?? true,
 			depthSort: opts.depthSort ?? true,
-			cull: opts.cull ?? true
+			cull: opts.cull ?? true,
+			atlas: opts.atlas ?? true
 		};
 		if (this.options.autoResize && typeof ResizeObserver !== 'undefined') {
 			this.ro = new ResizeObserver(() => this.resize());
@@ -197,6 +201,7 @@ export class Stage {
 		}
 	};
 
+	private atlas = new GlyphAtlas();
 	private fontCache = new Map<string, string>();
 	private fontFor(layer: Layer, size: number) {
 		const key = `${layer}|${size}`;
@@ -255,17 +260,29 @@ export class Stage {
 		let fill = '';
 		let alpha = 1;
 		let drawn = 0;
+		const useAtlas = this.options.atlas;
 		for (const c of list) {
 			if (this.options.cull && (c.x < vx0 || c.x > vx1 || c.y < vy0 || c.y > vy1)) continue;
-			const f = this.fontFor(c.layer, c.size);
-			if (f !== font) ctx.font = font = f;
 			const col = c.color === 'currentColor' ? this.options.color : c.color;
-			if (col !== fill) ctx.fillStyle = fill = col;
 			if (c.opacity !== alpha) ctx.globalAlpha = alpha = c.opacity;
-			// Mirror by flipping the x axis around the character's root.
-			ctx.setTransform(z * c.facing, 0, 0, z, (c.x - camera.x) * z, (c.y - camera.y) * z);
-			ctx.fillText(c.glyph, 0, 0);
-			if (c.body) this.drawBody(c);
+			const X = (c.x - camera.x) * z;
+			const Y = (c.y - camera.y) * z;
+			// Device-pixel size, rounded so the atlas sees a stable key.
+			const px = Math.round(c.size * z);
+			const hit = useAtlas && !c.body ? this.atlas.get(c.glyph, this.fontFor(c.layer, px), px, col) : null;
+			if (hit) {
+				const { cell, source } = hit;
+				// Mirror by flipping the x axis around the character's root.
+				ctx.setTransform(c.facing, 0, 0, 1, X, Y);
+				ctx.drawImage(source, cell.sx, cell.sy, cell.w, cell.h, -cell.ox, -cell.oy, cell.w, cell.h);
+			} else {
+				const f = this.fontFor(c.layer, c.size);
+				if (f !== font) ctx.font = font = f;
+				if (col !== fill) ctx.fillStyle = fill = col;
+				ctx.setTransform(z * c.facing, 0, 0, z, X, Y);
+				ctx.fillText(c.glyph, 0, 0);
+				if (c.body) this.drawBody(c);
+			}
 			c.dirty = false;
 			drawn++;
 		}
