@@ -470,7 +470,10 @@ export class Stage {
 		ctx.save();
 		ctx.translate(hx * s, -hy * s);
 		if (info.hold === 'forearm') ctx.rotate((-lib.forearm(c.action, c.frame, t.held!.hand) * Math.PI) / 180);
-		ctx.translate(-gx * ts, gy * ts);
+		// A hanging thing heavier than the arm is long — a full sack being
+		// dragged — rests on the ground instead of sinking through it.
+		const sink = info.hold === 'hang' ? Math.max(0, gy * ts - hy * s) : 0;
+		ctx.translate(-gx * ts, gy * ts - sink);
 		ctx.font = this.fontFor('things', t.size);
 		ctx.fillStyle = t.color ?? this.options.color;
 		ctx.textAlign = 'center';

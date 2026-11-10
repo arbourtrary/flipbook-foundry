@@ -144,11 +144,11 @@ export const pile: ThingDef = {
 
 export const wall: ThingDef = {
 	name: 'wall',
-	description: 'The edge of a wall — tall enough to hide behind. Draw it after a figure to hide them.',
+	description: 'The edge of a wall — wide and tall enough to hide a figure. Draw it after a figure to hide them.',
 	frames: 1,
 	hold: 'none',
 	grip: () => [0, 0],
-	draw: () => [poly([[-80, 0], [80, 0], [80, 1000], [-80, 1000]])]
+	draw: () => [poly([[-190, 0], [190, 0], [190, 1060], [-190, 1060]])]
 };
 
 export const clod: ThingDef = {

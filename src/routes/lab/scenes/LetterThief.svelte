@@ -7,7 +7,6 @@
 	// set right-aligned by pretext: every stolen letter is removed from the
 	// text and the line re-flows toward the thief, like a conveyor belt.
 	const SENTENCE = 'HAPPY HOLIDAYS, EVERYONE';
-	const FONT = '700 54px Georgia';
 	const SIZE = 120;
 	const H = 300;
 
@@ -23,7 +22,7 @@
 
 		lib
 			.load(['regular', 'things'])
-			.then(() => document.fonts.load(FONT))
+			.then(() => document.fonts.load('700 54px Georgia'))
 			.then(async () => {
 				if (!alive) return;
 				const ink = getComputedStyle(canvas).color;
@@ -33,7 +32,16 @@
 				const wallX = s.width - 110;
 				const standX = wallX - 210; // where the thief works from
 				let text = SENTENCE;
-				const flow = createTextFlow({ text, font: FONT, x: 16, y: 0, width: standX - 80 - 16, lineHeight: 70, align: 'right' });
+				const width = standX - 46 - 16;
+				// Largest size (≤ 54px) at which the whole sentence fits on one line.
+				const measure = document.createElement('canvas').getContext('2d')!;
+				let px = 54;
+				for (; px > 18; px -= 2) {
+					measure.font = `700 ${px}px Georgia`;
+					if (measure.measureText(SENTENCE).width < width - 8) break;
+				}
+				const FONT = `700 ${px}px Georgia`;
+				const flow = createTextFlow({ text, font: FONT, x: 16, y: 0, width, lineHeight: px * 1.3, align: 'right' });
 				// Sit the line on the ground.
 				flow.layout();
 				flow.options.y += ground - (flow.fragments[0]?.y ?? ground);
@@ -45,10 +53,10 @@
 					flow.draw(st.ctx, ink);
 				});
 
-				const wall: Thing = s.addThing({ name: 'wall', x: wallX, y: ground, size: SIZE * 1.1, layer: 'front' });
+				const wall: Thing = s.addThing({ name: 'wall', x: wallX, y: ground, size: SIZE, layer: 'front' });
 				void wall;
 				const sack: Thing = s.addThing({ name: 'sack', x: wallX + 70, y: ground, size: SIZE, layer: 'back' });
-				const thief: Character = s.add({ x: wallX + 12, y: ground, size: SIZE, facing: -1 });
+				const thief: Character = s.add({ x: wallX + 4, y: ground, size: SIZE, facing: -1 });
 
 				const steal = () =>
 					new Promise<void>((done) => {
@@ -82,7 +90,7 @@
 
 				// The show, on a loop.
 				while (alive) {
-					thief.x = wallX + 12;
+					thief.x = wallX + 4;
 					thief.facing = -1;
 					sack.frame = 0;
 					s.hold(sack, thief, 'L', true);

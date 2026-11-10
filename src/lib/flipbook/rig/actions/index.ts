@@ -8,6 +8,7 @@ import { GESTURE } from './gesture';
 import { EMOTE } from './emote';
 import { INTERACTION } from './interaction';
 import { MORE } from './more';
+import { PROPS } from './props';
 
 export const ACTIONS: ActionDef[] = [
 	...LOCOMOTION,
@@ -18,5 +19,6 @@ export const ACTIONS: ActionDef[] = [
 	...GESTURE,
 	...EMOTE,
 	...INTERACTION,
-	...MORE
+	...MORE,
+	...PROPS
 ];

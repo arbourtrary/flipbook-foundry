@@ -32,7 +32,7 @@
 				const u = SIZE / lib.unitsPerEm; // font units → px
 				const digger: Character = s.add({ x: s.width * 0.38, y: ground, size: SIZE });
 				const shovel: Thing = s.addThing({ name: 'shovel', size: SIZE });
-				const hole: Thing = s.addThing({ name: 'hole', x: digger.x + 380 * u, y: ground, size: SIZE });
+				const hole: Thing = s.addThing({ name: 'hole', x: digger.x + 440 * u, y: ground, size: SIZE });
 				const pile: Thing = s.addThing({ name: 'pile', x: digger.x - 330 * u, y: ground, size: SIZE });
 				const letters: Prop[] = [];
 
@@ -48,7 +48,7 @@
 				const blade = (): [number, number] => {
 					const [hx, hy] = digger.anchor('handR');
 					const a = (lib.forearm(digger.action, digger.frame, 'R') * Math.PI) / 180;
-					return [hx + Math.cos(a) * 420 * u * digger.facing, hy - Math.sin(a) * 420 * u];
+					return [hx + Math.cos(a) * 440 * u * digger.facing, hy - Math.sin(a) * 440 * u];
 				};
 
 				digger.on('scoop', () => {
