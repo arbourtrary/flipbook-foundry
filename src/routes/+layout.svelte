@@ -2,6 +2,10 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import '$lib/ds/tokens.css';
 	import '$lib/ds/reset.css';
+	import { setFontBase } from 'flipbook-foundry';
+
+	// The site serves its own freshly baked fonts; the package defaults to jsDelivr.
+	setFontBase('/fonts/');
 
 	let { children } = $props();
 </script>

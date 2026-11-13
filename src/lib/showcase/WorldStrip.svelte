@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, getLibrary, wander, greet, type Character } from '$lib/flipbook/core';
+	import { Stage, getLibrary, wander, greet, type Character } from 'flipbook-foundry';
 
 	interface Props {
 		rows?: number;
@@ -31,10 +31,25 @@
 					s.ctx.fillStyle = ink;
 					for (let i = 0; i < rows; i++) s.ctx.fillRect(0, Math.round(rowY(s.height, i)), s.width, 1);
 					if (title) {
-						const size = Math.min(s.height * 0.34, s.width * 0.2);
-						s.ctx.font = titleFont.replace('{size}', String(Math.round(size)));
+						// One line shrunk to fit the width; on narrow screens, one word per line
+						// stacked above the first rule if that sets the type larger.
+						const font = (px: number) => titleFont.replace('{size}', String(Math.floor(px)));
+						const fit = (lines: string[], max: number) => {
+							s.ctx.font = font(max);
+							const w = Math.max(...lines.map((l) => s.ctx.measureText(l).width));
+							return Math.min(max, (max * s.width) / w);
+						};
+						const top0 = rowY(s.height, 0);
+						const words = title.split(' ');
+						let lines = [title];
+						let size = fit(lines, s.height * 0.34);
+						if (words.length > 1) {
+							const stacked = fit(words, top0 / (words.length * 0.95 + 0.1));
+							if (stacked > size * 1.4) [lines, size] = [words, stacked];
+						}
+						s.ctx.font = font(size);
 						s.ctx.textAlign = 'left';
-						s.ctx.fillText(title, 0, rowY(s.height, 0) - size * 0.02);
+						lines.forEach((l, i) => s.ctx.fillText(l, 0, top0 - size * 0.02 - (lines.length - 1 - i) * size * 0.95));
 						s.ctx.textAlign = 'center';
 					}
 				});

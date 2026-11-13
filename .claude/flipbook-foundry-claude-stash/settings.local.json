@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:github.com)",
-      "Bash(bun --version)",
-      "Bash(npx --yes sv@latest create . --template minimal --types ts --no-add-ons --install npm)"
-    ]
-  }
-}

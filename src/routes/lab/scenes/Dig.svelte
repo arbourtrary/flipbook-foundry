@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, getLibrary, type Character, type Prop, type Thing } from '$lib/flipbook/core';
+	import { Stage, getLibrary, type Character, type Prop, type Thing } from 'flipbook-foundry';
 
 	// Composable props: the shovel is a glyph in the Things font, held in the
 	// figure's right hand and turned with the forearm every frame. The hole

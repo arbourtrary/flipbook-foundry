@@ -1,7 +1,9 @@
 // Headless runtime checks: hub routing, travel-to-x, ledge baselines,
 // auto-next, events. Run: npx tsx scripts/test-runtime.ts
 import assert from 'node:assert/strict';
-import { Character } from '../src/lib/flipbook/core/character.ts';
+import { Character } from '../packages/engine/src/core/character.ts';
+import { getLibrary, setDefaultFamily, setFontBase } from '../packages/engine/src/core/library.ts';
+import stick from '@flipbook-foundry/stick';
 
 // Like a browser: a frame, then pending promise callbacks, then the next frame.
 const run = async (c: Character, ms: number) => {
@@ -93,6 +95,20 @@ const run = async (c: Character, ms: number) => {
 	assert.equal(Math.round(c.x), 200);
 	assert.equal(c.facing, 1);
 	assert.ok(done);
+}
+
+// Families: one library each, chosen per character or by default.
+{
+	const other = { ...stick, id: 'other', fontBase: 'https://example.com/other/' };
+	assert.equal(getLibrary().family, stick);
+	assert.notEqual(getLibrary(other), getLibrary());
+	assert.equal(new Character({ library: getLibrary(other) }).library.family.id, 'other');
+	setFontBase('/self/', other);
+	assert.equal(getLibrary(other).fontBase, '/self/');
+	assert.match(getLibrary().fontBase, /@flipbook-foundry\/stick@/);
+	setDefaultFamily(other);
+	assert.equal(new Character().library.family.id, 'other');
+	setDefaultFamily(stick);
 }
 
 console.log('runtime: all checks passed');

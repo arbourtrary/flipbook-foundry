@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Text, Button, Link, Field, Stack, Row, Container, Rule } from '$lib/ds';
-	import { Figure } from '$lib/flipbook/svelte';
+	import { Figure } from 'flipbook-foundry/svelte';
 
 	let fieldValue = $state('');
 	let errorValue = $state('not-an-email');
@@ -52,7 +52,7 @@
 				</Row>
 				<Text variant="small" color="ink-2">
 					Four working tokens. One accent per visible viewport — used once on this page, on the
-					price below.
+					number below.
 				</Text>
 			</Stack>
 
@@ -68,8 +68,8 @@
 				</Row>
 				<Row gap="4" wrap>
 					<Button variant="primary" href="/docs">{#snippet children()}As link{/snippet}</Button>
-					<Button variant="secondary" href="/license">
-						{#snippet children()}Read license{/snippet}
+					<Button variant="secondary" href="/forge">
+						{#snippet children()}Open the builder{/snippet}
 					</Button>
 				</Row>
 			</Stack>
@@ -129,12 +129,12 @@
 				<Text variant="heading">The single accent example</Text>
 				<Row gap="6" align="baseline" wrap>
 					<Text variant="display">
-						<span class="price"><span class="dollar">$</span>1</span>
+						<span class="price">69</span>
 					</Text>
 					<Stack gap="2">
 						<Text variant="subheading">Flipbook Foundry</Text>
 						<Text variant="small" color="ink-2">
-							One-time. Includes .woff2, .otf, the license, and bragging rights.
+							Actions, one font. Free and open source.
 						</Text>
 					</Stack>
 				</Row>
@@ -207,10 +207,5 @@
 	.price {
 		color: var(--accent);
 		font-variant-numeric: tabular-nums;
-	}
-	.dollar {
-		font-size: 0.55em;
-		vertical-align: 0.55em;
-		margin-right: 0.05em;
 	}
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Stage, Figure } from '$lib/flipbook/svelte';
+	import { Stage, Figure } from 'flipbook-foundry/svelte';
 
 	const FONTS = [
 		{ label: 'Georgia', font: '700 10px Georgia' },

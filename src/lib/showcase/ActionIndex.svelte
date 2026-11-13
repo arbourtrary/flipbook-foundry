@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getLibrary } from '$lib/flipbook/core';
-	import { Figure } from '$lib/flipbook/svelte';
+	import { getLibrary } from 'flipbook-foundry';
+	import { Figure } from 'flipbook-foundry/svelte';
 
 	const ORDER = ['locomotion', 'aerial', 'pratfall', 'transition', 'idle', 'gesture', 'emote', 'interaction'];
 	const lib = getLibrary();

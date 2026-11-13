@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getLibrary } from '$lib/flipbook/core';
+	import { getLibrary } from 'flipbook-foundry';
 
 	// Every frame of an action, set as plain text. Select it, copy it — it's
 	// just characters in a font.

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Page } from '$lib/flipbook/svelte';
-	import type { Page as PageT } from '$lib/flipbook/core';
+	import { Page } from 'flipbook-foundry/svelte';
+	import type { Page as PageT } from 'flipbook-foundry';
 
 	// As you scroll through, everyone in the story gets sleepier. Asking a
 	// figure to `sleep` from standing routes through sit-down / lie-down on

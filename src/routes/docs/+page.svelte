@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Container, Stack, Rule, Text, Code, Link } from '$lib/ds';
-	import { getLibrary } from '$lib/flipbook/core';
-	import { Figure } from '$lib/flipbook/svelte';
+	import { getLibrary } from 'flipbook-foundry';
+	import { Figure } from 'flipbook-foundry/svelte';
 
 	const lib = getLibrary();
 	const ORDER = ['locomotion', 'aerial', 'pratfall', 'transition', 'idle', 'gesture', 'emote', 'interaction'];
@@ -21,23 +21,28 @@
 		['behaviors', 'Behaviors'],
 		['hooks', 'React hooks'],
 		['config', 'FlipbookConfig'],
+		['families', 'Families'],
 		['hubs', 'Hubs & routing'],
 		['actions', 'Action reference'],
 		['authoring', 'Authoring actions']
 	];
 
-	const install = `// Svelte
-import { Stage, Figure, TextFlow, FlipbookConfig } from 'flipbook/svelte';
-// React
-import { Stage, Figure, TextFlow, FlipbookConfig, useAnimate } from 'flipbook/react';
-// Anything else
-import { createStage, animate, stagger } from 'flipbook';
+	const install = `npm i flipbook-foundry
 
-// Serve static/fonts/flipbook-*.woff2 at /fonts/. Components load what they use;
-// call getLibrary().load(['regular', 'bold']) yourself to preload.`;
+// Svelte
+import { Stage, Figure, TextFlow, FlipbookConfig } from 'flipbook-foundry/svelte';
+// React
+import { Stage, Figure, TextFlow, FlipbookConfig, useAnimate } from 'flipbook-foundry/react';
+// Anything else
+import { createStage, animate, stagger } from 'flipbook-foundry';
+
+// Fonts load from jsDelivr, pinned to your installed version, and only the
+// chunks your figures use. To self-host, copy node_modules/flipbook-foundry/fonts/
+// to your public folder and call setFontBase('/fonts/') once at startup.
+// Preload with getLibrary().load(['regular', 'bold']).`;
 
 	const pageEx = `<Page
-  text="Bob {walk} left the house. Sue {wave} waved. The dog {run} gave chase."
+  text={'Bob {walk} left the house. Sue {wave} waved. The dog {run} gave chase.'}
   font="400 20px Georgia"   // any CSS font for the words
   figureScale={1.3}         // figure size relative to the text (default 1.3)
   align="center"            // or left
@@ -106,7 +111,7 @@ stage.toStage(clientX, clientY)          // pointer → stage space
 stage.camera = { x, y, zoom }            // scroll and zoom big maps
 stage.stats                               // { fps, characters, drawn, updateMs, drawMs }`;
 
-	const thingsEx = `// Things are glyphs too: props and set pieces in the Flipbook Things font.
+	const thingsEx = `// Things are glyphs too: props and set pieces in the Flipbook Stick Things font.
 // shovel · broom · sack (12 fullnesses) · hole (12 depths) · pile (12 sizes) · wall · clod
 await getLibrary().load(['regular', 'things']);
 
@@ -143,7 +148,7 @@ flow.layout(obstacles);  // Rect[] → fragments, pure arithmetic
 flow.draw(ctx);
 flow.ledges();           // word tops: places to stand, sit or hang`;
 
-	const animateEx = `import { animate, stagger } from 'flipbook';
+	const animateEx = `import { animate, stagger } from 'flipbook-foundry';
 
 animate(bob, 'jump');                                // → controls (thenable)
 await animate(bob, 'walk', { x: 400, then: 'wave' }); // travel, then settle
@@ -174,7 +179,7 @@ c.use(wander(), greet());          // behaviours
 // are inserted for you. Loops play one cycle each.
 c.sequence(['sneak', 'trip', 'dust-off', 'wave'], { loop: true });`;
 
-	const behaviorsEx = `import { wander, greet } from 'flipbook';
+	const behaviorsEx = `import { wander, greet } from 'flipbook-foundry';
 
 stage.add({ x, y }).use(
   wander({
@@ -198,6 +203,7 @@ const reduced = useReducedMotion(); // honours prefers-reduced-motion
 <Figure ref={setBob} animate="idle" />   // ref → Character`;
 
 	const configEx = `<FlipbookConfig
+  family={stick}            // figure family (default: stick)
   transition={{ onTwos: true }}
   layer="bold"
   size={48}
@@ -206,7 +212,18 @@ const reduced = useReducedMotion(); // honours prefers-reduced-motion
   …
 </FlipbookConfig>`;
 
-	const authoringEx = `// src/lib/flipbook/rig/actions/emote.ts
+	const familiesEx = `import stick from '@flipbook-foundry/stick';
+import { getLibrary, setDefaultFamily, setFontBase } from 'flipbook-foundry';
+
+setDefaultFamily(stick);              // the family used when none is given
+<Stage family={stick}>…</Stage>        // a Stage's Figures draw in its family
+<Page family={stick} text={…} />
+<Figure family={stick} animate="wave" />   // inline figures
+
+getLibrary(stick).names();            // that family's actions
+setFontBase('/fonts/', stick);        // self-host its fonts`;
+
+	const authoringEx = `// packages/rig/actions/emote.ts
 export const shrug: ActionDef = {
   name: 'shrug', category: 'gesture', description: '…',
   frames: 30, fps: 24, loop: false, from: 'stand', to: 'stand',
@@ -224,14 +241,14 @@ export const shrug: ActionDef = {
 </script>
 
 <svelte:head>
-	<title>Docs — Flipbook</title>
+	<title>Docs — Flipbook Foundry</title>
 </svelte:head>
 
 <main>
 	<Container>
 		<div class="layout">
 			<nav>
-				<a href="/" class="home"><Figure animate="walk" size={36} /> Flipbook</a>
+				<a href="/" class="home"><Figure animate="walk" size={36} /> Flipbook Foundry</a>
 				{#each toc as [id, label]}
 					<a href="#{id}">{label}</a>
 				{/each}
@@ -243,7 +260,7 @@ export const shrug: ActionDef = {
 						<Stack gap="4">
 							<Text variant="title">Docs</Text>
 							<Text variant="body">
-								Flipbook is an animation library where every frame is a glyph. Actions are baked into fonts at build
+								Flipbook Foundry is an animation library where every frame is a glyph. Actions are baked into fonts at build
 								time; at runtime a figure is one character that gets swapped for the next drawing. The API borrows
 								framer-motion's vocabulary. If you know <code>animate</code>, <code>variants</code> and
 								<code>stagger</code>, you know this.
@@ -259,7 +276,7 @@ export const shrug: ActionDef = {
 							<Text variant="heading">Page</Text>
 							<Text variant="body">
 								The simplest way in. Write a sentence and drop actions into it as <code>{'{walk}'}</code>. pretext lays
-								the paragraph out once, with words in your font and figures in the Flipbook font, all at text size.
+								the paragraph out once, with words in your font and figures in the Flipbook Stick font, all at text size.
 								Every drawing of an action has the same width, so animating a figure only swaps its character and the
 								layout never moves.
 							</Text>
@@ -379,6 +396,21 @@ export const shrug: ActionDef = {
 							<Text variant="heading">FlipbookConfig</Text>
 							<Text variant="body">Defaults for every Figure below it, like framer-motion's MotionConfig.</Text>
 							<Code code={configEx} />
+						</Stack>
+					</section>
+
+					<Rule />
+
+					<section id="families">
+						<Stack gap="4">
+							<Text variant="heading">Families</Text>
+							<Text variant="body">
+								A family is a set of figure fonts and the manifest of actions drawn in them. Each one is its own package;
+								<code>flipbook-foundry</code> ships with <code>@flipbook-foundry/stick</code> as the default, so you only
+								name a family to switch or self-host. Families load their fonts from jsDelivr, pinned to the installed
+								version.
+							</Text>
+							<Code code={familiesEx} />
 						</Stack>
 					</section>
 

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Container, Stack, Rule, Text } from '$lib/ds';
-	import { Page } from '$lib/flipbook/svelte';
-	import { getLibrary, type Page as PageT } from '$lib/flipbook/core';
+	import { Page } from 'flipbook-foundry/svelte';
+	import { getLibrary, type Page as PageT } from 'flipbook-foundry';
 	import { illustrate } from './verbs';
 	import Domino from './Domino.svelte';
 	import Bedtime from './Bedtime.svelte';
@@ -270,7 +270,7 @@
 				<Stack gap="3">
 					<Text variant="heading">What this page loaded</Text>
 					<Text variant="body" color="ink-2">
-						The Flipbook font is split by category, and the browser fetches only the parts whose drawings appear.
+						The Flipbook Stick font is split by category, and the browser fetches only the parts whose drawings appear.
 					</Text>
 					<table>
 						<tbody>

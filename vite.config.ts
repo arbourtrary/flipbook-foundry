@@ -32,5 +32,7 @@ function labPicks(): Plugin {
 }
 
 export default defineConfig({
-	plugins: [sveltekit(), labPicks()]
+	plugins: [sveltekit(), labPicks()],
+	// The site imports the workspace packages from source.
+	server: { fs: { allow: ['packages'] } }
 });

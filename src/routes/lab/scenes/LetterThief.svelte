@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, createTextFlow, getLibrary, type Character, type Prop, type Thing } from '$lib/flipbook/core';
+	import { Stage, createTextFlow, getLibrary, type Character, type Prop, type Thing } from 'flipbook-foundry';
 
 	// A thief peeks out from behind a wall, sneaks over with an empty sack,
 	// and steals a sentence one letter at a time. The sentence is real text,

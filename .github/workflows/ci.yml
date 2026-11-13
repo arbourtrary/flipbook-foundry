@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      # The site build uses the committed fonts; the baker is checked separately.
+      - run: npx vite build
+      - run: npm run package
+      - run: npx publint packages/engine
+      - run: npx publint packages/stick
+      # Re-bake and fail if the committed manifest is stale (font binaries
+      # carry timestamps, so only the manifest is compared).
+      - run: npm run build:font stick
+      - run: git diff --exit-code -- packages/stick/generated

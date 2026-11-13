@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, getLibrary, type Character } from '$lib/flipbook/core';
+	import { Stage, getLibrary, type Character } from 'flipbook-foundry';
 
 	// A queue for the counter. Every few seconds the person at the front is
 	// served and leaves; everyone shuffles up exactly one place (travel-to-x

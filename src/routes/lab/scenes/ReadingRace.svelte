@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, createTextFlow, getLibrary, type Character } from '$lib/flipbook/core';
+	import { Stage, createTextFlow, getLibrary, type Character } from 'flipbook-foundry';
 
 	// A figure runs along the tops of the words, line by line, the way your
 	// eye reads. pretext's word ledges are the ground. Long words trip it up.

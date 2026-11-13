@@ -14,6 +14,12 @@ const config = {
 				return c;
 			}
 		},
+		// The site imports the packages from source, exactly as users import them.
+		alias: {
+			'flipbook-foundry': 'packages/engine/src',
+			'@flipbook-foundry/stick': 'packages/stick',
+			$rig: 'packages/rig'
+		},
 		adapter: adapter({
 			fallback: '404.html',
 			strict: true

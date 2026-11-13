@@ -2,8 +2,8 @@
 import { chromium } from 'playwright-core';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { THINGS } from '../src/lib/flipbook/rig/things.ts';
-import { toSvgD } from '../src/lib/flipbook/rig/geometry.ts';
+import { THINGS } from '../packages/stick/things.ts';
+import { toSvgD } from '../packages/rig/geometry.ts';
 const S = 0.14, CELL = 1100, BASE = 760;
 let rows = '';
 for (const t of THINGS) {

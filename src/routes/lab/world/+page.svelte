@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, getLibrary, wander, greet, type Character } from '$lib/flipbook/core';
+	import { Stage, getLibrary, wander, greet, type Character } from 'flipbook-foundry';
 
 	let canvas: HTMLCanvasElement;
 	let stage: Stage | null = null;

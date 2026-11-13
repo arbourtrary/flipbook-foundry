@@ -9,11 +9,11 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { homedir } from 'node:os';
-import { ACTIONS } from '../src/lib/flipbook/rig/actions/index.ts';
-import { HUBS } from '../src/lib/flipbook/rig/actions/hubs.ts';
-import { bake } from '../src/lib/flipbook/rig/timeline.ts';
-import { toSvgD } from '../src/lib/flipbook/rig/geometry.ts';
-import { THINGS } from '../src/lib/flipbook/rig/things.ts';
+import { ACTIONS } from '../packages/rig/actions/index.ts';
+import { HUBS } from '../packages/rig/actions/hubs.ts';
+import { bake } from '../packages/rig/timeline.ts';
+import { toSvgD } from '../packages/rig/geometry.ts';
+import { THINGS } from '../packages/stick/things.ts';
 
 // PROP=shovel (or PROP=sack:L) draws a held thing at the figure's hand on
 // every frame, the same way the runtime will.

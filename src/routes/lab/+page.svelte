@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Container, Stack, Row, Rule, Text, Button } from '$lib/ds';
-	import { createLibrary, getLibrary, type Library, type Manifest, type Transition } from '$lib/flipbook/core';
-	import { Figure } from '$lib/flipbook/svelte';
+	import { createLibrary, getLibrary, type Library, type Manifest, type Transition } from 'flipbook-foundry';
+	import { Figure } from 'flipbook-foundry/svelte';
 	import LabStrip from './LabStrip.svelte';
 
 	type Verdict = 'keep' | 'redo';
@@ -52,7 +52,8 @@
 		const entries = await Promise.all(
 			BUILDS.map(async (b) => {
 				const m = (await (await fetch(`/lab/${b.id}/manifest.json`)).json()) as Manifest;
-				return [b.id, createLibrary(m)] as const;
+				const family = { id: `lab-${b.id}`, manifest: m, anchors: async () => ({}), fontBase: `/lab/${b.id}/` };
+				return [b.id, createLibrary(family)] as const;
 			})
 		);
 		variants = Object.fromEntries(entries);

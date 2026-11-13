@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Stage, Figure, TextFlow } from '$lib/flipbook/svelte';
-	import type { Stage as StageT } from '$lib/flipbook/core';
+	import { Stage, Figure, TextFlow } from 'flipbook-foundry/svelte';
+	import type { Stage as StageT } from 'flipbook-foundry';
 
 	const copy =
 		'This paragraph is set in a real typeface and laid out by pretext, which measures once and then wraps with arithmetic alone. ' +

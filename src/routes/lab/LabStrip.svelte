@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, getLibrary, type Library, type Transition, type Layer } from '$lib/flipbook/core';
+	import { Stage, getLibrary, type Library, type Transition, type Layer } from 'flipbook-foundry';
 
 	interface Props {
 		actions: string[];

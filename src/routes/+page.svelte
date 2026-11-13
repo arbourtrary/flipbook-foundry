@@ -1,20 +1,23 @@
 <script lang="ts">
-	import { Container, Stack, Row, Rule, Text, Button, Link, Code } from '$lib/ds';
-	import { getLibrary } from '$lib/flipbook/core';
+	import { Container, Stack, Row, Rule, Text, Link, Code } from '$lib/ds';
+	import { getLibrary } from 'flipbook-foundry';
 	import WorldStrip from '$lib/showcase/WorldStrip.svelte';
 	import FlowDemo from '$lib/showcase/FlowDemo.svelte';
 	import LettersDemo from '$lib/showcase/LettersDemo.svelte';
 	import GlyphStrip from '$lib/showcase/GlyphStrip.svelte';
 	import ActionIndex from '$lib/showcase/ActionIndex.svelte';
-	import BuyButton from '$lib/buy/BuyButton.svelte';
-	import { Figure, Page } from '$lib/flipbook/svelte';
+	import Install from '$lib/showcase/Install.svelte';
+	import Playground from '$lib/showcase/Playground.svelte';
+	import { REPO } from '$lib/site';
+	import { Figure, Page } from 'flipbook-foundry/svelte';
 
 	const lib = getLibrary();
 	const actionCount = lib.names().length;
 	const frameCount = Object.values(lib.manifest.actions).reduce((n, a) => n + a.frames, 0);
+	const description = `Stick-figure animation built from a font. ${actionCount} actions, ${frameCount.toLocaleString('en-US')} drawings, a framer-motion-style API for Svelte, React and plain JavaScript. Free and open source.`;
 
 	const svelteSnippet = `<script>
-  import { Stage, Figure, TextFlow } from 'flipbook/svelte';
+  import { Stage, Figure, TextFlow } from 'flipbook-foundry/svelte';
 <\/script>
 
 <!-- Inline: one glyph in a line of text -->
@@ -31,7 +34,7 @@
   />
 </Stage>`;
 
-	const reactSnippet = `import { Stage, Figure, useAnimate, stagger } from 'flipbook/react';
+	const reactSnippet = `import { Stage, Figure, useAnimate, stagger } from 'flipbook-foundry/react';
 
 function Parade({ people }) {
   const animate = useAnimate();
@@ -49,7 +52,7 @@ function Parade({ people }) {
   );
 }`;
 
-	const imperativeSnippet = `import { createStage, animate, wander, greet } from 'flipbook';
+	const imperativeSnippet = `import { createStage, animate, wander, greet } from 'flipbook-foundry';
 
 const stage = createStage(canvas);
 const bob = stage.add({ x: 0, y: 300, size: 80 });
@@ -66,15 +69,17 @@ sue.use(wander(), greet());`;
 </script>
 
 <svelte:head>
-	<title>Flipbook — an animation library where every frame is a glyph</title>
-	<meta
-		name="description"
-		content="Stick-figure animation built from a font. {actionCount} actions, {frameCount} drawings, framer-motion-style API for Svelte and React, pretext-powered text that makes room."
-	/>
+	<title>Flipbook Foundry — an animation library where every frame is a glyph</title>
+	<meta name="description" content={description} />
+	<meta property="og:title" content="Flipbook Foundry" />
+	<meta property="og:description" content={description} />
+	<meta property="og:type" content="website" />
+	<meta property="og:image" content="/og.png" />
+	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
 <main>
-	<WorldStrip title="Flipbook" rows={5} population={64} height={560} />
+	<WorldStrip title="Flipbook Foundry" rows={5} population={64} height={560} />
 
 	<Container>
 		<Stack gap="24">
@@ -82,14 +87,14 @@ sue.use(wander(), greet());`;
 				<Stack gap="6">
 					<Text variant="title">An animation library where every frame is a glyph.</Text>
 					<Text variant="subheading" color="ink-2">
-						{actionCount} actions, {frameCount.toLocaleString()} hand-timed drawings, one font. Walk them, trip them, sit
-						them on your headlines. A framer-motion-style API for Svelte and React. Every figure is a character in a font,
-						laid out by pretext like any other.
+						{actionCount} actions, {frameCount.toLocaleString('en-US')} hand-timed drawings, one font. A framer-motion-style API
+						for Svelte, React and plain JavaScript. Free and open source.
 					</Text>
-					<Row gap="4" wrap>
-						<Button href="/docs">Read the docs</Button>
-						<Button href="/forge" variant="secondary">Open the builder</Button>
-						<BuyButton />
+					<Row gap="6" align="center" wrap>
+						<Install />
+						<Link href="/docs">Docs</Link>
+						<Link href="/forge">Builder</Link>
+						<Link href={REPO}>GitHub</Link>
 					</Row>
 					<Text variant="small" color="ink-2">Poke anyone up there. They don't mind.</Text>
 				</Stack>
@@ -97,6 +102,13 @@ sue.use(wander(), greet());`;
 
 			<Rule />
 
+			<section>
+				<Stack gap="6">
+					<Text variant="heading">Write your own.</Text>
+					<Playground />
+				</Stack>
+			</section>
+			<Rule />
 			<section>
 				<Stack gap="6">
 					<Text variant="heading">Figures are characters.</Text>
@@ -114,7 +126,7 @@ sue.use(wander(), greet());`;
 					<Stack gap="4">
 						<Text variant="heading">It's just text.</Text>
 						<Text variant="body">
-							Each drawing is a character in the Flipbook font. A walk is twenty-four of them in a row. Playing an action
+							Each drawing is a character in the Flipbook Stick font. A walk is twenty-four of them in a row. Playing an action
 							means swapping one character for the next at the right moment — no canvas paths, no SVG, no skeleton at
 							runtime. Select the line on the right and copy it: you're holding a walk cycle.
 						</Text>
@@ -149,8 +161,8 @@ sue.use(wander(), greet());`;
 				<Stack gap="6">
 					<Text variant="heading">Letters with legs.</Text>
 					<Text variant="body" color="ink-2">
-						Any font, any letter. The letter becomes the body; the limbs come from the Flipbook Limbs font, posed by the
-						same {frameCount.toLocaleString()} drawings.
+						Any font, any letter. The letter becomes the body; the limbs come from the Flipbook Stick Limbs font, posed by the
+						same {frameCount.toLocaleString('en-US')} drawings.
 					</Text>
 					<LettersDemo />
 				</Stack>
@@ -192,8 +204,8 @@ sue.use(wander(), greet());`;
 			<footer>
 				<Row justify="between" align="baseline" wrap>
 					<Text variant="small" color="ink-2">
-						Flipbook Foundry. Fonts are $1; the library is free to use with them.
-						<Link href="/license">License</Link>
+						Flipbook Foundry. Code under MIT, fonts under the SIL Open Font License.
+						<Link href="/how">How it works</Link> · <Link href={REPO}>GitHub</Link>
 					</Text>
 					<span class="sign"><Figure animate="bow" size={40} transition={{ repeat: Infinity, repeatDelay: 2 }} /></span>
 				</Row>

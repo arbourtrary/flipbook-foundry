@@ -2,8 +2,8 @@
 // pose (sparse inheritance is resolved on load and re-sparsified on export),
 // plus the action-level fields. Pure functions only — IK lives here too.
 
-import { STAND, swapLR, type Build, type Pose } from '$lib/flipbook/rig/skeleton';
-import { resolveKeys, type ActionDef, type Ease, type Key } from '$lib/flipbook/rig/timeline';
+import { STAND, swapLR, type Build, type Pose } from '$rig/skeleton';
+import { resolveKeys, type ActionDef, type Ease, type Key } from '$rig/timeline';
 
 export interface EditKey {
 	at: number;

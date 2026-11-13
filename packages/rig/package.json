@@ -1,0 +1,7 @@
+{
+	"name": "@flipbook-foundry/rig",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Build-time humanoid skeleton, timeline and action library shared by figure families.",
+	"type": "module"
+}

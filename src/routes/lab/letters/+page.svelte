@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Stage, Figure } from '$lib/flipbook/svelte';
+	import { Stage, Figure } from 'flipbook-foundry/svelte';
 	const word = 'HELLO';
 	const acts = ['walk', 'wave', 'jump', 'dance', 'cheer'];
 	const fonts = ['700 10px Georgia', '800 10px "Inter Tight", system-ui', 'italic 400 10px "Times New Roman"'];

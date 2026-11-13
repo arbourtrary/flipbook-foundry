@@ -1,0 +1,37 @@
+{
+	"name": "@flipbook-foundry/stick",
+	"version": "0.1.0",
+	"description": "Stick figures for Flipbook Foundry: 91 actions baked into fonts.",
+	"license": "OFL-1.1",
+	"author": "arbourtrary",
+	"homepage": "https://github.com/arbourtrary/flipbook-foundry#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/arbourtrary/flipbook-foundry.git",
+		"directory": "packages/stick"
+	},
+	"keywords": [
+		"flipbook-foundry",
+		"font",
+		"stick-figure",
+		"animation"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"index.js",
+		"index.d.ts",
+		"generated",
+		"fonts",
+		"OFL.txt",
+		"README.md"
+	],
+	"exports": {
+		".": {
+			"types": "./index.d.ts",
+			"default": "./index.js"
+		},
+		"./fonts/*": "./fonts/*",
+		"./package.json": "./package.json"
+	}
+}

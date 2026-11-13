@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, getLibrary, type Stage as StageT } from '$lib/flipbook/core';
+	import { Stage, getLibrary, type Stage as StageT } from 'flipbook-foundry';
 	let canvas: HTMLCanvasElement;
 	let stats = $state('');
 	onMount(() => {

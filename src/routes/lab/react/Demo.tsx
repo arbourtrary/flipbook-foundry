@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Stage, Figure, TextFlow, FlipbookConfig, useAnimate, stagger, type Character } from '$lib/flipbook/react';
+import { Stage, Figure, TextFlow, FlipbookConfig, useAnimate, stagger, type Character } from 'flipbook-foundry/react';
 
 export default function Demo() {
 	const [action, setAction] = useState('walk');

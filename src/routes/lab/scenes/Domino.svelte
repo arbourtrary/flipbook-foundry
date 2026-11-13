@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Page } from '$lib/flipbook/svelte';
-	import { getLibrary, type Page as PageT } from '$lib/flipbook/core';
+	import { Page } from 'flipbook-foundry/svelte';
+	import { getLibrary, type Page as PageT } from 'flipbook-foundry';
 
 	// Topple is the domino fall; fall back to faceplant until it's baked.
 	const FALL = getLibrary().has('topple') ? 'topple' : 'faceplant';

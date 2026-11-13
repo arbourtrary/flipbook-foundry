@@ -1,0 +1,65 @@
+{
+	"name": "flipbook-foundry",
+	"version": "0.1.0",
+	"description": "An animation library where every frame is a glyph. A framer-motion-style API for Svelte, React and plain JavaScript, drawing figures from font families.",
+	"license": "MIT",
+	"author": "arbourtrary",
+	"homepage": "https://github.com/arbourtrary/flipbook-foundry#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/arbourtrary/flipbook-foundry.git",
+		"directory": "packages/engine"
+	},
+	"bugs": "https://github.com/arbourtrary/flipbook-foundry/issues",
+	"keywords": [
+		"animation",
+		"font",
+		"stick-figure",
+		"flipbook",
+		"svelte",
+		"react",
+		"framer-motion",
+		"pretext",
+		"canvas",
+		"typography"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./svelte": {
+			"types": "./dist/svelte/index.d.ts",
+			"svelte": "./dist/svelte/index.js",
+			"default": "./dist/svelte/index.js"
+		},
+		"./react": {
+			"types": "./dist/react/index.d.ts",
+			"default": "./dist/react/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"prepack": "cp ../../README.md ../../LICENSE ."
+	},
+	"dependencies": {
+		"@chenglou/pretext": "0.0.7",
+		"@flipbook-foundry/stick": "^0.1.0"
+	},
+	"peerDependencies": {
+		"react": ">=18",
+		"svelte": "^5.0.0"
+	},
+	"peerDependenciesMeta": {
+		"react": {
+			"optional": true
+		},
+		"svelte": {
+			"optional": true
+		}
+	}
+}

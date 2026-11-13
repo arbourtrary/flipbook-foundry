@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Stage, createTextFlow, getLibrary, type Character, type Prop } from '$lib/flipbook/core';
+	import { Stage, createTextFlow, getLibrary, type Character, type Prop } from 'flipbook-foundry';
 
 	// An editor with an eraser walks up to a word that shouldn't be there and
 	// scrubs it out, letter by letter. Wherever the eraser tip actually goes

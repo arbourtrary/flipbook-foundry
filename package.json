@@ -1,43 +1,45 @@
 {
-	"name": "flipbook-foundry",
+	"name": "flipbook-foundry-site",
 	"private": true,
-	"version": "0.0.1",
+	"version": "0.0.0",
 	"type": "module",
+	"workspaces": [
+		"packages/*"
+	],
 	"scripts": {
-		"dev": "npm run build:assets && vite dev",
-		"build": "npm run build:assets && vite build",
-		"build:assets": "npm run build:font && npm run build:license",
+		"dev": "vite dev",
+		"build": "vite build",
 		"build:font": "tsx scripts/bake.ts",
-		"build:license": "tsx scripts/build-license.ts",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"sheet": "tsx scripts/sheet.ts",
-		"test": "tsx scripts/test-runtime.ts"
+		"test": "tsx scripts/test-runtime.ts",
+		"package": "cd packages/engine && svelte-package -i src -o dist && cd ../.. && tsx scripts/pack.ts",
+		"release": "npm run check && npm test && npm run package && publint packages/stick && publint packages/engine"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/package": "^3.0.2",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@types/node": "^25.9.1",
 		"@types/opentype.js": "^1.3.10",
 		"@types/react": "^19.2.2",
 		"@types/react-dom": "^19.2.2",
+		"opentype.js": "^2.0.0",
 		"playwright-core": "^1.56.1",
 		"polygon-clipping": "^0.15.7",
+		"publint": "^0.3.25",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
+		"svgpath": "^2.6.0",
 		"tsx": "^4.22.3",
 		"typescript": "^6.0.2",
-		"vite": "^8.0.7"
-	},
-	"dependencies": {
-		"@chenglou/pretext": "^0.0.7",
-		"opentype.js": "^2.0.0",
-		"svgpath": "^2.6.0",
+		"vite": "^8.0.7",
 		"wawoff2": "^2.0.1"
 	}
 }

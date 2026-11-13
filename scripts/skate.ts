@@ -1,7 +1,7 @@
 // Prints world-space position of the lowest foot per frame; a planted foot
 // should hold the same world x across consecutive frames.
-import { ACTIONS } from '../src/lib/flipbook/rig/actions/index.ts';
-import { bake } from '../src/lib/flipbook/rig/timeline.ts';
+import { ACTIONS } from '../packages/rig/actions/index.ts';
+import { bake } from '../packages/rig/timeline.ts';
 const names = process.argv.slice(2);
 for (const def of ACTIONS.filter((a) => !names.length || names.includes(a.name))) {
 	const b = bake(def);

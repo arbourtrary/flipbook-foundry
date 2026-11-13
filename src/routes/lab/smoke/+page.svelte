@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Stage, Figure, TextFlow } from '$lib/flipbook/svelte';
-	import type { Stage as StageT } from '$lib/flipbook/core';
+	import { Stage, Figure, TextFlow } from 'flipbook-foundry/svelte';
+	import type { Stage as StageT } from 'flipbook-foundry';
 	let stage: StageT | null = $state(null);
 	let stats = $state('');
 	const actions = ['walk', 'run'];

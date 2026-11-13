@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Text, Button } from '$lib/ds';
-	import { ACTIONS } from '$lib/flipbook/rig/actions/index';
-	import { HUBS } from '$lib/flipbook/rig/actions/hubs';
-	import { bake, sample, type BakedAction, type Ease, type Category, type Hub } from '$lib/flipbook/rig/timeline';
-	import { BUILD, type Build, type Pose, type JointName } from '$lib/flipbook/rig/skeleton';
-	import { toSvgD } from '$lib/flipbook/rig/geometry';
+	import { ACTIONS } from '$rig/actions/index';
+	import { HUBS } from '$rig/actions/hubs';
+	import { bake, sample, type BakedAction, type Ease, type Category, type Hub } from '$rig/timeline';
+	import { BUILD, type Build, type Pose, type JointName } from '$rig/skeleton';
+	import { toSvgD } from '$rig/geometry';
 	import Slider from './Slider.svelte';
 	import {
 		type Model,
@@ -467,7 +467,7 @@
 </script>
 
 <svelte:head>
-	<title>Forge — Flipbook</title>
+	<title>Forge — Flipbook Foundry</title>
 </svelte:head>
 
 <svelte:window onkeydown={onKey} />
@@ -476,7 +476,7 @@
 	<!-- left: actions -->
 	<aside class="col left">
 		<header class="head">
-			<a href="/" class="mark">Flipbook</a>
+			<a href="/" class="mark">Flipbook Foundry</a>
 			<Text variant="subheading">Forge</Text>
 		</header>
 		<div class="tools">
