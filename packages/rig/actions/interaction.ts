@@ -184,7 +184,8 @@ export const punch: ActionDef = {
 	trailSpeed: 90,
 	keys: [
 		{ at: 0, ...STAND },
-		{ at: 5, armR: [-40, 120], armL: [60, 110], lean: -6, head: -4, squash: 0.97, ease: 'snap' },
+		// The fist accelerates into the hit.
+		{ at: 5, armR: [-40, 120], armL: [60, 110], lean: -6, head: -4, squash: 0.97, ease: 'in' },
 		{ at: 8, armR: [90, 0], reachR: 1.18, armL: [-20, 90], lean: 18, arch: 4, head: -4, squash: 1.02, event: 'hit' },
 		{ at: 11, armR: [90, 2], reachR: 1.15 },
 		{ at: 15, armR: [20, 110], reachR: 1, armL: [30, 80], lean: 4, squash: 1 },

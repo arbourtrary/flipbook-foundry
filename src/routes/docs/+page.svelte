@@ -81,6 +81,7 @@ a newline                starts a new paragraph`;
 		['repeatDelay', 'seconds', 'Hold between repeats.'],
 		['phase', '0–1', 'Start a loop partway through, to desynchronise a crowd.'],
 		['inPlace', 'boolean', 'Ignore baked root motion: treadmill instead of travel.'],
+		['interrupt', "'settle' | 'cut'", "How to leave what's playing. 'settle' (default) finishes a one-shot or plays a loop to its next exit, then settles to rest. 'cut' switches at once."],
 		['route', 'boolean', 'Route through hub transitions first (default true).']
 	];
 
@@ -425,6 +426,12 @@ export const shrug: ActionDef = {
 								<code>wave</code> and it plays <code>get-up</code> first. Ask a standing one to <code>sit-idle</code> and it plays
 								<code>sit-down</code>. Ledge actions move the ground line for you: <code>sit-on</code> puts a figure on a
 								ledge, <code>hop-off</code> drops it back to the floor.
+							</Text>
+							<Text variant="body">
+								Loops pass through the same rest pose. Each one has exit frames, at most half a second apart, with a short
+								settle into rest baked from each. A new action waits for the next exit, settles, and starts; a one-shot
+								finishes first. Loops start on their calmest frame. Nothing cuts mid-pose unless you pass
+								<code>{"{ interrupt: 'cut' }"}</code>.
 							</Text>
 						</Stack>
 					</section>

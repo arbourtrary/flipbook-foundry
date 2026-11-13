@@ -1,6 +1,6 @@
 import type { ActionDef, Key } from '../timeline';
 import { STAND } from '../skeleton';
-import { CROUCH, HANG, LIE, PERCH, SIT } from './hubs';
+import { CROUCH, HANG, HANG_Y, LIE, PERCH, SIT } from './hubs';
 import { run } from './locomotion';
 
 // First pose of the run cycle — start-run lands on it, skid-stop leaves
@@ -8,9 +8,8 @@ import { run } from './locomotion';
 const { at: _at, ease: _e, puff: _p, vx: _v, event: _ev, ...RUN0 } = run.keys[0] as Key;
 
 // Ledge geometry (floor:false actions; y = 0 is the ledge):
-//   HANG  — pelvis 450 below the ledge so the hands grip it.
+//   HANG  — pelvis HANG_Y (458) below the ledge so the hands grip it.
 //   PERCH — sitting on a chair-height ledge; feet rest on the floor 180 below.
-const HANG_Y = -450;
 const SEAT_DROP = 180;
 const STAND_Y = 353; // pelvis height of STAND with feet on y = 0
 
@@ -235,6 +234,7 @@ export const startRun: ActionDef = {
 	fps: 24,
 	loop: false,
 	from: 'stand',
+	next: 'run',
 	keys: [
 		{ at: 0, ...STAND },
 		{ at: 4, lean: -8, arch: -6, head: 6, legL: [-8, 8], legR: [6, 10], armL: [60, 40], armR: [40, 50], squash: 1.03, ease: 'in', vx: 0 },

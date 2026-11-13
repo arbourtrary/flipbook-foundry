@@ -97,6 +97,73 @@ const run = async (c: Character, ms: number) => {
 	assert.ok(done);
 }
 
+// Changing action hands over through the rest pose: no frame-to-frame jump.
+{
+	await getLibrary().loadAnchors();
+	const lib = getLibrary();
+	const PTS = ['head', 'handL', 'handR', 'footL', 'footR', 'pelvis'] as const;
+	const typicalStep = (a: typeof lib extends { action(n: string): infer A } ? A : never) => {
+		const steps: number[] = [];
+		for (let f = 1; f < a.frames; f++)
+			steps.push(Math.max(...PTS.map((p) => Math.hypot(lib.anchor(a, f, p)[0] - lib.anchor(a, f - 1, p)[0], lib.anchor(a, f, p)[1] - lib.anchor(a, f - 1, p)[1]))));
+		return steps.sort((x, y) => x - y)[Math.floor(steps.length / 2)] ?? 0;
+	};
+	const watch = async (c: Character, ms: number) => {
+		let worst = 0;
+		let prev = lib.anchor(c.action, c.frame, 'pelvis') && PTS.map((p) => lib.anchor(c.action, c.frame, p));
+		let was = c.action;
+		for (let t = 0; t < ms; t += 16) {
+			c.update(16);
+			await Promise.resolve();
+			const cur = PTS.map((p) => lib.anchor(c.action, c.frame, p));
+			// Only hand-overs between clips (each action's own motion is the
+			// audit's job), measured against the outgoing action's usual step.
+			// Into a settle is the loop's own next step (its frame 0 is the exit
+			// frame; scripts/jar.ts checks that), so it's not a hand-over.
+			if (c.action !== was && !c.action.name.includes('~settle')) {
+				const d = Math.max(...cur.map((q, i) => Math.hypot(q[0] - prev[i][0], q[1] - prev[i][1])));
+				worst = Math.max(worst, d / Math.max(60, typicalStep(was) * 1.4));
+			}
+			was = c.action;
+			prev = cur;
+		}
+		return worst;
+	};
+	for (const [from, to] of [['walk', 'wave'], ['run', 'sit-idle'], ['dance', 'shrug'], ['cheer', 'walk'], ['wave', 'jump']]) {
+		const c = new Character({ animate: 'idle', size: 100 });
+		await run(c, 100);
+		c.animate(from);
+		await run(c, 430);
+		const seen: string[] = [];
+		c.on('start', (e) => seen.push(e.action));
+		c.animate(to);
+		const worst = await watch(c, 2500);
+		assert.ok(worst <= 1, `${from} → ${to}: a hand-over jumps ${worst.toFixed(1)}× a normal step`);
+		assert.equal(seen.at(-1), to);
+		assert.ok(seen.every((n) => !n.includes('~')), 'settle moves are silent');
+	}
+}
+
+// A one-shot finishes before the next action; 'cut' switches at once.
+{
+	const c = new Character({ animate: 'idle' });
+	await run(c, 100);
+	c.animate('wave');
+	await run(c, 300);
+	let waveEnded = false;
+	c.on('complete', (e) => e.action === 'wave' && (waveEnded = true));
+	c.animate('shrug');
+	await run(c, 100);
+	assert.equal(c.action.name, 'wave');
+	await run(c, 2500);
+	assert.ok(waveEnded);
+	c.animate('wave');
+	await run(c, 300);
+	c.animate('jump', { interrupt: 'cut' });
+	await run(c, 50);
+	assert.equal(c.action.name, 'jump');
+}
+
 // Families: one library each, chosen per character or by default.
 {
 	const other = { ...stick, id: 'other', fontBase: 'https://example.com/other/' };

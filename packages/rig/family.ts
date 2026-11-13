@@ -6,7 +6,7 @@
 // feel needs re-timed actions. A new body needs its own skeleton and actions.
 
 import type { ActionDef } from './timeline';
-import type { Build, Parts, Skin } from './skeleton';
+import type { Build, Parts, Pose, Skin } from './skeleton';
 
 export interface LayerConfig {
 	/** Runtime layer id: 'regular', 'bold', 'limbs'… */
@@ -27,6 +27,8 @@ export interface FamilyConfig<Thing = unknown> {
 	build: Build;
 	skin: Skin;
 	actions: ActionDef[];
+	/** Rest poses actions start and end on; loops settle into these. */
+	hubs: Record<string, Pose>;
 	/** Props, baked into a "<name> Things" font. */
 	things?: Thing[];
 	layers: LayerConfig[];

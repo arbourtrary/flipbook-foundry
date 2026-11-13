@@ -207,7 +207,7 @@ export const peekOut: ActionDef = {
 		{ at: 16, lean: 40, head: -10 },
 		// …and down.
 		{ at: 20, lean: 38, head: 22 },
-		{ at: 23, lean: 39, head: 6, ease: 'hold' },
+		{ at: 23, lean: 39, head: 6, ease: 'inOut' },
 		// Duck back in fast.
 		{ at: 26, lean: -4, arch: 2, head: -6, armR: [72, 40], armL: [56, 46], squash: 0.97, event: 'in', ease: 'snap' },
 		{ at: 30, lean: 0, head: -2, squash: 1 },

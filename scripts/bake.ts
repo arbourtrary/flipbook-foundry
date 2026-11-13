@@ -19,6 +19,7 @@ import polygonClipping from 'polygon-clipping';
 import type { Parts } from '../packages/rig/skeleton.ts';
 import type { FamilyConfig } from '../packages/rig/family.ts';
 import type { ThingDef } from '../packages/stick/things.ts';
+import { settlesFor } from '../packages/rig/settle.ts';
 import { exportWoff2 } from '../src/lib/font/exportWoff2.ts';
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -29,7 +30,6 @@ const variant = vi >= 0 ? args[vi + 1] : null;
 const familyId = args.find((a, i) => !a.startsWith('--') && i !== vi + 1) ?? 'stick';
 const pkgDir = join(repo, 'packages', familyId);
 const FAMILY: FamilyConfig<ThingDef> = (await import(join(pkgDir, 'family.ts'))).default;
-const ACTIONS = FAMILY.actions;
 const THINGS = FAMILY.things ?? [];
 
 // `--variant <id>` bakes an alternate build (proportions / weight) from the
@@ -39,6 +39,9 @@ const VARIANTS = FAMILY.variants ?? {};
 if (variant && !VARIANTS[variant]) throw new Error(`Unknown variant ${variant}`);
 const build = { ...FAMILY.build, ...(variant ? VARIANTS[variant].build : {}) };
 const prefix = `flipbook-${FAMILY.id}`;
+// Settle moves between each loop and its rest pose are baked like actions.
+const SETTLE = settlesFor(FAMILY.actions, FAMILY.hubs, { build, skin: FAMILY.skin });
+const ACTIONS = [...FAMILY.actions, ...SETTLE.defs];
 // Name-table metadata for every font: the fonts are SIL Open Font License 1.1 (see OFL.txt).
 const FONT_META = {
 	copyright: 'Copyright 2026 The Flipbook Foundry Project Authors (https://github.com/arbourtrary/flipbook-foundry)',
@@ -113,7 +116,8 @@ async function main() {
 	for (const def of ACTIONS) {
 		const last = chunkDefs[chunkDefs.length - 1];
 		const start = starts.get(def.name)!;
-		if (last && last.id === def.category) {
+		// Same category continues the chunk, up to a size that stays a small download.
+		if (last && last.id === def.category && last.to - last.from + def.frames <= 200) {
 			last.to = start + def.frames - 1;
 			last.actions.push(def);
 		} else chunkDefs.push({ id: def.category, from: start, to: start + def.frames - 1, actions: [def] });
@@ -149,6 +153,7 @@ async function main() {
 					if (f.event) events[i] = f.event;
 				});
 				manifestActions[def.name] = {
+					...SETTLE.info.get(def.name),
 					start,
 					frames: def.frames,
 					fps: def.fps,
@@ -277,7 +282,7 @@ async function main() {
 		await writeFile(join(genDir, 'manifest.js'), mod(manifest));
 		await writeFile(join(genDir, 'anchors.js'), mod(anchorsOut));
 	}
-	console.log(`${ACTIONS.length} actions, ${cp - START_CP} frames → manifest v${manifest.version}`);
+	console.log(`${FAMILY.actions.length} actions + ${SETTLE.defs.length} settles, ${cp - START_CP} frames → manifest v${manifest.version}`);
 }
 
 main().catch((e) => {

@@ -26,6 +26,12 @@ export interface Transition {
 	phase?: number;
 	/** Play in place: ignore baked root motion. */
 	inPlace?: boolean;
+	/**
+	 * What happens to the action already playing. 'settle' (default) lets a
+	 * one-shot finish and plays a loop on to its next exit, then settles into
+	 * the rest pose before this one starts. 'cut' switches on the next frame.
+	 */
+	interrupt?: 'settle' | 'cut';
 }
 
 export interface Target {
@@ -57,7 +63,13 @@ export interface CharacterOptions {
 	variants?: Variants;
 	transition?: Transition;
 	/** Letter (any font) standing in for the body; pairs with the 'limbs' layer. */
-	body?: { char: string; font: string; color?: string };
+	body?: {
+		char: string;
+		font: string;
+		color?: string;
+		/** Draw the letter over the limbs instead of under them. */
+		front?: boolean;
+	};
 	/** Outline the figure in paper colour so it stays legible over ink (Stage only). */
 	halo?: boolean;
 	library?: Library;
@@ -86,6 +98,13 @@ interface Clip {
 	resolve: () => void;
 	settle?: Definition;
 	startFrame: number;
+	/** Finish on reaching this frame (a loop's exit, or frame 0 of a reversed rise). */
+	stopAt?: number;
+	/** Generated settle/rise move: plays without start/complete events. */
+	silent?: boolean;
+	rise?: boolean;
+	/** Facing to take when this clip starts. */
+	facing?: 1 | -1;
 }
 
 let nextId = 1;
@@ -124,6 +143,10 @@ export class Character {
 	private waiting = 0;
 	private listeners = new Map<string, Set<Listener>>();
 	private hub: Hub;
+	/** Nothing to settle out of until something has played. */
+	private played = false;
+	/** Remaining x correction after travel-to-x stops on an exit frame. */
+	private slide = { per: 0, left: 0 };
 
 	constructor(opts: CharacterOptions = {}) {
 		this.library = opts.library ?? getLibrary();
@@ -221,47 +244,103 @@ export class Character {
 	}
 
 	/**
-	 * Play an action (or a variant name). Interrupts whatever is playing,
-	 * routing through hub transitions first if needed. Resolves when a
-	 * one-shot (or finite repeat, or travel-to-x) completes.
+	 * Play an action (or a variant name). Whatever is playing hands over
+	 * through the shared rest pose (see Transition.interrupt), routing
+	 * through hub transitions if needed. Resolves when a one-shot (or finite
+	 * repeat, or travel-to-x) completes.
 	 */
 	animate(def: Definition, override: Transition = {}, fromSequence = false): PlaybackControls {
 		if (!fromSequence) this.seqId++;
 		const target = this.resolve(def);
 		const t: Transition = { ...this.transition, ...target.transition, ...override };
 		const action = this.library.action(target.action);
-		if (target.facing) this.facing = target.facing;
+		let facing = target.facing ?? this.facing;
 		if (target.x !== undefined) {
 			// Face so the action's own travel carries us toward x — forward for
 			// a walk, away from x for a backpedal.
 			const backwards = action.dx.reduce((a, b) => a + b, 0) < 0;
 			const toward = target.x >= this.x ? 1 : -1;
-			this.facing = (backwards ? -toward : toward) as 1 | -1;
+			facing = (backwards ? -toward : toward) as 1 | -1;
 		}
 
 		// Flush the queue; anything waiting on it resolves now (interrupted).
 		for (const c of this.queue) c.resolve();
 		this.queue = [];
-		if (this.clip) this.clip.resolve();
-
-		const clips: Clip[] = [];
-		const route = t.route !== false;
-		const here = this.clip ? (this.clip.action.loop ? this.clip.action.from : this.hub) : this.hub;
-		if (route && here !== action.from) {
-			for (const hop of this.library.route(here, action.from)) clips.push(this.makeClip(hop, {}, () => {}));
-		}
+		const cur = this.clip;
+		if (cur) cur.resolve();
 
 		let resolve!: () => void;
 		const finished = new Promise<void>((r) => (resolve = r));
+		const cut = t.interrupt === 'cut' || !this.played;
+
+		// The same loop again: keep stepping and just take the new target.
+		if (!cut && cur && cur.action === action && action.loop && cur.stopAt === undefined && !cur.silent && facing === this.facing) {
+			cur.resolve = resolve;
+			cur.untilX = target.x;
+			cur.untilDir = target.x !== undefined ? (target.x >= this.x ? 1 : -1) : 0;
+			cur.settle = target.then;
+			return { then: (a, b) => finished.then(a, b), stop: () => this.stop(), finished };
+		}
+
+		// Leave what's playing through the shared rest pose: a one-shot
+		// finishes, a loop plays on to its next exit (then settles), and a
+		// half-played rise runs back down to rest.
+		let here = this.hub;
+		let draining = false;
+		if (!cut && cur) {
+			cur.settle = undefined;
+			cur.untilX = undefined;
+			if (cur.rise) {
+				this.dir = -1;
+				cur.stopAt = 0;
+				draining = this.frame > 0;
+				here = cur.action.from;
+			} else if (cur.action.loop) {
+				here = cur.action.from;
+				if (cur.action.exits?.length) {
+					cur.stopAt = this.nextExit(cur.action, this.frame);
+					draining = true;
+				}
+			} else {
+				cur.repeat = this.plays;
+				draining = true;
+				here = cur.action.to;
+			}
+		} else if (cur) {
+			here = cur.action.loop ? cur.action.from : this.hub;
+		}
+
+		const clips: Clip[] = [];
+		const route = t.route !== false;
+		if (route && here !== action.from) {
+			for (const hop of this.library.route(here, action.from)) clips.push(this.makeClip(hop, {}, () => {}));
+		}
 		const main = this.makeClip(action, t, resolve);
+		// Turn when this action starts, not mid-way through the last one.
+		main.facing = facing;
 		main.untilX = target.x;
 		main.untilDir = target.x !== undefined ? (target.x >= this.x ? 1 : -1) : 0;
 		main.settle = target.then;
+		if (cut) this.facing = facing;
+		// Coming from rest, a loop starts on its calmest frame, risen into.
+		if (!cut && action.loop && t.phase === undefined) {
+			if (action.rise && this.library.has(action.rise)) {
+				const r = this.makeClip(this.library.action(action.rise), {}, () => {});
+				r.silent = true;
+				r.rise = true;
+				clips.push(r);
+			}
+			main.startFrame = action.enter ?? 0;
+		}
 		clips.push(main);
-
 		this.queue = clips;
-		this.clip = null;
-		this.advanceClip();
+
+		if (draining && cur) {
+			if (cur.action.loop && cur.stopAt === this.frame) this.finish(cur);
+		} else {
+			this.clip = null;
+			this.advanceClip();
+		}
 
 		return {
 			then: (a, b) => finished.then(a, b),
@@ -340,8 +419,10 @@ export class Character {
 		this.acc = 0;
 		this.waiting = next.delay;
 		if (next.action.baseline[0]) this.y -= next.action.baseline[0] * this.scale;
+		if (next.facing) this.facing = next.facing;
 		this.dirty = true;
-		this.emit('start', { action: next.action.name, frame: this.frame });
+		this.played = true;
+		if (!next.silent) this.emit('start', { action: next.action.name, frame: this.frame });
 		this.enterFrame(next);
 	}
 
@@ -376,7 +457,12 @@ export class Character {
 		let f = this.frame + this.dir;
 		if (f >= n || f < 0) {
 			this.plays++;
-			if (this.plays > c.repeat) return this.finish(c);
+			if (this.plays > c.repeat) {
+				// A loop that has played its cycles still leaves on an exit.
+				if (!c.action.loop || !c.action.exits?.length || c.stopAt !== undefined) return this.finish(c);
+				c.repeat = Infinity;
+				c.stopAt = this.nextExit(c.action, 0);
+			}
 			// A one-shot that ends somewhere else (trip ends lying down) can't
 			// just restart at frame 0 — that snaps. Rest for repeatDelay, take
 			// the inverse route home (get-up), then play it again.
@@ -391,18 +477,62 @@ export class Character {
 			if (c.repeatDelay > 0) this.waiting = c.repeatDelay;
 		}
 		this.frame = Math.max(0, Math.min(n - 1, f));
+		if (this.slide.left > 0) {
+			this.x += this.slide.per;
+			this.slide.left--;
+		}
 		// Root motion: the baked dx carries the planted foot exactly.
 		if (!c.inPlace) {
 			const dx = c.action.dx[this.frame] * this.scale * this.facing * this.dir;
 			this.x += dx;
-			if (c.untilX !== undefined && (c.untilDir! > 0 ? this.x >= c.untilX : this.x <= c.untilX)) {
-				this.x = c.untilX;
-				this.dirty = true;
-				return this.finish(c);
+			if (c.untilX !== undefined) {
+				const left = (c.untilX - this.x) * c.untilDir!;
+				if (c.action.loop && c.action.exits?.includes(this.frame)) {
+					// Stop on the exit nearest the target and glide the rest.
+					if (left <= this.travelToNextExit(c) / 2) {
+						this.slide = { per: (c.untilX - this.x) / 6, left: 6 };
+						this.dirty = true;
+						this.enterFrame(c);
+						return this.finish(c);
+					}
+				} else if (left <= 0) {
+					// Overshot between exits: hold x, step on to an exit in place.
+					this.x = c.untilX;
+					if (c.action.loop && c.action.exits?.length) {
+						c.inPlace = true;
+						c.stopAt = this.nextExit(c.action, this.frame);
+					} else {
+						this.dirty = true;
+						return this.finish(c);
+					}
+				}
 			}
 		}
 		this.dirty = true;
 		this.enterFrame(c);
+		if (c.stopAt === this.frame) this.finish(c);
+	}
+
+	/** First exit at or after this frame, in play order. */
+	private nextExit(action: ActionInfo, frame: number) {
+		const n = action.frames;
+		for (let k = 0; k < n; k++) {
+			const f = (((frame + k * this.dir) % n) + n) % n;
+			if (action.exits!.includes(f)) return f;
+		}
+		return frame;
+	}
+
+	/** Stage px this clip covers between the current frame and its next exit. */
+	private travelToNextExit(c: Clip) {
+		const n = c.action.frames;
+		let sum = 0;
+		for (let k = 1; k <= n; k++) {
+			const f = (this.frame + k) % n;
+			sum += Math.abs(c.action.dx[f]) * this.scale;
+			if (c.action.exits!.includes(f)) break;
+		}
+		return sum;
 	}
 
 	private replayVia(c: Clip) {
@@ -417,14 +547,33 @@ export class Character {
 	private finish(c: Clip) {
 		this.hub = c.action.loop ? c.action.from : c.action.to;
 		if (c.action.baseline[1]) this.y -= c.action.baseline[1] * this.scale;
-		this.emit('complete', { action: c.action.name, frame: this.frame });
+		if (!c.silent) this.emit('complete', { action: c.action.name, frame: this.frame });
 		const settle = c.settle;
 		c.resolve();
+		// A loop leaves through its settle move into the rest pose.
+		const out = c.action.loop ? this.settleFrom(c.action, this.frame) : null;
+		if (out) {
+			const s = this.makeClip(out, {}, () => {});
+			s.silent = true;
+			s.settle = settle ?? (c.untilX !== undefined && !this.queue.length ? this.restDef(c) : undefined);
+			this.queue.unshift(s);
+			return this.advanceClip();
+		}
 		if (this.queue.length) return this.advanceClip();
 		this.clip = null;
 		if (settle !== undefined) this.animate(settle);
 		else if (c.action.next && this.library.has(c.action.next)) this.animate(c.action.next, { route: false });
-		else if (c.untilX !== undefined) this.animate(this.variants.idle ?? (this.library.has('idle') ? 'idle' : c.action.name));
+		else if (c.untilX !== undefined) this.animate(this.restDef(c));
+	}
+
+	private restDef(c: Clip): Definition {
+		return this.variants.idle ?? (this.library.has('idle') ? 'idle' : c.action.name);
+	}
+
+	private settleFrom(action: ActionInfo, frame: number): ActionInfo | null {
+		const i = action.exits?.indexOf(frame) ?? -1;
+		const name = i >= 0 ? action.settle?.[i] : null;
+		return name && this.library.has(name) ? this.library.action(name) : null;
 	}
 }
 

@@ -3,6 +3,7 @@
 import type { FamilyConfig } from '../rig/family';
 import { BUILD, STICK_SKIN } from '../rig/skeleton';
 import { ACTIONS } from '../rig/actions/index';
+import { HUBS } from '../rig/actions/hubs';
 import { THINGS, type ThingDef } from './things';
 
 const family: FamilyConfig<ThingDef> = {
@@ -11,6 +12,7 @@ const family: FamilyConfig<ThingDef> = {
 	build: BUILD,
 	skin: STICK_SKIN,
 	actions: ACTIONS,
+	hubs: HUBS,
 	things: THINGS,
 	layers: [
 		{ id: 'regular', style: 'Regular', weight: 1, parts: 'full' },

@@ -1,7 +1,7 @@
 # @flipbook-foundry/stick
 
 Stick figures for [Flipbook Foundry](https://github.com/arbourtrary/flipbook-foundry):
-91 actions and 2,516 drawings, baked into the Flipbook Stick fonts.
+92 actions and 2,550 drawings, baked into the Flipbook Stick fonts.
 
 This is the default family of `flipbook-foundry`, which depends on it, so you
 normally don't install it yourself. Import it to name it explicitly or to

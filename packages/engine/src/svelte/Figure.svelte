@@ -9,7 +9,8 @@
 		type Variants,
 		type Transition,
 		type Family,
-		type Layer
+		type Layer,
+		type CharacterOptions
 	} from '../core';
 	import { getStage, getConfig, prefersReducedMotion } from './context';
 
@@ -33,7 +34,7 @@
 		layer?: Layer;
 		color?: string;
 		/** A letter in any font, standing in for the body. */
-		body?: { char: string; font: string; color?: string };
+		body?: CharacterOptions['body'];
 		/** Inline only: let root motion move the element. */
 		travel?: boolean;
 		/** Stage only: a thing from the Things font in this figure's hand. */

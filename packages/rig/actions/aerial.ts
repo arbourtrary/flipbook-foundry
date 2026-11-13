@@ -35,8 +35,8 @@ export const jump: ActionDef = {
 	keys: [
 		{ at: 0, ...STAND },
 		{ at: 4, lean: 22, arch: 14, head: -8, legL: [46, 90], legR: [52, 96], armL: [-40, 20], armR: [-30, 24], squash: 0.95 },
-		{ at: 8, lean: 30, arch: 18, head: -14, legL: [62, 118], legR: [68, 122], armL: [-72, 10], armR: [-64, 14], squash: 0.9, ease: 'in' },
-		{ at: 10, lean: -4, arch: -12, head: -10, lift: 30, legL: [-6, 2], legR: [-2, 4], strideL: 1.1, strideR: 1.1, armL: [160, 6], armR: [170, 10], squash: 1.06, event: 'launch' },
+		{ at: 8, lean: 30, arch: 18, head: -14, legL: [62, 118], legR: [68, 122], armL: [-72, 10], armR: [-64, 14], squash: 0.9 },
+		{ at: 11, lean: -4, arch: -12, head: -10, lift: 30, legL: [-6, 2], legR: [-2, 4], strideL: 1.1, strideR: 1.1, armL: [160, 6], armR: [170, 10], squash: 1.06, event: 'launch' },
 		{ at: 15, lean: 10, arch: 10, head: 4, lift: 250, legL: [72, 124], legR: [66, 116], strideL: 1, strideR: 1, armL: [130, 50], armR: [146, 40], squash: 1 },
 		{ at: 20, lean: 2, arch: 0, head: -4, lift: 130, legL: [22, 30], legR: [16, 24], armL: [110, 20], armR: [124, 24] },
 		{ at: 23, lean: 22, arch: 16, head: -12, lift: 0, legL: [44, 96], legR: [52, 100], armL: [70, 40], armR: [56, 44], squash: 0.84, headSquash: 0.9, puff: true, event: 'land' },
@@ -73,8 +73,8 @@ export const leap: ActionDef = {
 // Backflip — crouch, launch, tuck over backwards, stick the landing.
 // rot −360 → 0 is the same picture, so a one-frame hold swaps it back to
 // the exact STAND hub without a spin.
-export const flip: ActionDef = {
-	name: 'flip',
+export const backflip: ActionDef = {
+	name: 'backflip',
 	category: 'aerial',
 	description: 'Tucked backflip, sticks the landing.',
 	frames: 34,
@@ -89,11 +89,37 @@ export const flip: ActionDef = {
 		{ at: 8, lean: -10, arch: -14, head: -16, legL: [-4, 2], legR: [-2, 4], strideL: 1.08, strideR: 1.08, armL: [178, 4], armR: [184, 6], squash: 1.04, y: 40, event: 'launch' },
 		{ at: 11, rot: -80, lean: 10, arch: 20, head: 10, legL: [100, 140], legR: [96, 134], strideL: 1, strideR: 1, armL: [70, 80], armR: [64, 86], squash: 1, y: 560, x: -40 },
 		{ at: 15, rot: -190, y: 660, x: -90 },
-		{ at: 19, rot: -290, legL: [60, 90], legR: [54, 84], armL: [120, 30], armR: [110, 30], y: 540, x: -130, ease: 'out' },
+		{ at: 19, rot: -290, legL: [60, 90], legR: [54, 84], armL: [120, 30], armR: [110, 30], y: 540, x: -130, ease: 'in' },
 		{ at: 22, rot: -360, lean: 20, arch: 14, head: -10, legL: [40, 76], legR: [46, 80], armL: [100, 10], armR: [80, 14], squash: 0.86, y: 0, x: -150, puff: true, event: 'land', ease: 'hold' },
 		{ at: 23, rot: 0, ease: 'out' },
 		{ at: 26, lean: 24, arch: 16, head: -12, legL: [46, 92], legR: [52, 96], armL: [90, 10], armR: [70, 10], squash: 0.94 },
 		{ at: 33, ...STAND, x: -150 }
+	]
+};
+
+// Frontflip — crouch, swing the arms up to launch, tuck over forwards,
+// travel forward and stick it. Same beats as the backflip, rotating +360.
+export const frontflip: ActionDef = {
+	name: 'frontflip',
+	category: 'aerial',
+	description: 'Tucked frontflip, sticks the landing.',
+	frames: 34,
+	fps: 24,
+	loop: false,
+	ground: 'free',
+	from: 'stand',
+	to: 'stand',
+	keys: [
+		{ at: 0, ...STAND },
+		{ at: 5, lean: 24, arch: 16, head: -10, legL: [56, 110], legR: [60, 114], armL: [-62, 12], armR: [-56, 16], squash: 0.92 },
+		{ at: 8, lean: 14, arch: -6, head: -6, legL: [-4, 2], legR: [-2, 4], strideL: 1.08, strideR: 1.08, armL: [178, 4], armR: [184, 6], squash: 1.04, y: 40, x: 10, event: 'launch' },
+		{ at: 11, rot: 80, lean: 20, arch: 22, head: -14, legL: [110, 140], legR: [104, 134], strideL: 1, strideR: 1, armL: [60, 80], armR: [54, 86], squash: 1, y: 560, x: 50 },
+		{ at: 15, rot: 190, y: 660, x: 95 },
+		{ at: 19, rot: 290, legL: [60, 90], legR: [54, 84], armL: [40, 30], armR: [30, 30], y: 540, x: 130, ease: 'in' },
+		{ at: 22, rot: 360, lean: 20, arch: 14, head: -10, legL: [40, 76], legR: [46, 80], armL: [100, 10], armR: [80, 14], squash: 0.86, y: 0, x: 150, puff: true, event: 'land', ease: 'hold' },
+		{ at: 23, rot: 0, ease: 'out' },
+		{ at: 26, lean: 24, arch: 16, head: -12, legL: [46, 92], legR: [52, 96], armL: [90, 10], armR: [70, 10], squash: 0.94 },
+		{ at: 33, ...STAND, x: 150 }
 	]
 };
 
@@ -129,7 +155,8 @@ export const land: ActionDef = {
 	travel: false,
 	to: 'stand',
 	keys: [
-		{ at: 0, ...STAND, lift: 140, lean: -4, arch: -6, head: -12, legL: [30, 40], legR: [16, 30], armL: [150, 30], armR: [170, 40] },
+		// fall's upright frame, so a fall hands straight into the landing.
+		{ at: 0, ...STAND, lift: 140, lean: -6, arch: -8, head: -14, legL: [30, 60], legR: [-20, 30], armL: [160, 40], armR: [120, 70] },
 		{ at: 2, lift: 0, lean: 30, arch: 20, head: -16, legL: [60, 124], legR: [66, 126], armL: [50, 30], armR: [70, 36], squash: 0.78, headSquash: 0.82, puff: true, event: 'land' },
 		{ at: 5, lean: 34, arch: 22, head: -10, legL: [58, 118], legR: [64, 122], armL: [24, 30], armR: [36, 30], squash: 0.9, headSquash: 1 },
 		{ at: 9, lean: 30, arch: 20, head: 10, squash: 0.92 },
@@ -139,4 +166,4 @@ export const land: ActionDef = {
 	]
 };
 
-export const AERIAL: ActionDef[] = [hop, jump, leap, flip, fall, land];
+export const AERIAL: ActionDef[] = [hop, jump, leap, frontflip, backflip, fall, land];

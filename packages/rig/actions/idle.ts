@@ -1,6 +1,6 @@
 import { STAND } from '../skeleton';
 import type { ActionDef } from '../timeline';
-import { HANG, LIE, PERCH, SIT } from './hubs';
+import { HANG, HANG_Y, LIE, PERCH, SIT } from './hubs';
 
 // Hand to brow (shading the eyes), solved for the default build.
 const BROW: [number, number] = [110, 114];
@@ -204,7 +204,6 @@ export const perchIdle: ActionDef = {
 };
 
 // Hang-idle — dangling from a ledge at y = 0, legs pendulum-swinging.
-const HANG_Y = -458;
 export const hangIdle: ActionDef = {
 	name: 'hang-idle',
 	category: 'idle',

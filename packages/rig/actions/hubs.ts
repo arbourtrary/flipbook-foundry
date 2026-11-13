@@ -54,9 +54,13 @@ export const PERCH: Pose = {
 	armR: [10, 40]
 };
 
+// Pelvis this far below the ledge so the hands grip it.
+export const HANG_Y = -458;
+
 // Hanging by both hands from a ledge at y = 0.
 export const HANG: Pose = {
 	...STAND,
+	y: HANG_Y,
 	lean: 0,
 	head: -6,
 	armL: [176, 0],

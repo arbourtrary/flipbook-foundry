@@ -45,6 +45,14 @@ export interface ActionInfo {
 	height: number;
 	/** Per-frame anchors; filled in by library.loadAnchors() (the Stage does this). */
 	anchors?: number[][];
+	/** Loops only: frames where the loop can hand back to its rest pose. */
+	exits?: number[];
+	/** Loops only: settle move played from each exit to rest (null = already at rest). */
+	settle?: (string | null)[];
+	/** Loops only: frame to start on when entering from rest. */
+	enter?: number;
+	/** Loops only: move from rest into the enter frame (null = not needed). */
+	rise?: string | null;
 }
 
 export interface ThingInfo {
@@ -152,16 +160,17 @@ export function createLibrary(family: Family = stick): Library {
 		fontBase: family.fontBase,
 		unitsPerEm: manifest.unitsPerEm,
 		advance: manifest.advance,
-		names: () => [...actions.keys()],
+		// Settle moves are generated plumbing, not actions to ask for.
+		names: () => [...actions.values()].filter((a) => a.category !== 'settle').map((a) => a.name),
 		has: (n) => actions.has(n),
 		action(name) {
 			const a = actions.get(name);
-			if (!a) throw new Error(`[flipbook] Unknown action "${name}". Try one of: ${[...actions.keys()].join(', ')}`);
+			if (!a) throw new Error(`[flipbook] Unknown action "${name}". Try one of: ${lib.names().join(', ')}`);
 			return a;
 		},
 		byCategory() {
 			const out: Record<string, ActionInfo[]> = {};
-			for (const a of actions.values()) (out[a.category] ??= []).push(a);
+			for (const a of actions.values()) if (a.category !== 'settle') (out[a.category] ??= []).push(a);
 			return out;
 		},
 		glyph(action, frame) {
@@ -234,7 +243,12 @@ export function createLibrary(family: Family = stick): Library {
 		},
 		async load(layers = ['regular'], baseUrl = lib.fontBase, want) {
 			if (typeof document === 'undefined' || typeof FontFace === 'undefined') return;
-			const ranges = want?.filter((n) => actions.has(n)).map((n) => {
+			// An action's settle moves load with it, so leaving it never waits.
+			const names = want?.flatMap((n) => {
+				const a = actions.get(n);
+				return a ? [n, ...(a.settle ?? []), a.rise ?? null].filter((x): x is string => !!x) : [];
+			});
+			const ranges = names?.map((n) => {
 				const a = actions.get(n)!;
 				return [a.start, a.start + a.frames - 1];
 			});

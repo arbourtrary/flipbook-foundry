@@ -233,11 +233,10 @@ export const skip: ActionDef = {
 		[
 			{ at: 0, lean: 6, arch: 2, head: -2, lift: 0, legR: [24, 8], legL: [-24, 34], armL: [30, 50], armR: [-24, 20], squash: 1, strideR: 1 },
 			{ at: 2, lean: 8, arch: 6, head: -4, legR: [14, 30], legL: [0, 80], armL: [8, 50], armR: [-4, 30], squash: 0.94 },
-			{ at: 3, lean: 4, arch: -2, head: -6, legR: [-4, 6], legL: [60, 96], armL: [-24, 30], armR: [74, 50], squash: 1.04, strideR: 1.1 },
-			{ at: 5, lean: -2, arch: -6, head: -8, lift: 52, legR: [-2, 30], legL: [62, 90], armL: [-36, 34], armR: [100, 40], squash: 1, strideR: 1 },
-			{ at: 7, lean: 4, arch: 2, head: -2, lift: 0, legR: [4, 22], legL: [56, 84], armL: [-26, 30], armR: [60, 46], squash: 0.96 },
-			{ at: 9, lean: 6, arch: 0, legR: [-8, 16], legL: [40, 50], armL: [0, 40], armR: [10, 36], squash: 1 },
-			{ at: 10, legR: [-14, 18], legL: [30, 14], strideR: 1.06, armL: [14, 44], armR: [-8, 28] }
+			{ at: 4, lean: 4, arch: -2, head: -6, legR: [-4, 6], legL: [60, 96], armL: [-24, 30], armR: [74, 50], squash: 1.04, strideR: 1.1 },
+			{ at: 6, lean: -2, arch: -6, head: -8, lift: 52, legR: [-2, 30], legL: [62, 90], armL: [-36, 34], armR: [100, 40], squash: 1, strideR: 1 },
+			{ at: 8, lean: 4, arch: 2, head: -2, lift: 0, legR: [4, 22], legL: [56, 84], armL: [-26, 30], armR: [60, 46], squash: 0.96 },
+			{ at: 10, lean: 6, arch: 0, legR: [-12, 18], legL: [34, 30], armL: [8, 42], armR: [0, 32], squash: 1, strideR: 1.04 }
 		],
 		12
 	)

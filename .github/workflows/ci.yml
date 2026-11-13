@@ -17,6 +17,8 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm test
+      # Motion audit: pops, loop seams, rest poses, settle alignment.
+      - run: npm run audit
       # The site build uses the committed fonts; the baker is checked separately.
       - run: npx vite build
       - run: npm run package

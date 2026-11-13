@@ -406,7 +406,14 @@ export class Stage {
 			if (col !== fill) ctx.fillStyle = fill = col;
 			const f = this.fontFor(c.layer, c.size);
 			if (f !== font) ctx.font = font = f;
-			if (c.body) {
+			if (c.body?.front) {
+				// Limbs behind the letter: at rest it's a letter on legs, and
+				// arms show only where they reach past it.
+				ctx.fillText(c.glyph, 0, 0);
+				this.drawBody(c);
+				ctx.font = font = f;
+				fill = '';
+			} else if (c.body) {
 				// Letter first, then the limbs over it with a paper halo, so
 				// arms read in front of the body like a comic panel.
 				this.drawBody(c);
@@ -421,7 +428,7 @@ export class Stage {
 				ctx.strokeStyle = this.options.paper;
 				ctx.strokeText(c.glyph, 0, 0);
 			}
-			ctx.fillText(c.glyph, 0, 0);
+			if (!c.body?.front) ctx.fillText(c.glyph, 0, 0);
 			if (hands) {
 				for (const t of hands) if (!t.held!.behind) this.drawHeld(t, c);
 				font = '';
@@ -569,6 +576,15 @@ export class Stage {
 		if (b.color) ctx.fillStyle = b.color;
 		// Un-mirror so the letter reads correctly when facing left.
 		if (c.facing < 0) ctx.scale(-1, 1);
+		if (b.front) {
+			// Limbs are already drawn behind: blank the letter's box first so
+			// they don't show through its counters (the hole in an o).
+			const m = ctx.measureText(b.char);
+			const fill = ctx.fillStyle;
+			ctx.fillStyle = this.options.paper;
+			ctx.fillRect(-m.actualBoundingBoxLeft, h * 0.1 - m.actualBoundingBoxAscent, m.actualBoundingBoxLeft + m.actualBoundingBoxRight, m.actualBoundingBoxAscent + m.actualBoundingBoxDescent);
+			ctx.fillStyle = fill;
+		}
 		ctx.fillText(b.char, 0, h * 0.1);
 		ctx.restore();
 	}

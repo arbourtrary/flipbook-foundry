@@ -13,7 +13,7 @@
 	const rowSize = (i: number) => 30 + i * 8;
 
 	const LETTERS = 'FLIPBOOK';
-	const REACTIONS = ['cheer', 'victory', 'laugh', 'panic', 'flex', 'dance', 'trip', 'flip', 'jump'];
+	const REACTIONS = ['cheer', 'victory', 'laugh', 'panic', 'flex', 'dance', 'trip', 'frontflip', 'backflip', 'jump'];
 
 	function populate(n: number) {
 		if (!stage) return;

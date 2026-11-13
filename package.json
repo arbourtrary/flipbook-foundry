@@ -17,7 +17,8 @@
 		"sheet": "tsx scripts/sheet.ts",
 		"test": "tsx scripts/test-runtime.ts",
 		"package": "cd packages/engine && svelte-package -i src -o dist && cd ../.. && tsx scripts/pack.ts",
-		"release": "npm run check && npm test && npm run package && publint packages/stick && publint packages/engine"
+		"release": "npm run check && npm test && npm run audit && npm run package && publint packages/stick && publint packages/engine",
+		"audit": "tsx scripts/jar.ts --fail"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",

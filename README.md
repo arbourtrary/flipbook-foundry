@@ -89,8 +89,11 @@ Keynote or a word processor too.
   figures every frame.
 - **Grounded motion.** Each frame ships with how far the planted foot
   travelled, so figures cover ground without sliding.
-- **Routing.** Figures get between rest poses on their own:
-  `animate="sit-idle"` from a run plays the stop and the sit-down first.
+- **A shared rest state.** Every action starts and ends on a rest pose, and
+  every loop has exit frames with baked settles into it. Changing action
+  waits for the next exit, settles, routes to the right rest pose, and goes:
+  `animate="sit-idle"` from a run plays the stop and the sit-down first, and
+  nothing cuts mid-pose unless you ask for `{ interrupt: 'cut' }`.
 - **Letters with legs.** Any letter in any font can be the body, with limbs from
   the Flipbook Stick Limbs font.
 - **Props.** Shovels, brooms and sacks in the Flipbook Stick Things font, held

@@ -25,9 +25,12 @@ The repo is an npm workspace:
    list. Poses are joint angles on a fixed skeleton; see `wave` in `gesture.ts`
    for a small example.
 2. Rough it out in `/forge`, which exports the TypeScript for you.
-3. Check it with `npm run sheet <name>` (contact sheets in `.sheets/`) and, for
-   anything that travels, `npx tsx scripts/skate.ts <name>` (planted-foot
-   drift should be near zero).
+3. Check it with `npm run sheet <name>` (contact sheets in `.sheets/`), and
+   run `npx tsx scripts/jar.ts <name>`. It flags teleports (one big jump
+   between calm frames), loops that don't flow back into their first frame,
+   travel that lurches or steps backward, and one-shots that don't start and
+   end on their rest pose. For anything that travels,
+   `npx tsx scripts/skate.ts <name>` shows planted-foot drift.
 4. `npm run build:font` re-bakes the stick fonts and manifest. Commit the
    changes in `packages/stick/fonts/` and `packages/stick/generated/` with your
    action.
@@ -65,6 +68,7 @@ apart by font family name, which is why every font name carries the family's.
 ```sh
 npm run check
 npm test
+npm run audit
 npm run build
 npm run package && npx publint packages/engine && npx publint packages/stick
 ```

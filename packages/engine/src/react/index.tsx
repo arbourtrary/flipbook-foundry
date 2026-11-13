@@ -30,6 +30,7 @@ import {
 	Page as CorePage,
 	plainText,
 	type PageOptions,
+	type CharacterOptions,
 	type Family,
 	type Library,
 	animate as coreAnimate,
@@ -211,7 +212,7 @@ export interface FigureProps {
 	facing?: 1 | -1;
 	layer?: Layer;
 	color?: string;
-	body?: { char: string; font: string; color?: string };
+	body?: CharacterOptions['body'];
 	travel?: boolean;
 	/** Stage only: a thing from the Things font in this figure's hand. */
 	holding?: { thing: string; hand?: 'L' | 'R'; behind?: boolean; frame?: number; size?: number };

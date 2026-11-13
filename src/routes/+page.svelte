@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Container, Stack, Row, Rule, Text, Link, Code } from '$lib/ds';
 	import { getLibrary } from 'flipbook-foundry';
-	import WorldStrip from '$lib/showcase/WorldStrip.svelte';
+	import Wordmark from '$lib/showcase/Wordmark.svelte';
 	import FlowDemo from '$lib/showcase/FlowDemo.svelte';
 	import LettersDemo from '$lib/showcase/LettersDemo.svelte';
 	import GlyphStrip from '$lib/showcase/GlyphStrip.svelte';
@@ -13,7 +13,7 @@
 
 	const lib = getLibrary();
 	const actionCount = lib.names().length;
-	const frameCount = Object.values(lib.manifest.actions).reduce((n, a) => n + a.frames, 0);
+	const frameCount = lib.names().reduce((n, name) => n + lib.action(name).frames, 0);
 	const description = `Stick-figure animation built from a font. ${actionCount} actions, ${frameCount.toLocaleString('en-US')} drawings, a framer-motion-style API for Svelte, React and plain JavaScript. Free and open source.`;
 
 	const svelteSnippet = `<script>
@@ -79,10 +79,10 @@ sue.use(wander(), greet());`;
 </svelte:head>
 
 <main>
-	<WorldStrip title="Flipbook Foundry" rows={5} population={64} height={560} />
 
 	<Container>
 		<Stack gap="24">
+			<header class="mark"><Wordmark /></header>
 			<section class="lede">
 				<Stack gap="6">
 					<Text variant="title">An animation library where every frame is a glyph.</Text>
@@ -96,7 +96,6 @@ sue.use(wander(), greet());`;
 						<Link href="/forge">Builder</Link>
 						<Link href={REPO}>GitHub</Link>
 					</Row>
-					<Text variant="small" color="ink-2">Poke anyone up there. They don't mind.</Text>
 				</Stack>
 			</section>
 
@@ -220,8 +219,11 @@ sue.use(wander(), greet());`;
 		color: var(--ink);
 		padding-bottom: var(--space-16);
 	}
+	.mark {
+		/* The wordmark's own headroom (room for a flip) is the top margin. */
+		padding-top: var(--space-2);
+	}
 	.lede {
-		padding-top: var(--space-12);
 		max-width: 56rem;
 	}
 	.two {

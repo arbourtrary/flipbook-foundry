@@ -1,10 +1,9 @@
 import type { ActionDef } from '../timeline';
 import { STAND } from '../skeleton';
-import { HANG, LIE } from './hubs';
+import { HANG, HANG_Y, LIE } from './hubs';
 
 // Hang convention shared with hang-idle: ledge at y = 0, pelvis this far
 // below it so the hands meet the ledge.
-const HANG_Y = -458;
 
 // Type — hunched over an invisible keyboard, hands pecking in turn, head
 // bobbing a beat behind the fingers.
