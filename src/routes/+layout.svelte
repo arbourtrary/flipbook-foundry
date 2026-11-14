@@ -3,6 +3,8 @@
 	import '$lib/ds/tokens.css';
 	import '$lib/ds/reset.css';
 	import { setFontBase } from 'flipbook-foundry';
+	import { page } from '$app/state';
+	import Swarm from '$lib/showcase/Swarm.svelte';
 	import { base } from '$app/paths';
 
 	// The site serves its own freshly baked fonts; the package defaults to jsDelivr.
@@ -23,3 +25,6 @@
 </svelte:head>
 
 {@render children()}
+
+<!-- The lab has its own tools; everywhere else gets the swarm. -->
+{#if !page.url.pathname.includes('/lab')}<Swarm />{/if}

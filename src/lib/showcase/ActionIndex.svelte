@@ -10,7 +10,8 @@
 {#each groups as [cat, list]}
 	<section>
 		<h3>{cat} <span>{list.length}</span></h3>
-		<div class="grid">
+		<!-- The cells are the exhibit; the swarm stays out of them. -->
+		<div class="grid" data-swarm-skip>
 			{#each list as a (a.name)}
 				<div class="cell" title={a.description}>
 					<!-- Ledge actions hang below their baseline; lift them into the cell. -->

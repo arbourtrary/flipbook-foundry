@@ -14,22 +14,39 @@
 	const text = $derived(Array.from({ length: a.frames }, (_, i) => lib.glyph(a, i)).join(''));
 	const { family } = lib.css('regular');
 	let ready = $state(false);
+	// One line per action: shrink to fit the width, down to a floor, then
+	// let the line scroll sideways rather than wrap.
+	const MIN = 20;
+	let el: HTMLParagraphElement;
+	let fit: number | null = $state(null);
+	function measure() {
+		if (!el) return;
+		const natural = (el.scrollWidth / (fit ?? size)) * size;
+		fit = Math.max(MIN, Math.min(size, (size * el.clientWidth) / natural));
+	}
 	onMount(() => {
-		lib.load(['regular']).then(() => (ready = true));
+		lib.load(['regular']).then(() => {
+			ready = true;
+			requestAnimationFrame(measure);
+		});
+		const ro = new ResizeObserver(measure);
+		ro.observe(el);
+		return () => ro.disconnect();
 	});
 </script>
 
-<p class="strip" style="font-family: '{family}'; font-size: {size}px; opacity: {ready ? 1 : 0}">{text}</p>
+<p class="strip" bind:this={el} style="font-family: '{family}'; font-size: {fit ?? size}px; opacity: {ready ? 1 : 0}">{text}</p>
 <p class="codes">
-	U+{a.start.toString(16).toUpperCase()}–U+{(a.start + a.frames - 1).toString(16).toUpperCase()} · {a.frames} glyphs
+	{action} · U+{a.start.toString(16).toUpperCase()}–U+{(a.start + a.frames - 1).toString(16).toUpperCase()} · {a.frames} glyphs
 </p>
 
 <style>
 	.strip {
 		margin: 0;
 		line-height: 1.1;
-		overflow-wrap: anywhere;
-		word-break: break-all;
+		white-space: nowrap;
+		overflow-x: auto;
+		scrollbar-width: none;
 		letter-spacing: -0.12em;
 		transition: opacity 200ms;
 	}

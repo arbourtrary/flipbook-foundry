@@ -2,12 +2,14 @@
 	import { Container, Stack, Row, Rule, Text, Link, Code } from '$lib/ds';
 	import { getLibrary } from 'flipbook-foundry';
 	import InlineName from '$lib/showcase/InlineName.svelte';
+	import Performer from '$lib/showcase/Performer.svelte';
 	import FlowDemo from '$lib/showcase/FlowDemo.svelte';
 	import LettersDemo from '$lib/showcase/LettersDemo.svelte';
 	import GlyphStrip from '$lib/showcase/GlyphStrip.svelte';
 	import ActionIndex from '$lib/showcase/ActionIndex.svelte';
 	import Install from '$lib/showcase/Install.svelte';
 	import Playground from '$lib/showcase/Playground.svelte';
+	import LetterThieves from '$lib/showcase/LetterThieves.svelte';
 	import { REPO } from '$lib/site';
 	import { base } from '$app/paths';
 	import { Figure, Page } from 'flipbook-foundry/svelte';
@@ -83,7 +85,7 @@ sue.use(wander(), greet());`;
 
 	<Container>
 		<Stack gap="24">
-			<header class="mark"><InlineName where="between" entrance="frontflip" loop={['wave-hello', 'shrug', { action: 'clap', repeat: 1 }, 'bow']} /></header>
+			<header class="mark"><InlineName where="between" entrance="backflip" loop={['wave-hello', 'backflip', 'shrug', { action: 'clap', repeat: 1 }, 'bow']} /></header>
 			<section class="lede">
 				<Stack gap="6">
 					<Text variant="title">An animation library where every frame is a glyph.</Text>
@@ -122,24 +124,28 @@ sue.use(wander(), greet());`;
 			<Rule />
 
 			<section>
-				<div class="two">
+				<Stack gap="8">
 					<Stack gap="4">
-						<Text variant="heading">It's just text.</Text>
-						<Text variant="body">
-							Each drawing is a character in the Flipbook Stick font. A walk is twenty-four of them in a row. Playing an action
-							means swapping one character for the next at the right moment — no canvas paths, no SVG, no skeleton at
-							runtime. Select the line on the right and copy it: you're holding a walk cycle.
-						</Text>
-						<Text variant="body">
-							Each frame also carries how far the planted foot travelled, so figures cover ground without skating, plus
-							anchors for hands, feet and head so they can carry things and meet each other's hands.
-						</Text>
+						<Text variant="heading"><LetterThieves text="It's just text." steal={[5, 12]} /></Text>
+						<div class="two">
+							<Text variant="body">
+								Each drawing is a character in the Flipbook Stick font. A walk is twenty-four of them in a row. Playing an action
+								means swapping one character for the next at the right moment — no canvas paths, no SVG, no skeleton at
+								runtime. Select a line below and copy it: you're holding a walk cycle.
+							</Text>
+							<Text variant="body">
+								Each frame also carries how far the planted foot travelled, so figures cover ground without skating, plus
+								anchors for hands, feet and head so they can carry things and meet each other's hands.
+							</Text>
+						</div>
 					</Stack>
 					<Stack gap="6">
 						<GlyphStrip action="walk" size={44} />
 						<GlyphStrip action="trip" size={44} />
+						<GlyphStrip action="backflip" size={44} />
+						<GlyphStrip action="kick" size={44} />
 					</Stack>
-				</div>
+				</Stack>
 			</section>
 
 			<Rule />
@@ -207,7 +213,9 @@ sue.use(wander(), greet());`;
 						Flipbook Foundry. Code under MIT, fonts under the SIL Open Font License.
 						<Link href="/how">How it works</Link> · <Link href={REPO}>GitHub</Link>
 					</Text>
-					<span class="sign"><Figure animate="bow" size={40} transition={{ repeat: Infinity, repeatDelay: 2 }} /></span>
+					<span class="sign"
+						><Performer size={40} entrance="backflip" loop={['wave', 'bow', 'backflip']} /></span
+					>
 				</Row>
 			</footer>
 		</Stack>
