@@ -40,7 +40,8 @@
 	}
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+		/* At least three across, even on a phone. */
+		grid-template-columns: repeat(auto-fill, minmax(min(136px, calc(100% / 3 - 1px)), 1fr));
 		border-top: var(--hairline);
 		border-left: var(--hairline);
 	}
