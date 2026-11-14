@@ -244,6 +244,9 @@ export const shrug: ActionDef = {
 
 <svelte:head>
 	<title>Docs — Flipbook Foundry</title>
+	<meta name="description" content="Install, the Svelte, React and plain JavaScript APIs, and every action in the Stick family." />
+	<meta property="og:title" content="Docs — Flipbook Foundry" />
+	<meta property="og:description" content="Install, the Svelte, React and plain JavaScript APIs, and every action in the Stick family." />
 </svelte:head>
 
 <main>

@@ -469,6 +469,9 @@
 
 <svelte:head>
 	<title>Forge — Flipbook Foundry</title>
+	<meta name="description" content="Build a new stick-figure action from keyframes in the browser and copy it out as TypeScript." />
+	<meta property="og:title" content="Forge — Flipbook Foundry" />
+	<meta property="og:description" content="Build a new stick-figure action from keyframes in the browser and copy it out as TypeScript." />
 </svelte:head>
 
 <svelte:window onkeydown={onKey} />

@@ -11,7 +11,6 @@
 	import Playground from '$lib/showcase/Playground.svelte';
 	import LetterThieves from '$lib/showcase/LetterThieves.svelte';
 	import { REPO } from '$lib/site';
-	import { base } from '$app/paths';
 	import { Figure, Page } from 'flipbook-foundry/svelte';
 
 	const lib = getLibrary();
@@ -77,8 +76,6 @@ sue.use(wander(), greet());`;
 	<meta property="og:title" content="Flipbook Foundry" />
 	<meta property="og:description" content={description} />
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://arbourtrary.com{base}/og.png" />
-	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
 <main>
