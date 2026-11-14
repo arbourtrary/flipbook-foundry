@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { base } from '$app/paths';
-	import { Container, Stack, Rule, Text, Code, Link } from '$lib/ds';
+	import { Container, Stack, Row, Rule, Text, Code, Link } from '$lib/ds';
+	import Performer from '$lib/showcase/Performer.svelte';
+	import { REPO, AUTHOR } from '$lib/site';
 	import { getLibrary } from 'flipbook-foundry';
 	import { Figure } from 'flipbook-foundry/svelte';
 
@@ -479,6 +481,21 @@ export const shrug: ActionDef = {
 							<Code code={authoringEx} />
 						</Stack>
 					</section>
+
+					<Rule />
+
+					<footer>
+						<Row justify="between" align="baseline" wrap>
+							<Text variant="small" color="ink-2">
+								Flipbook Foundry. Code under MIT, fonts under the SIL Open Font License.
+								<Link href="/how">How it works</Link> · <Link href={REPO}>GitHub</Link><br />
+								Made by <Link href={AUTHOR}>arbourtrary</Link>
+							</Text>
+							<span class="sign"
+								><Performer size={40} entrance="backflip" loop={['wave', 'bow', 'backflip']} /></span
+							>
+						</Row>
+					</footer>
 				</Stack>
 			</article>
 		</div>
