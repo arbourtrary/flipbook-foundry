@@ -3,9 +3,10 @@
 	import '$lib/ds/tokens.css';
 	import '$lib/ds/reset.css';
 	import { setFontBase } from 'flipbook-foundry';
+	import { base } from '$app/paths';
 
 	// The site serves its own freshly baked fonts; the package defaults to jsDelivr.
-	setFontBase('/fonts/');
+	setFontBase(`${base}/fonts/`);
 
 	let { children } = $props();
 </script>

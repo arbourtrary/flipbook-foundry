@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -8,10 +9,12 @@
 	}
 
 	let { href, external = false, children }: Props = $props();
+	// Root-relative hrefs follow the site's base path.
+	const to = $derived(href.startsWith('/') ? base + href : href);
 </script>
 
 <a
-	{href}
+	href={to}
 	class="lk"
 	target={external ? '_blank' : undefined}
 	rel={external ? 'noopener noreferrer' : undefined}

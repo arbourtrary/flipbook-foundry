@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { Text, Button } from '$lib/ds';
 	import { ACTIONS } from '$rig/actions/index';
@@ -476,7 +477,7 @@
 	<!-- left: actions -->
 	<aside class="col left">
 		<header class="head">
-			<a href="/" class="mark">Flipbook Foundry</a>
+			<a href="{base}/" class="mark">Flipbook Foundry</a>
 			<Text variant="subheading">Forge</Text>
 		</header>
 		<div class="tools">

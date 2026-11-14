@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { Container, Stack, Rule, Text, Code, Link } from '$lib/ds';
 	import { getLibrary } from 'flipbook-foundry';
 	import { Figure } from 'flipbook-foundry/svelte';
@@ -249,7 +250,7 @@ export const shrug: ActionDef = {
 	<Container>
 		<div class="layout">
 			<nav>
-				<a href="/" class="home"><Figure animate="walk" size={36} /> Flipbook Foundry</a>
+				<a href="{base}/" class="home"><Figure animate="walk" size={36} /> Flipbook Foundry</a>
 				{#each toc as [id, label]}
 					<a href="#{id}">{label}</a>
 				{/each}

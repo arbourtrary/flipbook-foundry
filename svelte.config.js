@@ -20,6 +20,8 @@ const config = {
 			'@flipbook-foundry/stick': 'packages/stick',
 			$rig: 'packages/rig'
 		},
+		// GitHub Pages serves the site under /<repo>; BASE_PATH is set in the deploy workflow.
+		paths: { base: process.env.BASE_PATH ?? '' },
 		adapter: adapter({
 			fallback: '404.html',
 			strict: true

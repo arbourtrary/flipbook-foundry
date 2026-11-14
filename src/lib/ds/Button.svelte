@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import type { Snippet } from 'svelte';
 
 	type Variant = 'primary' | 'secondary' | 'text';
@@ -20,10 +21,12 @@
 		onclick,
 		children
 	}: Props = $props();
+	// Root-relative hrefs follow the site's base path.
+	const to = $derived(href?.startsWith('/') ? base + href : href);
 </script>
 
 {#if href}
-	<a class="b b-{variant}" {href} aria-disabled={disabled || undefined}>
+	<a class="b b-{variant}" href={to} aria-disabled={disabled || undefined}>
 		{@render children()}
 	</a>
 {:else}
