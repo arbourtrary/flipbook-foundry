@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Container, Stack, Row, Rule, Text, Link, Code } from '$lib/ds';
 	import { getLibrary } from 'flipbook-foundry';
-	import Wordmark from '$lib/showcase/Wordmark.svelte';
+	import InlineName from '$lib/showcase/InlineName.svelte';
 	import FlowDemo from '$lib/showcase/FlowDemo.svelte';
 	import LettersDemo from '$lib/showcase/LettersDemo.svelte';
 	import GlyphStrip from '$lib/showcase/GlyphStrip.svelte';
@@ -83,7 +83,7 @@ sue.use(wander(), greet());`;
 
 	<Container>
 		<Stack gap="24">
-			<header class="mark"><Wordmark /></header>
+			<header class="mark"><InlineName where="between" entrance="frontflip" loop={['wave', 'shrug', { action: 'clap', repeat: 1 }, 'bow']} /></header>
 			<section class="lede">
 				<Stack gap="6">
 					<Text variant="title">An animation library where every frame is a glyph.</Text>
