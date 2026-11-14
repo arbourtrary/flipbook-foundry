@@ -192,4 +192,49 @@ export const facepalm: ActionDef = {
 	]
 };
 
+// Wave hello — turn to face the viewer, give a big overhead wave, turn back.
+// The figure has no face, so "facing us" is the symmetric front pose:
+// upright, arms flared evenly, feet apart. Arm angles that swing the hand
+// over the head read as a side-to-side wave seen from the front.
+const FRONT = {
+	lean: 0,
+	arch: 0,
+	head: 0,
+	armL: [-24, 10] as [number, number],
+	armR: [24, -10] as [number, number],
+	legL: [-11, 0] as [number, number],
+	legR: [11, 0] as [number, number]
+};
+export const waveHello: ActionDef = {
+	name: 'wave-hello',
+	category: 'gesture',
+	description: 'Turn to face the viewer, wave overhead, turn back.',
+	frames: 64,
+	fps: 24,
+	loop: false,
+	from: 'stand',
+	to: 'stand',
+	keys: [
+		{ at: 0, ...STAND },
+		// Turn: a small dip as the weight shifts, feet step apart.
+		{ at: 4, lean: 1.5, arch: 1, head: -1, squash: 0.98, armL: [-15, 12], armR: [13, 6], legL: [-8, 2], legR: [8, 3] },
+		{ at: 9, ...FRONT, squash: 1 },
+		// Wind up and fling the right hand overhead.
+		{ at: 13, ...FRONT, squash: 0.98, armR: [60, 60] },
+		{ at: 17, ...FRONT, lean: -2, squash: 1.02, armR: [132, 28], reachR: 1.05, ease: 'snap' },
+		// Three wags, the body swaying with the hand.
+		{ at: 22, ...FRONT, lean: 2, armR: [192, -28], head: 4 },
+		{ at: 27, ...FRONT, lean: -2, armR: [132, 28], head: -4 },
+		{ at: 32, ...FRONT, lean: 2, armR: [192, -28], head: 4 },
+		{ at: 37, ...FRONT, lean: -2, armR: [132, 28], head: -4 },
+		{ at: 42, ...FRONT, lean: 1, armR: [180, -20], head: 2, reachR: 1 },
+		// Bring it down and hold a beat facing us.
+		{ at: 49, ...FRONT },
+		{ at: 53, ...FRONT },
+		// Turn back to profile.
+		{ at: 58, lean: 1.5, arch: 1, head: -1, squash: 0.98, armL: [-15, 12], armR: [13, 6], legL: [-8, 2], legR: [8, 3] },
+		{ at: 63, ...STAND }
+	]
+};
+
 export const GESTURE: ActionDef[] = [wave, point, beckon, shrug, clap, salute, bow, think, facepalm];

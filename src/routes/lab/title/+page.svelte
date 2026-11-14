@@ -31,7 +31,7 @@
 						{:else if o.id === 'hop-once'}
 							<HopOnce />
 						{:else if o.id === 'flip-between'}
-							<InlineName where="between" entrance="frontflip" loop={['wave', 'shrug', { action: 'clap', repeat: 1 }, 'bow']} />
+							<InlineName where="between" entrance="frontflip" loop={['wave-hello', 'shrug', { action: 'clap', repeat: 1 }, 'bow']} />
 						{:else if o.id === 'lean-on-it'}
 							<InlineName where="end" rest="lean" facing={-1} hover="wave" />
 						{:else if o.id === 'cheer-at-end'}

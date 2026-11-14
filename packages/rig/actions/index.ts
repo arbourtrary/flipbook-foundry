@@ -4,7 +4,7 @@ import { AERIAL } from './aerial';
 import { PRATFALL } from './pratfall';
 import { TRANSITIONS } from './transitions';
 import { IDLE } from './idle';
-import { GESTURE } from './gesture';
+import { GESTURE, waveHello } from './gesture';
 import { EMOTE } from './emote';
 import { INTERACTION } from './interaction';
 import { MORE } from './more';
@@ -20,5 +20,7 @@ export const ACTIONS: ActionDef[] = [
 	...EMOTE,
 	...INTERACTION,
 	...MORE,
-	...PROPS
+	...PROPS,
+	// Appended so earlier actions keep their codepoints.
+	waveHello
 ];

@@ -83,7 +83,7 @@ sue.use(wander(), greet());`;
 
 	<Container>
 		<Stack gap="24">
-			<header class="mark"><InlineName where="between" entrance="frontflip" loop={['wave', 'shrug', { action: 'clap', repeat: 1 }, 'bow']} /></header>
+			<header class="mark"><InlineName where="between" entrance="frontflip" loop={['wave-hello', 'shrug', { action: 'clap', repeat: 1 }, 'bow']} /></header>
 			<section class="lede">
 				<Stack gap="6">
 					<Text variant="title">An animation library where every frame is a glyph.</Text>
