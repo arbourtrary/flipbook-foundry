@@ -178,7 +178,7 @@ export function Stage(props: StageProps) {
 					ref={canvas}
 					onPointerMove={props.onPointerMove}
 					onPointerDown={props.onPointerDown}
-					style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none' }}
+					style={{ display: 'block', width: '100%', height: '100%', touchAction: 'manipulation' }}
 				/>
 				{children}
 			</div>
