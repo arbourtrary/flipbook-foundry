@@ -10,7 +10,7 @@
 	import Install from '$lib/showcase/Install.svelte';
 	import Playground from '$lib/showcase/Playground.svelte';
 	import LetterThieves from '$lib/showcase/LetterThieves.svelte';
-	import { REPO } from '$lib/site';
+	import { REPO, AUTHOR } from '$lib/site';
 	import { Figure, Page } from 'flipbook-foundry/svelte';
 
 	const lib = getLibrary();
@@ -208,7 +208,8 @@ sue.use(wander(), greet());`;
 				<Row justify="between" align="baseline" wrap>
 					<Text variant="small" color="ink-2">
 						Flipbook Foundry. Code under MIT, fonts under the SIL Open Font License.
-						<Link href="/how">How it works</Link> · <Link href={REPO}>GitHub</Link>
+						<Link href="/how">How it works</Link> · <Link href={REPO}>GitHub</Link><br />
+						Made by <Link href={AUTHOR}>arbourtrary</Link>
 					</Text>
 					<span class="sign"
 						><Performer size={40} entrance="backflip" loop={['wave', 'bow', 'backflip']} /></span
