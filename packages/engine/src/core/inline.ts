@@ -45,6 +45,14 @@ export class InlineFigure {
 		if (opts.size) el.style.fontSize = `${opts.size}px`;
 		if (opts.color && opts.color !== 'currentColor') el.style.color = opts.color;
 		el.setAttribute('aria-hidden', 'true');
+		// Glyphs are private-use codepoints: drawn before their font chunk
+		// arrives, they show as the fallback font's hex "missing glyph" box.
+		// Stay hidden until this action's chunk has loaded.
+		el.style.visibility = 'hidden';
+		const c = this.character;
+		c.library.load([c.layer], undefined, [c.action.name]).then(() => {
+			if (live.has(this)) el.style.visibility = '';
+		}, () => {});
 		live.add(this);
 		if (live.size === 1) {
 			frame.update(update, true);

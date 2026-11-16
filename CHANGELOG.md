@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Inline figures stay hidden until their font chunk loads, instead of
+  flashing the system's "missing glyph" box on first paint.
+
 ## 0.1.0
 
 First public release, as two packages: the engine (`flipbook-foundry`) and the

@@ -266,8 +266,6 @@ export function Figure(props: FigureProps) {
 		} else {
 			inline = new InlineFigure(span.current!, { ...opts(), travel: latest.current.travel });
 			c = inline.character;
-			// Just this action's font chunk; others load when first shown.
-			c.library.load([c.layer], undefined, [c.action.name]);
 		}
 		charRef.current = c;
 		assignRef(latest.current.ref, c);
