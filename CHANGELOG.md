@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 (engine)
 
 - Inline figures stay hidden until their font chunk loads, instead of
   flashing the system's "missing glyph" box on first paint.

@@ -1,6 +1,6 @@
 {
 	"name": "flipbook-foundry",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "An animation library where every frame is a glyph. A framer-motion-style API for Svelte, React and plain JavaScript, drawing figures from font families.",
 	"license": "MIT",
 	"author": "arbourtrary",
