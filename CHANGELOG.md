@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 (engine)
 
 - Figures in a `Page` stay blank until their font chunk loads, instead of
   painting the "missing glyph" box on the canvas.
