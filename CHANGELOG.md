@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Figures in a `Page` stay blank until their font chunk loads, instead of
+  painting the "missing glyph" box on the canvas.
+
 ## 0.1.1 (engine)
 
 - Inline figures stay hidden until their font chunk loads, instead of

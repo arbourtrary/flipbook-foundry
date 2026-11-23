@@ -73,6 +73,11 @@ export class Page {
 	private ro: ResizeObserver | null = null;
 	private needsPaint = true;
 	private ink: string | null = null;
+	// Figure glyphs are private-use codepoints, and canvas text never waits
+	// for a web font: drawn before their chunk lands they paint the fallback
+	// font's "missing glyph" box. Leave their space blank until then.
+	private figuresReady = false;
+	private loading = 0;
 
 	constructor(canvas: HTMLCanvasElement, opts: PageOptions) {
 		this.canvas = canvas;
@@ -153,7 +158,13 @@ export class Page {
 		this.stats.figures = this.figures.length;
 		// Fetch only the font chunks these actions live in.
 		const used = this.figures.flatMap((c) => c.data.alts as string[]);
-		this.library.load([this.opts.layer ?? 'regular'], undefined, used).then(this.relayout);
+		this.figuresReady = false;
+		const token = ++this.loading;
+		this.library.load([this.opts.layer ?? 'regular'], undefined, used).then(() => {
+			if (token !== this.loading) return;
+			this.figuresReady = true;
+			this.relayout();
+		}, () => {});
 		this.layout();
 	}
 
@@ -228,9 +239,11 @@ export class Page {
 		for (const r of this.runs) {
 			if (r.font !== font) ctx.font = font = r.font;
 			if (r.figure) {
-				if (this.opts.figureColor) ctx.fillStyle = this.opts.figureColor;
-				ctx.fillText(r.figure.glyph, r.x, r.y);
-				if (this.opts.figureColor) ctx.fillStyle = ink;
+				if (this.figuresReady) {
+					if (this.opts.figureColor) ctx.fillStyle = this.opts.figureColor;
+					ctx.fillText(r.figure.glyph, r.x, r.y);
+					if (this.opts.figureColor) ctx.fillStyle = ink;
+				}
 				r.figure.dirty = false;
 			} else ctx.fillText(r.text, r.x, r.y);
 		}
