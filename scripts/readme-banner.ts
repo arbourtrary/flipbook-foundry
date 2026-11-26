@@ -35,6 +35,8 @@ const H = 352;
 const K = 0.05;
 // A frame's cell in the strip. Wider than any ink (±536) so neighbours stay clipped.
 const CELL = 1200;
+// Glyphs per <text> run in a strip (see main).
+const RUN = 24;
 const STAND_Y = 353; // pelvis height of STAND, feet on y = 0
 const THEMES = {
 	light: { ink: '#0F0F0E', line: '#9A9A96' },
@@ -590,10 +592,15 @@ async function main() {
 		const k = keyframes(`m${i}`, a.ticks, total);
 		css.push(k.css, `@keyframes s${i}{to{transform:translateX(${-total * CELL}px)}}`);
 		css.push(`.m${i}{animation:m${i} ${seconds}s linear infinite}.s${i}{animation:s${i} ${seconds}s steps(${total}) infinite}`);
-		const text = a.ticks.map((t) => String.fromCodePoint(t.cp)).join('');
-		bodies.push(
-			`<g class="m${i}" transform="${k.first}"><g transform="scale(${a.k})" clip-path="url(#c)"><text class="s${i}" x="${-CELL / 2}">${text}</text></g></g>`
-		);
+		// The strip is cut into short runs, each placed exactly. Firefox rounds
+		// every glyph advance a hair, and over a thousand frames one long run
+		// drifts several px off its cell.
+		const runs: string[] = [];
+		for (let r = 0; r < a.ticks.length; r += RUN) {
+			const text = a.ticks.slice(r, r + RUN).map((t) => String.fromCodePoint(t.cp)).join('');
+			runs.push(`<text x="${r * CELL - CELL / 2}">${text}</text>`);
+		}
+		bodies.push(`<g class="m${i}" transform="${k.first}"><g transform="scale(${a.k})" clip-path="url(#c)"><g class="s${i}">${runs.join('')}</g></g></g>`);
 	});
 
 	await mkdir(outDir, { recursive: true });
