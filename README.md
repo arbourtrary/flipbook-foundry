@@ -1,4 +1,7 @@
-# Flipbook Foundry
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/readme/banner-dark.svg">
+  <img alt="Flipbook Foundry" src=".github/readme/banner-light.svg" width="880">
+</picture>
 
 An animation library where every frame is a glyph.
 
@@ -126,6 +129,7 @@ npm run dev        # bake the fonts, start the site at localhost:5173
 | `npm run sheet walk run` | contact sheets in `.sheets/` (strip, world track, onion skin) |
 | `npx tsx scripts/overview.ts` | every action on one page |
 | `npx tsx scripts/skate.ts walk` | planted-foot drift per frame |
+| `npm run banner` | re-bake the animated README banner in `.github/readme/` |
 
 ```
 packages/

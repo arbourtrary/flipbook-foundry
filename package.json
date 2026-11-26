@@ -15,6 +15,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"sheet": "tsx scripts/sheet.ts",
+		"banner": "tsx scripts/readme-banner.ts",
 		"test": "tsx scripts/test-runtime.ts",
 		"package": "cd packages/engine && svelte-package -i src -o dist && cd ../.. && tsx scripts/pack.ts",
 		"release": "npm run check && npm test && npm run audit && npm run package && publint packages/stick && publint packages/engine",
